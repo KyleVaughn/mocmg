@@ -1,7 +1,5 @@
 import gmsh
 import logging 
-import logging.config
-from pathlib import Path
 
 # Initialize logger and gmsh.
 def initialize(option=None):
@@ -30,7 +28,7 @@ def initialize(option=None):
     ch = logging.StreamHandler()
     ch.setLevel(log_level)
     # create formatter and add it to the handlers
-    formatter = logging.Formatter(fmt='%(asctime)s %(levelname)s:  %(message)s', datefmt='%d/%m/%Y %H:%M:%S')
+    formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-10s: %(name)s - %(message)s', datefmt='%H:%M:%S')
     fh.setFormatter(formatter)
     ch.setFormatter(formatter)
     # add the handlers to the logger

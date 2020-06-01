@@ -1,4 +1,8 @@
 import gmsh
+import logging
+
+module_log = logging.getLogger('mocmg.overlayRectGrid')
+
 # Function to overlay a rectangular grid onto a 2D geometry that exists solely in
 #   the x-y plane.
 def overlayRectGrid(nx,ny):
