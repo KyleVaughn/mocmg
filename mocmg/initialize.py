@@ -21,10 +21,10 @@ def initialize(option=None):
     # create logger
     mocmgLogger = logging.getLogger('mocmg')
     mocmgLogger.setLevel(log_level)
-    # create file handler which logs even debug messages
+    # create file handler 
     fh = logging.FileHandler('mocmg.log')
     fh.setLevel(log_level)
-    # create console handler with a higher log level
+    # create console handler 
     ch = logging.StreamHandler()
     ch.setLevel(log_level)
     # create formatter and add it to the handlers
