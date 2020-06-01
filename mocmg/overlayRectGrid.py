@@ -1,5 +1,6 @@
 import gmsh
 import logging
+from collections import defaultdict
 
 module_log = logging.getLogger('mocmg.overlayRectGrid')
 
@@ -44,7 +45,37 @@ def overlayRectGrid(nx,ny):
 
     # Fragment the grid components with the original model components
     module_log.info(f'Fragmenting {len(dimGridTags)} entities with {len(modelEntities)} entities')
-    gmsh.model.occ.fragment(dimGridTags, modelEntities)
+    outTags, outChildren = gmsh.model.occ.fragment(modelEntities, dimGridTags)
+
+    # Assign new objects with correct material
+    #
+    # Get group tags for original entites and their children
+    tagData = {}
+    for i, e in enumerate(modelEntities):
+        children = outChildren[i] 
+        childTags = [t[1] for t in children]
+        groups = gmsh.model.getPhysicalGroupsForEntity(*e)
+        groups = list(groups)
+        if len(groups) > 0:            
+            for g in groups:
+                if g in tagData:
+                    # Union the current set and the child tags
+                    tagData[g] = tagData.get(g).union(set(childTags))
+                else:
+                    # Add the key and children to the dict
+                    tagData[g] = set(childTags)
+#    for e in zip(modelEntities, children):
+#        module_log.debug(f'Entity {e[0]} children: {e[1]}')
+#
+#        groupTags = gmsh.model.getPhysicalGroupsForEntity(e[0][0],e[0][1])
+#        module_log.debug(f'Entity {e[0]} groups: {groupTags}')
+#        # If the original geometric entitiy had group tags, give them to the new fragments
+#        if len(groupTags) > 0:
+#            for i in range(len(groupTags)):
+#                
+#                groupName = gmsh.model.getPhysicalName(2,groupTags[i])
+#                module_log.debug(f'Group tag {groupTags[i]} name: {groupName}')
+
     module_log.info('Synchronizing model')
     gmsh.model.occ.synchronize()
     module_log.info('Model synchronized')
