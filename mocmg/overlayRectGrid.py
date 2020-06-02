@@ -5,7 +5,7 @@ from collections import defaultdict
 module_log = logging.getLogger('mocmg.overlayRectGrid')
 
 # Function to overlay a rectangular grid onto a 2D geometry that exists solely in
-#   the x-y plane.
+# the x-y plane.
 def overlayRectGrid(nx,ny):
     module_log.info('Overlaying rectangular grid')
 
@@ -39,43 +39,60 @@ def overlayRectGrid(nx,ny):
             y = y + dy/float(ny) 
         x = x + dx/float(nx)
 
-    # Fragment the grid components with themselves
     dimGridTags = [(2, tag) for tag in gridTags] # turn tags into tuples of the form (2,x)
     module_log.debug(f'Rectangular grid tags: {dimGridTags}')
 
     # Fragment the grid components with the original model components
-    module_log.info(f'Fragmenting {len(dimGridTags)} entities with {len(modelEntities)} entities')
+    module_log.info(f'Fragmenting {len(modelEntities)} entities with {len(dimGridTags)} entities')
     outTags, outChildren = gmsh.model.occ.fragment(modelEntities, dimGridTags)
-
-    # Assign new objects with correct material
     #
-    # Get group tags for original entites and their children
-    tagData = {}
+    #
+    # IMPORTANT
+    # At this point, the occ model entities exist and the original geometric entities do not.
+    # However, since the model has not been synchronized, the physical group information about the
+    # original geometric entities still exists and can be used. If the model is synchronized this
+    # information will be destroyed.
+    #
+    #
+
+    # Goal: Assign children to parent physical groups
+    #
+    # Get group tags and group names for original entites. Associate them with children.
+    groupChildren = {}
+    groupNames = {}
     for i, e in enumerate(modelEntities):
         children = outChildren[i] 
+        module_log.debug(f'Entity {e} had children {children}')
         childTags = [t[1] for t in children]
-        groups = gmsh.model.getPhysicalGroupsForEntity(*e)
-        groups = list(groups)
-        if len(groups) > 0:            
-            for g in groups:
-                if g in tagData:
+        groupTags = gmsh.model.getPhysicalGroupsForEntity(*e)
+        groupTags = list(groupTags)
+        if len(groupTags) > 0:            
+            module_log.debug(f'Entity {e} had {len(groupTags)} physical groups')
+            for tag in groupTags:
+                # if group is already known, just add children to set
+                # otherwise, add it and its name to dictionaries.
+                if tag in groupNames:
                     # Union the current set and the child tags
-                    tagData[g] = tagData.get(g).union(set(childTags))
+                    groupChildren[tag] = groupChildren.get(tag).union(set(childTags))
                 else:
                     # Add the key and children to the dict
-                    tagData[g] = set(childTags)
-#    for e in zip(modelEntities, children):
-#        module_log.debug(f'Entity {e[0]} children: {e[1]}')
-#
-#        groupTags = gmsh.model.getPhysicalGroupsForEntity(e[0][0],e[0][1])
-#        module_log.debug(f'Entity {e[0]} groups: {groupTags}')
-#        # If the original geometric entitiy had group tags, give them to the new fragments
-#        if len(groupTags) > 0:
-#            for i in range(len(groupTags)):
-#                
-#                groupName = gmsh.model.getPhysicalName(2,groupTags[i])
-#                module_log.debug(f'Group tag {groupTags[i]} name: {groupName}')
+                    groupNames[tag] = gmsh.model.getPhysicalName(2,tag)
+                    groupChildren[tag] = set(childTags)
+        else:
+            module_log.debug(f'Entity {e} had no physical groups')
+        # Report group names and children
+        module_log.debug(f'Group tag/name dictionary is now : {groupNames}')
+        module_log.debug(f'Group tag/child dictionary is now: {groupChildren}')
 
+    # Synchronize and remove old groups
     module_log.info('Synchronizing model')
+    gmsh.model.removePhysicalGroups()
     gmsh.model.occ.synchronize()
     module_log.info('Model synchronized')
+    # For each group, create a new group with the appropriate children and name
+    for tag in groupChildren.keys():
+        outTag = gmsh.model.addPhysicalGroup(2, list(groupChildren[tag]), tag)
+        if outTag != tag:
+            module_log.warning(f'Physical group {tag} could not be assigned to children with original tag.' + \
+                    'This could indicate an uncaught error prior to the execution of this code.')
+        gmsh.model.setPhysicalName(2, outTag, groupNames[tag])
