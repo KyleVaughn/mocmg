@@ -10,7 +10,7 @@ def initialize(option=None):
         log_level = logging.WARNING
         gmsh_verbosity = 2
     elif option == 'silent':
-        log_level = 60 # CRITICAL = 50
+        log_level = 50
         gmsh_verbosity = 0
     else:
         log_level = logging.INFO

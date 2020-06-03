@@ -6,7 +6,7 @@ module_log = logging.getLogger('mocmg.overlayRectGrid')
 
 # Function to overlay a rectangular grid onto a 2D geometry that exists solely in
 # the x-y plane.
-def overlayRectGrid(nx,ny):
+def overlayRectGrid(nx,ny,defaultMat='Material Void'):
     module_log.info('Overlaying rectangular grid')
 
     # Get all 2D model entities 
@@ -73,7 +73,7 @@ def overlayRectGrid(nx,ny):
                 # otherwise, add it and its name to dictionaries.
                 if tag in groupNames:
                     # Union the current set and the child tags
-                    groupChildren[tag] = groupChildren.get(tag).union(set(childTags))
+                    groupChildren[tag] = groupChildren[tag].union(set(childTags))
                 else:
                     # Add the key and children to the dict
                     groupNames[tag] = gmsh.model.getPhysicalName(2,tag)
@@ -96,3 +96,26 @@ def overlayRectGrid(nx,ny):
             module_log.warning(f'Physical group {tag} could not be assigned to children with original tag.' + \
                     'This could indicate an uncaught error prior to the execution of this code.')
         gmsh.model.setPhysicalName(2, outTag, groupNames[tag])
+
+    # Assign a default material to any entity that didn't inherit a material from parent.
+    # This should just be {bounding box}\{original geometry}
+    allEntities = gmsh.model.getEntities(2)
+    allEntitiesTags = set([t[1] for t in allEntities])
+    originalGeom = set()
+    for tag in groupChildren.keys():
+        originalGeom = originalGeom.union(groupChildren[tag])
+         
+    defaultMatGeom = allEntitiesTags.difference(originalGeom)
+    print('dflt', sorted(defaultMatGeom))
+    outTag = gmsh.model.addPhysicalGroup(2, list(defaultMatGeom))
+    gmsh.model.setPhysicalName(2, outTag, defaultMat)
+#    # Original geometry should be composed of first N lists of outChildren from fragment. 
+#    # where N is the number of original model entities.
+#    # Note that outChildren includes children from grid too in outChildren[X], X > N-1 
+#    originalGeom = set()
+#    for i in range(len(modelEntities)):
+#        originalGeom = originalGeom.union(set(outChildren[i]))
+#    
+#    defaultMatGeom = allEntities.difference(originalGeom)
+#    outTag = gmsh.model.addPhysicalGroup(2, list(defaultMatGeom))
+#    gmsh.model.setPhysicalName(2, outTag, defaultMat)
