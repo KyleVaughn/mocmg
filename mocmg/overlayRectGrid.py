@@ -6,16 +6,24 @@ module_log = logging.getLogger('mocmg.overlayRectGrid')
 
 # Function to overlay a rectangular grid onto a 2D geometry that exists solely in
 # the x-y plane.
-def overlayRectGrid(nx,ny,defaultMat='Material Void'):
+# Algorithm:
+#   1. Compute bounding box of model
+#   2. Generate rectangles to fill bounding box
+#   3. Fragment the grid components with the original model components
+#   4. Assign new entities to parent physical groups
+#   5. Group new entities based on which grid entity they reside in
+#   6. Assign a default material to any entity that didn't inherit a material from parent.
+def overlayRectGrid(nx,ny,nnx=1,nny=1,defaultMat='Material Void'):
     module_log.info('Overlaying rectangular grid')
 
     # Get all 2D model entities 
     modelEntities = gmsh.model.getEntities(2)
     module_log.debug(f'2D entity tags: {modelEntities}')
 
-    # Get bounding box
+# 1. Get bounding box
     bb = gmsh.model.getBoundingBox(-1,-1)
 
+# 2. Generate rectangles to fill bounding box
     # Compute quantities required for grid overlay 
     x_min, y_min, z_min = bb[0:3]
     x_max, y_max, z_max = bb[3:6]
@@ -24,8 +32,10 @@ def overlayRectGrid(nx,ny,defaultMat='Material Void'):
     dz = z_max - z_min
     if abs(dz > 1e-6): 
         module_log.warning(f"Model thickness is {dz:.6f} > 1e-6. Model expected in 2D x-y plane.")
-    width = dx/float(nx) # width of rectangle in grid
-    height = dy/float(ny) # height of rectangle in grid
+    nwidth = dx/float(nx) # width of rectangle in grid level 1
+    nheight = dy/float(ny) # height of rectangle in grid level 1
+    nwidth = dx/float(nx) # width of rectangle in grid level 2
+    nheight = dy/float(ny) # height of rectangle in grid level 2
     z = bb[5] # z location of the model. Assumed all entities have same z.
     
     # Generate rectangles to fill bounding box
@@ -42,7 +52,7 @@ def overlayRectGrid(nx,ny,defaultMat='Material Void'):
     dimGridTags = [(2, tag) for tag in gridTags] # turn tags into tuples of the form (2,x)
     module_log.debug(f'Rectangular grid tags: {dimGridTags}')
 
-    # Fragment the grid components with the original model components
+# 3. Fragment the grid components with the original model components
     module_log.info(f'Fragmenting {len(modelEntities)} entities with {len(dimGridTags)} entities')
     outTags, outChildren = gmsh.model.occ.fragment(modelEntities, dimGridTags)
     #
@@ -55,7 +65,7 @@ def overlayRectGrid(nx,ny,defaultMat='Material Void'):
     #
     #
 
-    # Goal: Assign children to parent physical groups
+# 4. Assign new entities to parent physical groups
     #
     # Get group tags and group names for original entites. Associate them with children.
     groupChildren = {}
@@ -89,6 +99,7 @@ def overlayRectGrid(nx,ny,defaultMat='Material Void'):
     gmsh.model.removePhysicalGroups()
     gmsh.model.occ.synchronize()
     module_log.info('Model synchronized')
+
     # For each group, create a new group with the appropriate children and name
     for tag in groupChildren.keys():
         outTag = gmsh.model.addPhysicalGroup(2, list(groupChildren[tag]), tag)
@@ -97,25 +108,18 @@ def overlayRectGrid(nx,ny,defaultMat='Material Void'):
                     'This could indicate an uncaught error prior to the execution of this code.')
         gmsh.model.setPhysicalName(2, outTag, groupNames[tag])
 
-    # Assign a default material to any entity that didn't inherit a material from parent.
+# 5. Group new entities based on which grid entity they reside in
+
+# 6. Assign a default material to any entity that didn't inherit a material from parent.
     # This should just be {bounding box}\{original geometry}
     allEntities = gmsh.model.getEntities(2)
     allEntitiesTags = set([t[1] for t in allEntities])
+    del allEntities # Can potentially be very large. Free up before making more big sets
     originalGeom = set()
     for tag in groupChildren.keys():
         originalGeom = originalGeom.union(groupChildren[tag])
-         
+    
+    del groupChildren # Likewise. Free up memory
     defaultMatGeom = allEntitiesTags.difference(originalGeom)
-    print('dflt', sorted(defaultMatGeom))
     outTag = gmsh.model.addPhysicalGroup(2, list(defaultMatGeom))
     gmsh.model.setPhysicalName(2, outTag, defaultMat)
-#    # Original geometry should be composed of first N lists of outChildren from fragment. 
-#    # where N is the number of original model entities.
-#    # Note that outChildren includes children from grid too in outChildren[X], X > N-1 
-#    originalGeom = set()
-#    for i in range(len(modelEntities)):
-#        originalGeom = originalGeom.union(set(outChildren[i]))
-#    
-#    defaultMatGeom = allEntities.difference(originalGeom)
-#    outTag = gmsh.model.addPhysicalGroup(2, list(defaultMatGeom))
-#    gmsh.model.setPhysicalName(2, outTag, defaultMat)
