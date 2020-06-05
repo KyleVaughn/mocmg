@@ -1,6 +1,6 @@
 import mocmg
 import gmsh
-mocmg.initialize(option='warning')
+mocmg.initialize(option='info')
 
 gmsh.model.occ.addDisk(1, 0, 0, 1, 1)
 gmsh.model.occ.addDisk(1.5, 0, 0, 1, 1)
