@@ -44,8 +44,8 @@ def overlayRectGrid(nx,ny,nnx=1,nny=1,defaultMat='Material Void'):
     for i in range(nx):
         y = y_min
         for j in range(ny):
-            gridTags.append(gmsh.model.occ.addRectangle(x,y,z, width, height))
-            module_log.debug(f'Added rectangle of width:{width:.2f} and height:{height:.2f} at ({x:.2f},{y:.2f},{z:.2f})')
+            gridTags.append(gmsh.model.occ.addRectangle(x,y,z, nwidth, nheight))
+            module_log.debug(f'Added rectangle of width:{nwidth:.2f} and height:{nheight:.2f} at ({x:.2f},{y:.2f},{z:.2f})')
             y = y + dy/float(ny) 
         x = x + dx/float(nx)
 
