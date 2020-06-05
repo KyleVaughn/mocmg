@@ -23,34 +23,51 @@ def overlayRectGrid(nx,ny,nnx=1,nny=1,defaultMat='Material Void'):
 # 1. Get bounding box
     bb = gmsh.model.getBoundingBox(-1,-1)
 
-# 2. Generate rectangles to fill bounding box
+# 2. Generate rectangles to fill bounding box. Group the second grid level rectangles by if in 1st level rectangles.
     # Compute quantities required for grid overlay 
     x_min, y_min, z_min = bb[0:3]
     x_max, y_max, z_max = bb[3:6]
+    print(f'x_min={x_min}')
     dx = x_max - x_min # Model width in x direction
     dy = y_max - y_min
     dz = z_max - z_min
     if abs(dz > 1e-6): 
         module_log.warning(f"Model thickness is {dz:.6f} > 1e-6. Model expected in 2D x-y plane.")
-    nwidth = dx/float(nx) # width of rectangle in grid level 1
-    nheight = dy/float(ny) # height of rectangle in grid level 1
-    nwidth = dx/float(nx) # width of rectangle in grid level 2
-    nheight = dy/float(ny) # height of rectangle in grid level 2
+
+    width1 = dx/float(nx) # width of rectangle in grid level 1
+    height1 = dy/float(ny) # height of rectangle in grid level 1
+    width2 = dx/float(nx*nnx) # width of rectangle in grid level 2
+    height2 = dy/float(ny*nny) # height of rectangle in grid level 2
     z = bb[5] # z location of the model. Assumed all entities have same z.
     
     # Generate rectangles to fill bounding box
     gridTags = [] # tags of the rectangles
     x = x_min
     for i in range(nx):
+        print(f'x={x}')
         y = y_min
         for j in range(ny):
-            gridTags.append(gmsh.model.occ.addRectangle(x,y,z, nwidth, nheight))
-            module_log.debug(f'Added rectangle of width:{nwidth:.2f} and height:{nheight:.2f} at ({x:.2f},{y:.2f},{z:.2f})')
-            y = y + dy/float(ny) 
-        x = x + dx/float(nx)
+            print(f'y={y}')
+            xx = x  
+            for ii in range(nnx):
+                print(f'xx={xx}')
+                yy = y
+                for jj in range(nny):
+                    print(f'yy={yy}')
+                    print(f'(xx,yy)={xx},{yy}')
+                    gridTags.append(gmsh.model.occ.addRectangle(xx,yy,z, width2, height2))
+                    module_log.debug(f'Added rectangle of width:{width2:.2f}' + \
+                           ' and height:{height2:.2f} at ({x:.2f},{y:.2f},{z:.2f})')
+                    yy = yy + height2
+                gmsh.model.occ.synchronize()
+                gmsh.fltk.run()
+                xx = xx + width2
+            y = y + height1
+        x = x + width1
 
     dimGridTags = [(2, tag) for tag in gridTags] # turn tags into tuples of the form (2,x)
     module_log.debug(f'Rectangular grid tags: {dimGridTags}')
+
 
 # 3. Fragment the grid components with the original model components
     module_log.info(f'Fragmenting {len(modelEntities)} entities with {len(dimGridTags)} entities')
