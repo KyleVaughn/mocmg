@@ -59,8 +59,8 @@ def initialize(mocmgOption=None,gmshOption=None, color=True):
         mocmgVerbosity = logging.DEBUG
     elif mocmgOption == 'warning':
         mocmgVerbosity = logging.WARNING
-    elif mocmgOption == 'silent':
-        mocmgVerbosity = 50
+    elif mocmgOption == 'error':
+        mocmgVerbosity = logging.ERROR
     else:
         mocmgVerbosity = logging.INFO
 
@@ -75,7 +75,7 @@ def initialize(mocmgOption=None,gmshOption=None, color=True):
 
     # Stdout
     logging_handler_out = logging.StreamHandler(sys.stdout)
-    logging_handler_out.setLevel(logging.DEBUG)
+    logging_handler_out.setLevel(mocmgVerbosity)
     logging_handler_out.addFilter(LessThanFilter(logging.WARNING))
     # If stdout is terminal, color if desired. Otherwise, don't color.
     if color and sys.stdout.isatty():
@@ -93,7 +93,8 @@ def initialize(mocmgOption=None,gmshOption=None, color=True):
 
     # Stderr
     logging_handler_err = logging.StreamHandler(sys.stderr)
-    logging_handler_err.setLevel(logging.WARNING)
+    lvl = max(logging.WARNING, mocmgVerbosity)
+    logging_handler_err.setLevel(lvl)
     # If stderr is terminal, color if desired. Otherwise, don't color.
     if color and sys.stderr.isatty():
         if mocmgOption == 'debug':
@@ -104,13 +105,6 @@ def initialize(mocmgOption=None,gmshOption=None, color=True):
         logging_handler_err.setFormatter(formatter)
     logger.addHandler(logging_handler_err)
 
-    #demonstrate the logging levels
-    log = logging.getLogger(__name__)
-    log.debug('DEBUG')
-    log.info('INFO')
-    log.warning('WARNING')
-    log.error('ERROR')
-    log.critical('CRITICAL')
 
     # gmsh
     if gmshOption == 'debug':
