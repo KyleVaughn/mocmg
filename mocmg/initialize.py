@@ -13,8 +13,47 @@ class LessThanFilter(logging.Filter):
         return 1 if record.levelno < self.max_level else 0
 
 
+# Logging formatter to add colors using ANSI
+class CustomFormatter(logging.Formatter):
+
+    def __init__(self, option=None):
+        self.option = option
+
+        green = "\x1b[32;10m"
+        default = "\x1b[39;10m"
+        yellow = "\x1b[33;10m"
+        red = "\x1b[31;10m"
+        bold_red = "\x1b[31;1m"
+        reset = "\x1b[0m"
+                                                                                             
+        fmt =      "%(asctime)s %(levelname)-10s: %(name)s - %(message)s'"
+        debugFmt = "%(asctime)s %(levelname)-10s: %(name)s - (line: %(lineno)d) %(message)s"
+
+        if option == 'debug':
+            self.FORMATS = {
+                logging.DEBUG:    green    + debugFmt + reset,
+                logging.INFO:     default  + debugFmt + reset,
+                logging.WARNING:  yellow   + debugFmt + reset,
+                logging.ERROR:    red      + debugFmt + reset,
+                logging.CRITICAL: bold_red + debugFmt + reset
+            }
+        else:
+            self.FORMATS = {
+                logging.DEBUG:    green    + fmt + reset,
+                logging.INFO:     default  + fmt + reset,
+                logging.WARNING:  yellow   + fmt + reset,
+                logging.ERROR:    red      + fmt + reset,
+                logging.CRITICAL: bold_red + fmt + reset
+            }
+
+    def format(self, record):
+        log_fmt = self.FORMATS.get(record.levelno)
+        formatter = logging.Formatter(log_fmt, datefmt='%H:%M:%S')
+        return formatter.format(record)
+
+
 # Initialize mocmg logger and gmsh.
-def initialize(mocmgOption=None,gmshOption=None):
+def initialize(mocmgOption=None,gmshOption=None, color=True):
     # mocmg
     if mocmgOption == 'debug':
         mocmgVerbosity = logging.DEBUG
@@ -29,17 +68,40 @@ def initialize(mocmgOption=None,gmshOption=None):
     logger = logging.getLogger()
     # Have to set the root logger level, it defaults to logging.WARNING
     logger.setLevel(logging.NOTSET)
-    formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-10s: %(name)s - %(message)s', datefmt='%H:%M:%S')
+    formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-10s: %(name)s - %(message)s', 
+            datefmt='%H:%M:%S')
+    debugFormatter = logging.Formatter(fmt='%(asctime)s %(levelname)-10s: %(name)s - (line: %(lineno)d) %(message)s', 
+            datefmt='%H:%M:%S')
 
+    # Stdout
     logging_handler_out = logging.StreamHandler(sys.stdout)
     logging_handler_out.setLevel(logging.DEBUG)
     logging_handler_out.addFilter(LessThanFilter(logging.WARNING))
-    logging_handler_out.setFormatter(formatter)
+    # If stdout is terminal, color if desired. Otherwise, don't color.
+    if color and sys.stdout.isatty():
+        if mocmgOption == 'debug':
+            print(f'mocmgOption={mocmgOption}')
+            logging_handler_out.setFormatter(CustomFormatter(option='debug'))
+        else:
+            logging_handler_out.setFormatter(CustomFormatter())
+    else:
+        if mocmgOption == 'debug':
+            logging_handler_out.setFormatter(debugFormatter)
+        else:
+            logging_handler_out.setFormatter(formatter)
     logger.addHandler(logging_handler_out)
 
+    # Stderr
     logging_handler_err = logging.StreamHandler(sys.stderr)
     logging_handler_err.setLevel(logging.WARNING)
-    logging_handler_err.setFormatter(formatter)
+    # If stderr is terminal, color if desired. Otherwise, don't color.
+    if color and sys.stderr.isatty():
+        if mocmgOption == 'debug':
+            logging_handler_err.setFormatter(CustomFormatter('debug'))
+        else:
+            logging_handler_err.setFormatter(CustomFormatter())
+    else:
+        logging_handler_err.setFormatter(formatter)
     logger.addHandler(logging_handler_err)
 
     #demonstrate the logging levels
@@ -54,11 +116,11 @@ def initialize(mocmgOption=None,gmshOption=None):
     if gmshOption == 'debug':
         gmshVerbosity = 99
     elif gmshOption == 'warning':
-        gmsh_verbosity = 2
+        gmshVerbosity = 2
     elif gmshOption == 'silent':
-        gmsh_verbosity = 0
+        gmshVerbosity = 0
     else:
-        gmsh_verbosity = 5 
+        gmshVerbosity = 5
 
     gmsh.initialize()
     gmsh.option.setNumber("General.Terminal", 1)
