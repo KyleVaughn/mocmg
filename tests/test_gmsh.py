@@ -1,4 +1,3 @@
-import gmsh
 import subprocess
 from unittest import TestCase
 
@@ -10,10 +9,12 @@ def run(cmd):
     stdout, stderr = proc.communicate()
     return stdout, stderr
 
-# Need to find inexpensive example where gmsh gives a warning. When found, use instead of current
+# Need to find inexpensive example where gmsh gives a warning. 
+# When found, use instead of current and add warnining checks.
 class test_gmsh(TestCase):
 
     # nosetests makes capturing output of gmsh difficult, so using subprocess is the solution for now.
+    # nose messes with io fileno
     def test_gmshVerbosityDebug(self):
         out, err = run(['python','./tests/gmsh/gmsh_verbosity.py', '99'])
         out, err = out.decode('ascii').splitlines(), err.decode('ascii').splitlines()
@@ -43,5 +44,5 @@ class test_gmsh(TestCase):
     def test_gmshVerbositySilent(self):
         out, err = run(['python','./tests/gmsh/gmsh_verbosity.py', '0'])
         out, err = out.decode('ascii').splitlines(), err.decode('ascii').splitlines()
-        self.assertIn('Error   : OpenCASCADE surface with tag 1 already exists', err)
-        self.assertFalse(err)
+        self.assertNotIn('Error   : OpenCASCADE surface with tag 1 already exists', err)
+        self.assertFalse(out)
