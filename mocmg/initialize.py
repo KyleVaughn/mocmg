@@ -12,13 +12,13 @@ class LessThanFilter(logging.Filter):
         #non-zero return means we log this message
         return 1 if record.levelno < self.max_level else 0
 
-
-# Logging formatter to add colors using ANSI
+# Logging formatter to add colors to messages using ANSI
 class CustomFormatter(logging.Formatter):
 
     def __init__(self, option=None):
         self.option = option
 
+        purple = "\x1b[35;10m"
         green = "\x1b[32;10m"
         default = "\x1b[39;10m"
         yellow = "\x1b[33;10m"
@@ -37,8 +37,8 @@ class CustomFormatter(logging.Formatter):
         self.FORMATS = {
             logging.DEBUG:    green    + theFormat + reset,
             logging.INFO:     default  + theFormat + reset,
-            logging.WARNING:  yellow   + theFormat + reset,
-            logging.ERROR:    red      + theFormat + reset,
+            logging.WARNING:  purple   + theFormat + reset,
+            logging.ERROR:    bold_red + theFormat + reset,
             logging.CRITICAL: bold_red + theFormat + reset
         }
 
@@ -47,8 +47,18 @@ class CustomFormatter(logging.Formatter):
         formatter = logging.Formatter(log_fmt, datefmt='%H:%M:%S')
         return formatter.format(record)
 
-
-# Initialize mocmg logger and gmsh.
+# Initialize mocmg logger and gmsh with desired level of output.
+# The levels are as follows:
+#   silent  : For gmsh only. Don't output anything from gmsh
+#   error   : Display error messages only
+#   warning : Display error and warning messages
+#   info    : Display error, warning, and info messages
+#   debug   : Display error, warning, info, and debug messages
+#
+# Inputs:
+#   mocmgOption: One of the levels above. String
+#   gmshOption: One of the leves above. String
+#   color: Option to color the output of log messages from mocmg. True or False
 def initialize(mocmgOption=None,gmshOption=None, color=True):
     # mocmg
     if mocmgOption == 'debug':
@@ -62,9 +72,9 @@ def initialize(mocmgOption=None,gmshOption=None, color=True):
 
     # Get the root logger
     logger = logging.getLogger()
-
     # Have to set the root logger level, it defaults to logging.WARNING
     logger.setLevel(logging.NOTSET)
+    # Format stdout and stderr based upon color and debug mode
     formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-10s: %(name)s - %(message)s', 
             datefmt='%H:%M:%S')
     debugFormatter = logging.Formatter(fmt='%(asctime)s %(levelname)-10s: %(name)s - (line: %(lineno)d) %(message)s', 

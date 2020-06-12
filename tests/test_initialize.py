@@ -29,7 +29,7 @@ referenceErr = ['WARNING   : tests.test_initialize - Warning message',
                 'ERROR     : tests.test_initialize - Error message', 
                 'CRITICAL  : tests.test_initialize - Critical message']
 
-# Note line numbers correspond to the testMessages function.
+# NOTE: line numbers correspond to the testMessages function.
 referenceDebugOut = ['DEBUG     : tests.test_initialize - (line: 11) Debug message',
                      'INFO      : tests.test_initialize - (line: 12) Info message']
 referenceDebugErr = ['WARNING   : tests.test_initialize - (line: 13) Warning message', 
