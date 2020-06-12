@@ -19,6 +19,7 @@ class test_gmsh(TestCase):
         out, err = run(['python','./tests/gmsh/gmsh_verbosity.py', '99'])
         out, err = out.decode('ascii').splitlines(), err.decode('ascii').splitlines()
         self.assertIn('Error   : OpenCASCADE surface with tag 1 already exists', err)
+        self.assertIn('Warning : Gmsh has aleady been initialized', err)
         self.assertIn('Info    : Meshing 2D...', out)
         self.assertIn('Debug   : Syncing OCC_Internals with GModel', out)
 

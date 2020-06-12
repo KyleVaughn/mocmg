@@ -62,6 +62,7 @@ def initialize(mocmgOption=None,gmshOption=None, color=True):
 
     # Get the root logger
     logger = logging.getLogger()
+
     # Have to set the root logger level, it defaults to logging.WARNING
     logger.setLevel(logging.NOTSET)
     formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-10s: %(name)s - %(message)s', 
@@ -73,10 +74,10 @@ def initialize(mocmgOption=None,gmshOption=None, color=True):
     logging_handler_out = logging.StreamHandler(sys.stdout)
     logging_handler_out.setLevel(mocmgVerbosity)
     logging_handler_out.addFilter(LessThanFilter(logging.WARNING))
+
     # If stdout is terminal, color if desired. Otherwise, don't color.
     if color and sys.stdout.isatty():
         if mocmgOption == 'debug':
-            print(f'mocmgOption={mocmgOption}')
             logging_handler_out.setFormatter(CustomFormatter(option='debug'))
         else:
             logging_handler_out.setFormatter(CustomFormatter())
@@ -91,14 +92,18 @@ def initialize(mocmgOption=None,gmshOption=None, color=True):
     logging_handler_err = logging.StreamHandler(sys.stderr)
     lvl = max(logging.WARNING, mocmgVerbosity)
     logging_handler_err.setLevel(lvl)
+
     # If stderr is terminal, color if desired. Otherwise, don't color.
     if color and sys.stderr.isatty():
         if mocmgOption == 'debug':
-            logging_handler_err.setFormatter(CustomFormatter('debug'))
+            logging_handler_err.setFormatter(CustomFormatter(option='debug'))
         else:
             logging_handler_err.setFormatter(CustomFormatter())
     else:
-        logging_handler_err.setFormatter(formatter)
+        if mocmgOption == 'debug':
+            logging_handler_err.setFormatter(debugFormatter)
+        else:
+            logging_handler_err.setFormatter(formatter)
     logger.addHandler(logging_handler_err)
 
 
