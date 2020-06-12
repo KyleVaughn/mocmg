@@ -30,21 +30,17 @@ class CustomFormatter(logging.Formatter):
         debugFmt = "%(asctime)s %(levelname)-10s: %(name)s - (line: %(lineno)d) %(message)s"
 
         if option == 'debug':
-            self.FORMATS = {
-                logging.DEBUG:    green    + debugFmt + reset,
-                logging.INFO:     default  + debugFmt + reset,
-                logging.WARNING:  yellow   + debugFmt + reset,
-                logging.ERROR:    red      + debugFmt + reset,
-                logging.CRITICAL: bold_red + debugFmt + reset
-            }
+            theFormat = debugFmt
         else:
-            self.FORMATS = {
-                logging.DEBUG:    green    + fmt + reset,
-                logging.INFO:     default  + fmt + reset,
-                logging.WARNING:  yellow   + fmt + reset,
-                logging.ERROR:    red      + fmt + reset,
-                logging.CRITICAL: bold_red + fmt + reset
-            }
+            theFormat = fmt
+
+        self.FORMATS = {
+            logging.DEBUG:    green    + theFormat + reset,
+            logging.INFO:     default  + theFormat + reset,
+            logging.WARNING:  yellow   + theFormat + reset,
+            logging.ERROR:    red      + theFormat + reset,
+            logging.CRITICAL: bold_red + theFormat + reset
+        }
 
     def format(self, record):
         log_fmt = self.FORMATS.get(record.levelno)
@@ -111,6 +107,8 @@ def initialize(mocmgOption=None,gmshOption=None, color=True):
         gmshVerbosity = 99
     elif gmshOption == 'warning':
         gmshVerbosity = 2
+    elif gmshOption == 'error':
+        gmshVerbosity = 1
     elif gmshOption == 'silent':
         gmshVerbosity = 0
     else:
