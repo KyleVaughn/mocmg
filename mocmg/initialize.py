@@ -67,6 +67,8 @@ def initialize(mocmgOption=None,gmshOption=None, color=True):
         mocmgVerbosity = logging.WARNING
     elif mocmgOption == 'error':
         mocmgVerbosity = logging.ERROR
+    elif mocmgOption == 'silent':
+        mocmgVerbosity = 99
     else:
         mocmgVerbosity = logging.INFO
 

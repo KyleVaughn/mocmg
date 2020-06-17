@@ -36,7 +36,7 @@ def generateRectGrid(bb,nx,ny,nnx=1,nny=1):
     height1 = dy/float(ny) # height of rectangle in grid level 1
     width2 = width1/float(nnx) # width of rectangle in grid level 2
     height2 = height1/float(nny) # height of rectangle in grid level 2
-    z = bb[5] # z location of the model. Assumed all entities have same z
+    z = bb[2] # z location of the model. Assumed all entities have same z
 
     # Generate rectangles to fill bounding box.
     # Generate only grid level 2 rectangles and group them based upon location to fit inside grid level 1 rectangles
@@ -60,8 +60,8 @@ def generateRectGrid(bb,nx,ny,nnx=1,nny=1):
                     tag = gmsh.model.occ.addRectangle(xx,yy,z, width2, height2)
                     gridTags.append(tag)
                     gridTagsLevel1[name1].append(tag)
-                    gridTagsLevel1[name2] = [tag]
-                    module_log.debug(f'Added grid L2 rectangle of width {width2:.2f}' + \
+                    gridTagsLevel2[name2] = [tag]
+                    module_log.debug(f'Added grid L2 rectangle of tag {tag}, width {width2:.2f},' + \
                            f' and height {height2:.2f} at ({xx:.2f},{yy:.2f},{z:.2f})')
                     yy = yy + height2
                 xx = xx + width2
@@ -74,17 +74,22 @@ def generateRectGrid(bb,nx,ny,nnx=1,nny=1):
 
     # Set physical groups
     physicalGroupTagsL1 = []
-    physicalGroupNamesL1 = gridTagsLevel1.keys()
+    physicalGroupNamesL1 = list(gridTagsLevel1.keys())
     for name in physicalGroupNamesL1:
         outTag = gmsh.model.addPhysicalGroup(2, gridTagsLevel1[name])
         physicalGroupTagsL1.append(outTag)
         gmsh.model.setPhysicalName(2, outTag, name)
 
-    physicalGroupTagsL2 = []
-    physicalGroupNamesL2 = gridTagsLevel2.keys()
-    for name in physicalGroupNamesL2:
-        outTag = gmsh.model.addPhysicalGroup(2, gridTagsLevel2[name])
-        physicalGroupTagsL2.append(outTag)
-        gmsh.model.setPhysicalName(2, outTag, name)
+    if not(nnx == 1 and nny == 1):   
+        physicalGroupTagsL2 = []
+        physicalGroupNamesL2 = list(gridTagsLevel2.keys())
+        for name in physicalGroupNamesL2:
+            outTag = gmsh.model.addPhysicalGroup(2, gridTagsLevel2[name])
+            physicalGroupTagsL2.append(outTag)
+            gmsh.model.setPhysicalName(2, outTag, name)
+    else:
+        physicalGroupTagsL2 = []
+        physicalGroupNamesL2 = []
 
+    # NOTE: physical surface tags are NOT elementary entity tags
     return physicalGroupTagsL1, physicalGroupTagsL2, physicalGroupNamesL1, physicalGroupNamesL2

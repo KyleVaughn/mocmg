@@ -1,3 +1,4 @@
+import gmsh
 import logging
 import mocmg
 import sys
@@ -30,11 +31,11 @@ referenceErr = ['WARNING   : tests.test_initialize - Warning message',
                 'CRITICAL  : tests.test_initialize - Critical message']
 
 # NOTE: line numbers correspond to the testMessages function.
-referenceDebugOut = ['DEBUG     : tests.test_initialize - (line: 11) Debug message',
-                     'INFO      : tests.test_initialize - (line: 12) Info message']
-referenceDebugErr = ['WARNING   : tests.test_initialize - (line: 13) Warning message', 
-                     'ERROR     : tests.test_initialize - (line: 14) Error message', 
-                     'CRITICAL  : tests.test_initialize - (line: 15) Critical message']
+referenceDebugOut = ['DEBUG     : tests.test_initialize - (line: 12) Debug message',
+                     'INFO      : tests.test_initialize - (line: 13) Info message']
+referenceDebugErr = ['WARNING   : tests.test_initialize - (line: 14) Warning message', 
+                     'ERROR     : tests.test_initialize - (line: 15) Error message', 
+                     'CRITICAL  : tests.test_initialize - (line: 16) Critical message']
 
 class test_initialize(TestCase):
     # Run with gmshOption='warning' or greater, otherwise gmsh will output
@@ -50,7 +51,7 @@ class test_initialize(TestCase):
         out, err = [l.split(None,1)[1] for l in out], [l.split(None,1)[1] for l in err] # strip times
         self.assertEqual(out, referenceOut)
         self.assertEqual(err, referenceErr)
-        self.assertEqual(gmsh.getNumber('General.Verbosity'), 2)
+        self.assertEqual(gmsh.option.getNumber('General.Verbosity'), 2)
         mocmg.finalize()
 
     def test_mocmgOptionDebug(self):
@@ -62,7 +63,7 @@ class test_initialize(TestCase):
         out, err = [l.split(None,1)[1] for l in out], [l.split(None,1)[1] for l in err] # strip times
         self.assertEqual(out, referenceDebugOut)
         self.assertEqual(err, referenceDebugErr)
-        self.assertEqual(gmsh.getNumber('General.Verbosity'), 1)
+        self.assertEqual(gmsh.option.getNumber('General.Verbosity'), 1)
         mocmg.finalize()
 
     def test_mocmgOptionWarning(self):
@@ -74,12 +75,11 @@ class test_initialize(TestCase):
         out, err = [l.split(None,1)[1] for l in out], [l.split(None,1)[1] for l in err] # strip times
         self.assertEqual(out, [])
         self.assertEqual(err, referenceErr)
-        self.assertEqual(gmsh.getNumber('General.Verbosity'), 0)
+        self.assertEqual(gmsh.option.getNumber('General.Verbosity'), 0)
         mocmg.finalize()
 
     def test_mocmgOptionError(self):
         with captured_output() as (out,err):
-            # Defaults = logging.INFO, gmsh=5=info, color=True
             mocmg.initialize(mocmgOption='error', gmshOption='warning')
             log = logging.getLogger(__name__)
             testMessages(log)
@@ -87,4 +87,15 @@ class test_initialize(TestCase):
         out, err = [l.split(None,1)[1] for l in out], [l.split(None,1)[1] for l in err] # strip times
         self.assertEqual(out, [])
         self.assertEqual(err, referenceErr[1:])
+        mocmg.finalize()
+
+    def test_mocmgOptionSilent(self):
+        with captured_output() as (out,err):
+            mocmg.initialize(mocmgOption='silent', gmshOption='warning')
+            log = logging.getLogger(__name__)
+            testMessages(log)
+        out, err = out.getvalue().splitlines(), err.getvalue().splitlines() 
+        out, err = [l.split(None,1)[1] for l in out], [l.split(None,1)[1] for l in err] # strip times
+        self.assertEqual(out, [])
+        self.assertEqual(err, [])
         mocmg.finalize()

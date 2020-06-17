@@ -9,8 +9,6 @@ def run(cmd):
     stdout, stderr = proc.communicate()
     return stdout, stderr
 
-# Need to find inexpensive example where gmsh gives a warning. 
-# When found, use instead of current and add warnining checks.
 class test_gmsh(TestCase):
 
     # nosetests makes capturing output of gmsh difficult, so using subprocess is the solution for now.
