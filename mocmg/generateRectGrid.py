@@ -56,7 +56,7 @@ def generateRectGrid(bb,nx,ny,nnx=1,nny=1):
             for ii in range(nnx):
                 yy = y
                 for jj in range(nny):
-                    name2 = f'Grid L2 ({i*nx+ii+1}, {j*ny+jj+1})'
+                    name2 = f'Grid L2 ({i*nnx+ii+1},{j*nny+jj+1})'
                     tag = gmsh.model.occ.addRectangle(xx,yy,z, width2, height2)
                     gridTags.append(tag)
                     gridTagsLevel1[name1].append(tag)
@@ -80,16 +80,12 @@ def generateRectGrid(bb,nx,ny,nnx=1,nny=1):
         physicalGroupTagsL1.append(outTag)
         gmsh.model.setPhysicalName(2, outTag, name)
 
-    if not(nnx == 1 and nny == 1):   
-        physicalGroupTagsL2 = []
-        physicalGroupNamesL2 = list(gridTagsLevel2.keys())
-        for name in physicalGroupNamesL2:
-            outTag = gmsh.model.addPhysicalGroup(2, gridTagsLevel2[name])
-            physicalGroupTagsL2.append(outTag)
-            gmsh.model.setPhysicalName(2, outTag, name)
-    else:
-        physicalGroupTagsL2 = []
-        physicalGroupNamesL2 = []
+    physicalGroupTagsL2 = []
+    physicalGroupNamesL2 = list(gridTagsLevel2.keys())
+    for name in physicalGroupNamesL2:
+        outTag = gmsh.model.addPhysicalGroup(2, gridTagsLevel2[name])
+        physicalGroupTagsL2.append(outTag)
+        gmsh.model.setPhysicalName(2, outTag, name)
 
     # NOTE: physical surface tags are NOT elementary entity tags
     return physicalGroupTagsL1, physicalGroupTagsL2, physicalGroupNamesL1, physicalGroupNamesL2

@@ -23,11 +23,14 @@ class test_generateRectGrid(TestCase):
         bb = [0, 0, 0, 9, 4, 0]
         PGTagsL1, PGTagsL2, PGNamesL1, PGNamesL2 = mocmg.generateRectGrid(bb, 3, 2)
         IDL1 = list(range(1,7)) 
+        IDL2 = list(range(7,13)) 
         namesL1 = ['Grid L1 (1,1)', 'Grid L1 (1,2)', 'Grid L1 (2,1)', 'Grid L1 (2,2)','Grid L1 (3,1)', 'Grid L1 (3,2)']
+        namesL2 = ['Grid L2 (1,1)', 'Grid L2 (1,2)', 'Grid L2 (2,1)', 'Grid L2 (2,2)','Grid L2 (3,1)', 'Grid L2 (3,2)']
         self.assertEqual(IDL1, PGTagsL1)
         self.assertEqual(namesL1, PGNamesL1)
-        self.assertEqual([], PGTagsL2)
-        self.assertEqual([], PGNamesL2)
+        self.assertEqual(IDL2, PGTagsL2)
+        print(PGNamesL2)
+        self.assertEqual(namesL2, PGNamesL2)
         # Locations/shape of entities
         for ptag in IDL1:
             # Elementary tag
@@ -60,13 +63,44 @@ class test_generateRectGrid(TestCase):
             IDL1 = list(range(1,7))
             IDL2 = list(range(7,43))
             namesL1 = ['Grid L1 (1,1)', 'Grid L1 (1,2)', 'Grid L1 (2,1)', 'Grid L1 (2,2)','Grid L1 (3,1)', 'Grid L1 (3,2)']
-            namesL2 = []
-            for i in range(nx):
-                for j in range(ny):
-                    for ii in range(nnx):
-                        for jj in range(nny):
-                            namesL2.append(f'Grid L2 ({i*nx+ii+1}, {j*ny+jj+1})')
-
+            namesL2 = [
+                    'Grid L2 (1,1)',\
+                    'Grid L2 (1,2)',\
+                    'Grid L2 (2,1)',\
+                    'Grid L2 (2,2)',\
+                    'Grid L2 (3,1)',\
+                    'Grid L2 (3,2)',\
+                    'Grid L2 (1,3)',\
+                    'Grid L2 (1,4)',\
+                    'Grid L2 (2,3)',\
+                    'Grid L2 (2,4)',\
+                    'Grid L2 (3,3)',\
+                    'Grid L2 (3,4)',\
+                    'Grid L2 (4,1)',\
+                    'Grid L2 (4,2)',\
+                    'Grid L2 (5,1)',\
+                    'Grid L2 (5,2)',\
+                    'Grid L2 (6,1)',\
+                    'Grid L2 (6,2)',\
+                    'Grid L2 (4,3)',\
+                    'Grid L2 (4,4)',\
+                    'Grid L2 (5,3)',\
+                    'Grid L2 (5,4)',\
+                    'Grid L2 (6,3)',\
+                    'Grid L2 (6,4)',\
+                    'Grid L2 (7,1)',\
+                    'Grid L2 (7,2)',\
+                    'Grid L2 (8,1)',\
+                    'Grid L2 (8,2)',\
+                    'Grid L2 (9,1)',\
+                    'Grid L2 (9,2)',\
+                    'Grid L2 (7,3)',\
+                    'Grid L2 (7,4)',\
+                    'Grid L2 (8,3)',\
+                    'Grid L2 (8,4)',\
+                    'Grid L2 (9,3)',\
+                    'Grid L2 (9,4)'
+                    ]
             self.assertEqual(IDL1, PGTagsL1)
             self.assertEqual(namesL1, PGNamesL1)
             self.assertEqual(IDL2, PGTagsL2)
