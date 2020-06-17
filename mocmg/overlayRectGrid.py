@@ -12,7 +12,7 @@ def overlayRectGrid(nx,ny,nnx=1,nny=1,defaultMat='Material Void',bb=None):
 
 # 1. Get all 2D model entities 
     modelDimTags = gmsh.model.getEntities(2)
-    module_log.debug(f'2D entity tags: {modelEntities}')
+    module_log.debug(f'2D entity dim tags: {modelDimTags}')
 
 # 2. Get bounding box
     if bb == None:
@@ -26,23 +26,20 @@ def overlayRectGrid(nx,ny,nnx=1,nny=1,defaultMat='Material Void',bb=None):
 
 # 4. Fragment the grid components with the original model components
     # Generate a list of all elementary entities in the grid
-    gridTags = set()
-    if nnx == 1 and nny == 1:
-        # No L2 if nnx = nny = 1
-        for ptag in pGroupTagsL1:
-            elemTags = gmsh.model.getEntitiesForPhysicalGroup(2, ptag)
-            gridTags.union(set(elemTags))
-    else:
-        for ptag in pGroupTagsL2:
-            elemTags = gmsh.model.getEntitiesForPhysicalGroup(2, ptag)
-            gridTags.union(set(elemTags))
-
-    module_log.info(f'Fragmenting {len(modelDimTags)} entities with {len(gridDimTags)} entities')
-    outTags, outChildren = gmsh.model.occ.fragment(modelEntities, dimGridTags)
+    gridElemTags = set()
+    for ptag in pGroupTagsL2:
+        elemTags = gmsh.model.getEntitiesForPhysicalGroup(2, ptag)
+        gridElemTags = gridElemTags.union(set(elemTags))
+    
+    gridElemTags = list(gridElemTags)
+    gridElemDimTags = [(2,tag) for tag in gridElemTags]
+    module_log.info(f'Fragmenting {len(modelDimTags)} entities with {len(gridElemDimTags)} entities')
+    fragmentTags, fragmentChildren = gmsh.model.occ.fragment(modelDimTags, gridElemDimTags)
     #
     #
     # NOTE
-    # At this point, the occ model entities exist and the original geometric entities do not.
+    # At this point, the occ fragment model entities exist and the original geometric entities do not.
+    # Except for visualization purposes.
     # However, since the model has not been synchronized, the physical group information about the
     # original geometric entities still exists and can be used. If the model is synchronized this
     # information will be destroyed.
