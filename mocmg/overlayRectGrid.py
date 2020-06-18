@@ -34,6 +34,7 @@ def overlayRectGrid(nx,ny,nnx=1,nny=1,defaultMat='Material Void',bb=None):
     gridElemTags = list(gridElemTags)
     gridElemDimTags = [(2,tag) for tag in gridElemTags]
     module_log.info(f'Fragmenting {len(modelDimTags)} entities with {len(gridElemDimTags)} entities')
+    # fragment outputs the NEW entities and the parent-child relationships for ALL input entities
     fragmentTags, fragmentChildren = gmsh.model.occ.fragment(modelDimTags, gridElemDimTags)
     #
     #
@@ -46,61 +47,60 @@ def overlayRectGrid(nx,ny,nnx=1,nny=1,defaultMat='Material Void',bb=None):
     #
     #
 
-## 4. Assign new entities to parent physical groups
-#    #
-#    # Get group tags and group names for original entites. Associate them with children.
-#    groupChildren = {}
-#    groupNames = {}
-#    for i, e in enumerate(modelEntities):
-#        children = outChildren[i] 
-#        module_log.debug(f'Entity {e} had children {children}')
-#        childTags = [t[1] for t in children]
-#        groupTags = gmsh.model.getPhysicalGroupsForEntity(*e)
-#        groupTags = list(groupTags)
-#        if len(groupTags) > 0:            
-#            module_log.debug(f'Entity {e} had {len(groupTags)} physical groups')
-#            for tag in groupTags:
-#                # if group is already known, just add children to set
-#                # otherwise, add it and its name to dictionaries.
-#                if tag in groupNames:
-#                    # Union the current set and the child tags
-#                    groupChildren[tag] = groupChildren[tag].union(set(childTags))
-#                else:
-#                    # Add the key and children to the dict
-#                    groupNames[tag] = gmsh.model.getPhysicalName(2,tag)
-#                    groupChildren[tag] = set(childTags)
-#        else:
-#            module_log.debug(f'Entity {e} had no physical groups')
-#        # Report group names and children
-#        module_log.debug(f'Group tag/name dictionary is now : {groupNames}')
-#        module_log.debug(f'Group tag/child dictionary is now: {groupChildren}')
-#
-#    # Synchronize and remove old groups
-#    module_log.info('Synchronizing model')
-#    gmsh.model.removePhysicalGroups()
-#    gmsh.model.occ.synchronize()
-#    module_log.info('Model synchronized')
-#
-#    # For each group, create a new group with the appropriate children and name
-#    for tag in groupChildren.keys():
-#        outTag = gmsh.model.addPhysicalGroup(2, list(groupChildren[tag]), tag)
-#        if outTag != tag:
-#            module_log.warning(f'Physical group {tag} could not be assigned to children with original tag.' + \
-#                    'This could indicate an uncaught error prior to the execution of this code.')
-#        gmsh.model.setPhysicalName(2, outTag, groupNames[tag])
-#
-## 5. Group new entities based on which grid entity they reside in
-#
-## 6. Assign a default material to any entity that didn't inherit a material from parent.
-#    # This should just be {bounding box}\{original geometry}
-#    allEntities = gmsh.model.getEntities(2)
-#    allEntitiesTags = set([t[1] for t in allEntities])
-#    del allEntities # Can potentially be very large. Free up before making more big sets
-#    originalGeom = set()
-#    for tag in groupChildren.keys():
-#        originalGeom = originalGeom.union(groupChildren[tag])
-#    
-#    del groupChildren # Likewise. Free up memory
-#    defaultMatGeom = allEntitiesTags.difference(originalGeom)
-#    outTag = gmsh.model.addPhysicalGroup(2, list(defaultMatGeom))
-#    gmsh.model.setPhysicalName(2, outTag, defaultMat)
+# 5. Assign old physical groups to new entities
+    # Get  physical group tags and physical group names from original entites. 
+    # Associate them with children.
+    fragmentChildrenGroups = {}
+    fragmentChildrenGroupNames = {}
+    for i, e in enumerate(modelDimTags + gridElemDimTags):
+        children = fragmentChildren[i] # dim tags of child entities
+        module_log.debug(f'Entity {e} had children {children}')
+        childTags = [t[1] for t in children] # tags of child entities
+        pGroupTags = list(gmsh.model.getPhysicalGroupsForEntity(*e)) # physical group tags
+        if len(pGroupTags) > 0:            
+            module_log.debug(f'Entity {e} had {len(pGroupTags)} physical groups')
+            for tag in pGroupTags:
+                # If group is already known, just add children to set
+                # otherwise, add it and its name to dictionaries.
+                if tag in fragmentChildrenGroupNames:
+                    # Union the current set and the child tags
+                    fragmentChildrenGroups[tag] = fragmentChildrenGroups[tag].union(set(childTags))
+                else:
+                    # Add the key and children to the dict
+                    fragmentChildrenGroupNames[tag] = gmsh.model.getPhysicalName(2,tag)
+                    fragmentChildrenGroups[tag] = set(childTags)
+        else:
+            module_log.debug(f'Entity {e} had no physical groups')
+        # Report group names and children
+        module_log.debug(f'Group tag/name dictionary is now : {fragmentChildrenGroupNames}')
+        module_log.debug(f'Group tag/child dictionary is now: {fragmentChildrenGroups}')
+
+    # Synchronize and remove old groups
+    module_log.info('Synchronizing model')
+    gmsh.model.removePhysicalGroups()
+    gmsh.model.occ.synchronize()
+    module_log.info('Model synchronized')
+
+    # For each group, create a new group with the appropriate children and name
+    for tag in fragmentChildrenGroups.keys():
+        outTag = gmsh.model.addPhysicalGroup(2, list(fragmentChildrenGroups[tag]), tag)
+        if outTag != tag:
+            module_log.warning(f'Physical group {tag} could not be assigned to children with original tag.' + \
+                    'This could indicate an uncaught error prior to the execution of this code.')
+        gmsh.model.setPhysicalName(2, outTag, fragmentChildrenGroupNames[tag])
+
+# 6. Assign a default material to any entity that didn't inherit a material from parent.
+    # This should just be {bounding box}\{original geometry}
+    allEntities = gmsh.model.getEntities(2)
+    allEntitiesTags = set([t[1] for t in allEntities])
+    del allEntities # Can potentially be very large. Free up before making more big sets
+    originalGeom = set()
+    modelTags = [t[1] for t in modelDimTags]
+    for i, e in enumerate(modelDimTags):
+        children = fragmentChildren[i]
+        childTags = [t[1] for t in children]
+        originalGeom = originalGeom.union(childTags)
+    
+    defaultMatGeom = allEntitiesTags.difference(originalGeom)
+    outTag = gmsh.model.addPhysicalGroup(2, list(defaultMatGeom))
+    gmsh.model.setPhysicalName(2, outTag, defaultMat)
