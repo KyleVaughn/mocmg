@@ -29,7 +29,6 @@ class test_generateRectGrid(TestCase):
         self.assertEqual(IDL1, PGTagsL1)
         self.assertEqual(namesL1, PGNamesL1)
         self.assertEqual(IDL2, PGTagsL2)
-        print(PGNamesL2)
         self.assertEqual(namesL2, PGNamesL2)
         # Locations/shape of entities
         for ptag in IDL1:
