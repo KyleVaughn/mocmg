@@ -5,12 +5,16 @@ module_log = logging.getLogger(__name__)
 
 abaqus_to_topo_type = {
     # 2D
+    # triangle
     "CPS3": "triangle",
     "STRI3": "triangle",
     "CPS6": "triangle6",
+    # quad
+    "CPS4": "quad",
+    "CPS8": "quad8"
 }
 
-def readAbaqusINP(pathToFile):
+def readAbaqusINP(pathToFile, floatbits=64):
     # read data in blocks based upon keyword
     nodes = {}
     elements = [] 
@@ -30,7 +34,7 @@ def readAbaqusINP(pathToFile):
             # Keywords
             keyword = line.partition(",")[0].strip().replace("*", "").upper()
             if keyword == "NODE":
-                nodes, line = _readNodes(f, nodes)
+                nodes, line = _readNodes(f, nodes, floatbits)
             elif keyword == "ELEMENT":
                 elem_type = _getParam(line, 'TYPE')
                 elem_block, line = _readElements(f)
@@ -51,7 +55,12 @@ def readAbaqusINP(pathToFile):
 
     return nodes, elements, element_sets
 
-def _readNodes(f, nodes):
+def _readNodes(f, nodes, floatbits):
+    if floatbits == 32:
+        float_type = np.float32
+    else:
+        float_type = np.float64
+
     while True:
         line = f.readline()
         if not line or line.startswith("*"):
@@ -59,7 +68,7 @@ def _readNodes(f, nodes):
 
         line = line.strip().split(",")
         point_id, coords = line[0], line[1:]
-        coords = np.array([float(x) for x in coords], dtype=float)
+        coords = np.array([float(x) for x in coords], dtype=float_type)
         nodes[int(point_id)] = coords
 
     return nodes, line
