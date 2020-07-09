@@ -26,7 +26,7 @@ class CustomFormatter(logging.Formatter):
         bold_red = "\x1b[31;1m"
         reset = "\x1b[0m"
                                                                                              
-        fmt =      "%(asctime)s %(levelname)-10s: %(name)s - %(message)s'"
+        fmt =      "%(asctime)s %(levelname)-10s: %(name)s - %(message)s"
         debugFmt = "%(asctime)s %(levelname)-10s: %(name)s - (line: %(lineno)d) %(message)s"
 
         if option == 'debug':

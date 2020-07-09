@@ -38,7 +38,7 @@ def readAbaqusINP(filepath):
             # Keywords
             keyword = line.partition(",")[0].strip().replace("*", "").upper()
             if keyword == "NODE":
-                nodes, line = _readNodes(f, nodes, floatbits)
+                nodes, line = _readNodes(f, nodes)
             elif keyword == "ELEMENT":
                 elem_type = _getParam(line, 'TYPE')
                 elem_block, line = _readElements(f)
@@ -59,7 +59,7 @@ def readAbaqusINP(filepath):
 
     return nodes, elements, element_sets
 
-def _readNodes(f, nodes, floatbits):
+def _readNodes(f, nodes):
     while True:
         line = f.readline()
         if not line or line.startswith("*"):
