@@ -1,20 +1,8 @@
 import gmsh
 import mocmg
-import logging
-import sys
 from contextlib import contextmanager
-from io import StringIO
+from .testingUtils import captured_output
 from unittest import TestCase
-
-@contextmanager
-def captured_output():
-    new_out, new_err = StringIO(), StringIO()
-    old_out, old_err = sys.stdout, sys.stderr
-    try:
-        sys.stdout, sys.stderr = new_out, new_err
-        yield sys.stdout, sys.stderr
-    finally:
-        sys.stdout, sys.stderr = old_out, old_err
 
 class test_generateRectGrid(TestCase):
 

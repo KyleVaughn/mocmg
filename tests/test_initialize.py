@@ -1,10 +1,8 @@
 import gmsh
 import logging
 import mocmg
-import sys
-from contextlib import contextmanager
-from io import StringIO
 from nose.tools import nottest
+from .testingUtils import captured_output
 from unittest import TestCase
 
 @nottest
@@ -15,27 +13,17 @@ def testMessages(logger):
     logger.error('Error message')
     logger.critical('Critical message')    
 
-@contextmanager
-def captured_output():
-    new_out, new_err = StringIO(), StringIO()
-    old_out, old_err = sys.stdout, sys.stderr
-    try:
-        sys.stdout, sys.stderr = new_out, new_err
-        yield sys.stdout, sys.stderr
-    finally:
-        sys.stdout, sys.stderr = old_out, old_err
-
 referenceOut = ['INFO      : tests.test_initialize - Info message']
 referenceErr = ['WARNING   : tests.test_initialize - Warning message', 
                 'ERROR     : tests.test_initialize - Error message', 
                 'CRITICAL  : tests.test_initialize - Critical message']
 
 # NOTE: line numbers correspond to the testMessages function.
-referenceDebugOut = ['DEBUG     : tests.test_initialize - (line: 12) Debug message',
-                     'INFO      : tests.test_initialize - (line: 13) Info message']
-referenceDebugErr = ['WARNING   : tests.test_initialize - (line: 14) Warning message', 
-                     'ERROR     : tests.test_initialize - (line: 15) Error message', 
-                     'CRITICAL  : tests.test_initialize - (line: 16) Critical message']
+referenceDebugOut = ['DEBUG     : tests.test_initialize - (line: 10) Debug message',
+                     'INFO      : tests.test_initialize - (line: 11) Info message']
+referenceDebugErr = ['WARNING   : tests.test_initialize - (line: 12) Warning message', 
+                     'ERROR     : tests.test_initialize - (line: 13) Error message', 
+                     'CRITICAL  : tests.test_initialize - (line: 14) Critical message']
 
 class test_initialize(TestCase):
     # Run with gmshOption='warning' or greater, otherwise gmsh will output

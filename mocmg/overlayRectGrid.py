@@ -6,6 +6,7 @@ from .generateRectGrid import generateRectGrid
 module_log = logging.getLogger(__name__)
 
 # NOTE: Remember to synchronize the model before using this function
+# It is assumed that the model already has material assigned
 
 def overlayRectGrid(nx,ny,nnx=1,nny=1,defaultMat='Material Void',bb=None):
     module_log.info('Overlaying rectangular grid')
