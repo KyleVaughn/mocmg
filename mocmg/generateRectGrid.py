@@ -21,7 +21,7 @@ module_log = logging.getLogger(__name__)
 #   physicalGroupNamesL1: A list of names of the physical groups for grid level 1 of the form "Grid L1 (i,j)"
 #   physicalGroupNamesL2: A list of names of the physical groups for grid level 2 of the form "Grid L2 (i,j)"
 #
-#   NOTE: gmsh.model.getPhysicalName(2, physicalGroupTagsL1[i]) = physicalGroupNamesL1[i]
+#   NOTE: gmsh.model.getPhysicalName(2, physicalGroupTagsL1[i]) == physicalGroupNamesL1[i]
 #   This holds for L2 as well
 def generateRectGrid(bb,nx,ny,nnx=1,nny=1):
     x_min, y_min, z_min = bb[0:3]

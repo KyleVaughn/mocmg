@@ -50,7 +50,7 @@ class test_generateRectGrid(TestCase):
         mocmg.finalize()
 
     def test_rectGridOptionalArgs(self):
-        # Caputure output since bb will throw warning on purpose
+        # Capture output since bb will throw warning on purpose
         with captured_output() as (out,err):
             mocmg.initialize(mocmgOption='warning', gmshOption='silent')
             nx = 3
@@ -124,7 +124,6 @@ class test_generateRectGrid(TestCase):
             self.assertAlmostEqual(3.5, x, places=5)
             self.assertAlmostEqual(1.5, y, places=5)
             self.assertAlmostEqual(0.0, z, places=5)
-#            gmsh.fltk.run()
             for ptag in IDL2:
                 # Elementary tag
                 etag = list(gmsh.model.getEntitiesForPhysicalGroup(2, ptag))

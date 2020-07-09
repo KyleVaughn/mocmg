@@ -79,17 +79,18 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
     # adjust elsets element numbering to hdf5
     # elements are written in order of list
     # need to construct global elem map
-    ecounter = 0
-    elemmap = {}
-    for eid, msh in enumerate(elements):
-        ekeys = list(msh[1].keys())
-        for h5elem, elem in enumerate(ekeys):
-            elemmap[elem] = h5elem + ecounter
-        ecounter += len(ekeys)
-    # now that we have global map, iterate through each elset
-    for sid, eset in enumerate(element_sets):
-        element_sets[sid][1] = np.array([elemmap[elem] for elem in element_sets[sid][1]], dtype=int)            
-    del elemmap, ekeys, ecounter
+    if element_sets != None:
+        ecounter = 0
+        elemmap = {}
+        for eid, msh in enumerate(elements):
+            ekeys = list(msh[1].keys())
+            for h5elem, elem in enumerate(ekeys):
+                elemmap[elem] = h5elem + ecounter
+            ecounter += len(ekeys)
+        # now that we have global map, iterate through each elset
+        for sid, eset in enumerate(element_sets):
+            element_sets[sid][1] = np.array([elemmap[elem] for elem in element_sets[sid][1]], dtype=int)            
+        del elemmap, ekeys, ecounter
 
     # elements/topology
     # if all surfaces same topology, merge into one dict
@@ -182,8 +183,17 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
         del elem_data
 
     # Element set data
+    if element_sets != None:
+        # split elsets into material and non-material
+        materials = []
+        other_sets = []
+        for sid in range(len(element_sets)):
+            if element_sets[0][0][0:8] == 'MATERIAL':
+                materials.append(element_sets[0])
+            else: 
+                other_sets.append(element_sets[0])
+            del element_sets[0]
 
-    
-
+        # Assumed one set per material
 
     _writeXML(filename, xdmf_file)

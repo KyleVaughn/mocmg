@@ -2,7 +2,7 @@ import gmsh
 import logging
 import sys
 
-# Filters messages of severity less than warning to stdout
+# Filters messages of severity less than argument
 class LessThanFilter(logging.Filter):
     def __init__(self, exclusive_maximum, name=""):
         super(LessThanFilter, self).__init__(name)

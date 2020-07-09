@@ -1,5 +1,6 @@
 import logging
 import numpy as np
+import os
 
 module_log = logging.getLogger(__name__)
 
@@ -14,12 +15,15 @@ abaqus_to_topo_type = {
     "CPS8": "quad8"
 }
 
-def readAbaqusINP(pathToFile, floatbits=64):
+def readAbaqusINP(filepath):
+    module_log.info(f'Reading mesh data from {filepath}') 
+    if not os.path.isfile(filepath):
+        module_log.error(f'File {filepath} not found')
     # read data in blocks based upon keyword
     nodes = {}
     elements = [] 
     element_sets = []
-    with open(pathToFile) as f:
+    with open(filepath) as f:
         line = f.readline()
         while True:
             # EOF
@@ -56,11 +60,6 @@ def readAbaqusINP(pathToFile, floatbits=64):
     return nodes, elements, element_sets
 
 def _readNodes(f, nodes, floatbits):
-    if floatbits == 32:
-        float_type = np.float32
-    else:
-        float_type = np.float64
-
     while True:
         line = f.readline()
         if not line or line.startswith("*"):
@@ -68,7 +67,7 @@ def _readNodes(f, nodes, floatbits):
 
         line = line.strip().split(",")
         point_id, coords = line[0], line[1:]
-        coords = np.array([float(x) for x in coords], dtype=float_type)
+        coords = np.array([float(x) for x in coords])
         nodes[int(point_id)] = coords
 
     return nodes, line
