@@ -250,6 +250,11 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
         mat_data_item.text = os.path.basename(h5_filename) + ":/" + "Material_ID"
 
         # Info section for material ID to material name
-        
+        material_information = ET.SubElement(
+            grid,
+            "Information",
+            Name="Material_Names",
+        )
+        material_information.text = " ".join(materials_name)
 
     _writeXML(filename, xdmf_file)
