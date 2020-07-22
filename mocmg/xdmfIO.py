@@ -22,14 +22,14 @@ topo_to_xdmf_type = {
     "triangle6": ["Triangle_6", "Tri_6"],
 }
 
-xdmf_idx_to_topo_type = {
+xdmf_int_to_topo_type = {
     0x4: "triangle",
     0x5: "quad",
     0x9: "hexahedron",
     0x24: "triangle6",
     0x25: "quad8",
 }
-topo_type_to_xdmf_idx = {v: k for k, v in xdmf_idx_to_topo_type.items()}
+topo_type_to_xdmf_int = {v: k for k, v in xdmf_int_to_topo_type.items()}
 
 def _writeXML(filename, root):
     tree = ET.ElementTree(root)
@@ -169,7 +169,7 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
         elem_data = {}
         for eid, e in enumerate(elements):
             key = e[0]
-            xdmf_key = np.array(topo_type_to_xdmf_idx[key])
+            xdmf_key = np.array(topo_type_to_xdmf_int[key])
             elem_data[eid] = [np.concatenate((xdmf_key, array), axis=None) for array in e[1].values()]
 
         elem_data = np.concatenate(list(elem_data.values()), axis=None)
@@ -256,5 +256,30 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
             Name="Material_Names",
         )
         material_information.text = " ".join(materials_name)
+        
+        # other element sets
+        for s in other_sets:
+            eset = ET.SubElement(
+                grid,
+                "Set",
+                Name=s[0],
+                SetType="Cell",
+            )
+            dt, prec = numpy_to_xdmf_dtype[s[1].dtype.name]
+            eset_data_item = ET.SubElement(
+                eset,    
+                "DataItem",
+                DataType=dt,
+                Dimensions=str(len(s[1])),
+                Format="HDF",
+                Precision=prec,
+            )
+            h5_file.create_dataset(
+                s[0],
+                data=s[1],
+                compression="gzip",
+                compression_opts=compression_opts,
+            )
+            eset_data_item.text = os.path.basename(h5_filename) + ":/" + s[0]
 
     _writeXML(filename, xdmf_file)
