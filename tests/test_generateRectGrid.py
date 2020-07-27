@@ -12,8 +12,20 @@ class test_generateRectGrid(TestCase):
         PGTagsL1, PGTagsL2, PGNamesL1, PGNamesL2 = mocmg.generateRectGrid(bb, 3, 2)
         IDL1 = list(range(1,7)) 
         IDL2 = list(range(7,13)) 
-        namesL1 = ['Grid L1 (1,1)', 'Grid L1 (1,2)', 'Grid L1 (2,1)', 'Grid L1 (2,2)','Grid L1 (3,1)', 'Grid L1 (3,2)']
-        namesL2 = ['Grid L2 (1,1)', 'Grid L2 (1,2)', 'Grid L2 (2,1)', 'Grid L2 (2,2)','Grid L2 (3,1)', 'Grid L2 (3,2)']
+        namesL1 = [
+                'Grid_L1_001_001',
+                'Grid_L1_001_002',
+                'Grid_L1_002_001',
+                'Grid_L1_002_002',
+                'Grid_L1_003_001',
+                'Grid_L1_003_002']
+        namesL2 = [
+                'Grid_L2_001_001',
+                'Grid_L2_001_002',
+                'Grid_L2_002_001',
+                'Grid_L2_002_002',
+                'Grid_L2_003_001',
+                'Grid_L2_003_002']
         self.assertEqual(IDL1, PGTagsL1)
         self.assertEqual(namesL1, PGNamesL1)
         self.assertEqual(IDL2, PGTagsL2)
@@ -49,44 +61,50 @@ class test_generateRectGrid(TestCase):
             PGTagsL1, PGTagsL2, PGNamesL1, PGNamesL2 = mocmg.generateRectGrid(bb, nx, ny, nnx, nny)
             IDL1 = list(range(1,7))
             IDL2 = list(range(7,43))
-            namesL1 = ['Grid L1 (1,1)', 'Grid L1 (1,2)', 'Grid L1 (2,1)', 'Grid L1 (2,2)','Grid L1 (3,1)', 'Grid L1 (3,2)']
+            namesL1 = [
+                    'Grid_L1_001_001',
+                    'Grid_L1_001_002',
+                    'Grid_L1_002_001',
+                    'Grid_L1_002_002',
+                    'Grid_L1_003_001',
+                    'Grid_L1_003_002']
             namesL2 = [
-                    'Grid L2 (1,1)',\
-                    'Grid L2 (1,2)',\
-                    'Grid L2 (2,1)',\
-                    'Grid L2 (2,2)',\
-                    'Grid L2 (3,1)',\
-                    'Grid L2 (3,2)',\
-                    'Grid L2 (1,3)',\
-                    'Grid L2 (1,4)',\
-                    'Grid L2 (2,3)',\
-                    'Grid L2 (2,4)',\
-                    'Grid L2 (3,3)',\
-                    'Grid L2 (3,4)',\
-                    'Grid L2 (4,1)',\
-                    'Grid L2 (4,2)',\
-                    'Grid L2 (5,1)',\
-                    'Grid L2 (5,2)',\
-                    'Grid L2 (6,1)',\
-                    'Grid L2 (6,2)',\
-                    'Grid L2 (4,3)',\
-                    'Grid L2 (4,4)',\
-                    'Grid L2 (5,3)',\
-                    'Grid L2 (5,4)',\
-                    'Grid L2 (6,3)',\
-                    'Grid L2 (6,4)',\
-                    'Grid L2 (7,1)',\
-                    'Grid L2 (7,2)',\
-                    'Grid L2 (8,1)',\
-                    'Grid L2 (8,2)',\
-                    'Grid L2 (9,1)',\
-                    'Grid L2 (9,2)',\
-                    'Grid L2 (7,3)',\
-                    'Grid L2 (7,4)',\
-                    'Grid L2 (8,3)',\
-                    'Grid L2 (8,4)',\
-                    'Grid L2 (9,3)',\
-                    'Grid L2 (9,4)'
+                    'Grid_L2_001_001',
+                    'Grid_L2_001_002',
+                    'Grid_L2_002_001',
+                    'Grid_L2_002_002',
+                    'Grid_L2_003_001',
+                    'Grid_L2_003_002',
+                    'Grid_L2_001_003',
+                    'Grid_L2_001_004',
+                    'Grid_L2_002_003',
+                    'Grid_L2_002_004',
+                    'Grid_L2_003_003',
+                    'Grid_L2_003_004',
+                    'Grid_L2_004_001',
+                    'Grid_L2_004_002',
+                    'Grid_L2_005_001',
+                    'Grid_L2_005_002',
+                    'Grid_L2_006_001',
+                    'Grid_L2_006_002',
+                    'Grid_L2_004_003',
+                    'Grid_L2_004_004',
+                    'Grid_L2_005_003',
+                    'Grid_L2_005_004',
+                    'Grid_L2_006_003',
+                    'Grid_L2_006_004',
+                    'Grid_L2_007_001',
+                    'Grid_L2_007_002',
+                    'Grid_L2_008_001',
+                    'Grid_L2_008_002',
+                    'Grid_L2_009_001',
+                    'Grid_L2_009_002',
+                    'Grid_L2_007_003',
+                    'Grid_L2_007_004',
+                    'Grid_L2_008_003',
+                    'Grid_L2_008_004',
+                    'Grid_L2_009_003',
+                    'Grid_L2_009_004'
                     ]
             self.assertEqual(IDL1, PGTagsL1)
             self.assertEqual(namesL1, PGNamesL1)

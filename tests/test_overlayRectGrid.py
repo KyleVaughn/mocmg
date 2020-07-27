@@ -11,8 +11,8 @@ class test_overlayRectGrid(TestCase):
     def test_gmshDisk(self):
         pgroups_ref = [
                 'Material Uranium',
-                'Grid L1 (1,1)',
-                'Grid L2 (1,1)',
+                'Grid_L1_001_001',
+                'Grid_L2_001_001',
                 'Material Void'
                 ]
         elem_ents = [
@@ -63,27 +63,37 @@ class test_overlayRectGrid(TestCase):
         # Also tests multilevel grid
         pgroups_ref = [
                 'Material Uranium',
-                'Grid L1 (1,1)',
-                'Grid L2 (1,1)',
+                'Grid_L1_001_001',
+                'Grid_L2_001_001',
+                'Grid_L2_001_002',
+                'Grid_L2_002_001',
+                'Grid_L2_002_002',
                 'Material Void'
                 ]
         elem_ents = [
                 [1, 2, 3, 4],
                 [1, 2, 3, 4, 5, 6, 7, 8],
-                ['tesla'],
-                [2, 3, 4, 5]
+                [4, 5],
+                [3, 6],
+                [2, 7],
+                [1, 8],
+                [5, 6, 7, 8]
                 ]
-        areas = [pi,
-                (4 - pi)/4.,
-                (4 - pi)/4.,
-                (4 - pi)/4.,
-                (4 - pi)/4.
+        areas = [pi/4,
+                pi/4,
+                pi/4,
+                pi/4,
+                (64 - pi)/4.,
+                (64 - pi)/4.,
+                (64 - pi)/4.,
+                (64 - pi)/4.
                 ]
         out_ref = ['INFO      : mocmg.overlayRectGrid - Overlaying rectangular grid',
-                'INFO      : mocmg.overlayRectGrid - Fragmenting 1 entities with 1 entities',
+                'INFO      : mocmg.overlayRectGrid - Fragmenting 1 entities with 4 entities',
                 'INFO      : mocmg.overlayRectGrid - Synchronizing model',
                 'INFO      : mocmg.overlayRectGrid - Model synchronized']
-        err_ref = []
+        err_ref = ['WARNING   : mocmg.overlayRectGrid - Bounding box for' +\
+                ' rectangular grid manually specified. Use caution. Box: [-4, -4, 0, 4, 4, 0]']
         with captured_output() as (out,err):
             mocmg.initialize(gmshOption='silent')
             gmsh.model.occ.addDisk(0, 0, 0, 1, 1)
@@ -93,7 +103,6 @@ class test_overlayRectGrid(TestCase):
             bb = [-4,-4,0,4,4,0]
             mocmg.overlayRectGrid(1,1,nnx=2,nny=2,bb=bb)
             # Check that entities were properly named 
-            #gmsh.fltk.run()
             pgroups = gmsh.model.getPhysicalGroups(2)
             for i, p in enumerate(pgroups):
                 name = gmsh.model.getPhysicalName(*p)
