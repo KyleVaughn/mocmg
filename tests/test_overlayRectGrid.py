@@ -11,8 +11,8 @@ class test_overlayRectGrid(TestCase):
     def test_gmshDisk(self):
         pgroups_ref = [
                 'Material Uranium',
-                'Grid_L1_001_001',
-                'Grid_L2_001_001',
+                'GRID_L1_001_001',
+                'GRID_L2_001_001',
                 'Material Void'
                 ]
         elem_ents = [
@@ -63,11 +63,11 @@ class test_overlayRectGrid(TestCase):
         # Also tests multilevel grid
         pgroups_ref = [
                 'Material Uranium',
-                'Grid_L1_001_001',
-                'Grid_L2_001_001',
-                'Grid_L2_001_002',
-                'Grid_L2_002_001',
-                'Grid_L2_002_002',
+                'GRID_L1_001_001',
+                'GRID_L2_001_001',
+                'GRID_L2_001_002',
+                'GRID_L2_002_001',
+                'GRID_L2_002_002',
                 'Material Void'
                 ]
         elem_ents = [

@@ -53,14 +53,14 @@ def generateRectGrid(bb,nx,ny,nnx=1,nny=1):
         for j in range(ny):
             xx = x
             # Generate grid level 2 entities for this grid level 1 entitity
-            name1 = f'Grid_L1_{i+1:03}_{j+1:03}'
+            name1 = f'GRID_L1_{i+1:03}_{j+1:03}'
             module_log.debug(f'Generating {name1} of width {width1:.2f}' + \
                    f' and height {height1:.2f} at ({x:.2f},{y:.2f},{z:.2f})')
             gridTagsLevel1[name1] = []
             for ii in range(nnx):
                 yy = y
                 for jj in range(nny):
-                    name2 = f'Grid_L2_{i*nnx+ii+1:03}_{j*nny+jj+1:03}'
+                    name2 = f'GRID_L2_{i*nnx+ii+1:03}_{j*nny+jj+1:03}'
                     tag = gmsh.model.occ.addRectangle(xx,yy,z, width2, height2)
                     gridTags.append(tag)
                     gridTagsLevel1[name1].append(tag)

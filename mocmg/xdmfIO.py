@@ -59,13 +59,13 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
     )
     # node numbering lost in hdf5. Need to adjust dict keys in elements, sets
     h5_file.create_dataset(
-        "nodes",
+        "NODES",
         data=np.stack(nodes.values()),
         compression="gzip",
         compression_opts=compression_opts,
     )
     del nodes
-    nodes_data_item.text = os.path.basename(h5_filename) + ":/" + "nodes"
+    nodes_data_item.text = os.path.basename(h5_filename) + ":/" + "NODES"
 
     # adjust elements node numbering to hdf5
     # create dict for map from node numbering to h5 number for fast lookup
@@ -129,12 +129,12 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
             Precision=prec,
         )
         h5_file.create_dataset(
-            "elements",
+            "ELEMENTS",
             data=np.stack(elements[0][1].values()),
             compression="gzip",
             compression_opts=compression_opts,
         )
-        topo_data_item.text = os.path.basename(h5_filename) + ":/" + "elements" 
+        topo_data_item.text = os.path.basename(h5_filename) + ":/" + "ELEMENTS" 
         del elements
 
     # mixed topology
@@ -174,12 +174,12 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
 
         elem_data = np.concatenate(list(elem_data.values()), axis=None)
         h5_file.create_dataset(
-            "elements",
+            "ELEMENTS",
             data=elem_data,
             compression="gzip",
             compression_opts=compression_opts,
         )
-        topo_data_item.text = os.path.basename(h5_filename) + ":/" + "elements"
+        topo_data_item.text = os.path.basename(h5_filename) + ":/" + "ELEMENTS"
         del elements
         del elem_data
 
@@ -230,7 +230,7 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
             grid,
             "Attribute",
             Center="Cell",
-            Name="Material_ID",
+            Name="MATERIAL_ID",
         )
         dt, prec = numpy_to_xdmf_dtype[material_array.dtype.name ]
         mat_data_item = ET.SubElement(
@@ -242,12 +242,12 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
             Precision=prec,
         )
         h5_file.create_dataset(
-            "Material_ID",
+            "MATERIAL_ID",
             data=material_array,
             compression="gzip",
             compression_opts=compression_opts,
         )
-        mat_data_item.text = os.path.basename(h5_filename) + ":/" + "Material_ID"
+        mat_data_item.text = os.path.basename(h5_filename) + ":/" + "MATERIAL_ID"
 
         # Info section for material ID to material name
         material_information = ET.SubElement(
