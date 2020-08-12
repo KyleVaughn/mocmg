@@ -1,7 +1,7 @@
 import mocmg
 import gmsh
 
-lc = 0.4
+lc = 0.20
 
 # Geometry
 # 1.26 cm pitch, 0.54 cm radius
@@ -20,7 +20,7 @@ gmsh.model.occ.synchronize()
 # Mesh
 gmsh.model.mesh.setSize(gmsh.model.getEntities(0), lc)
 gmsh.model.mesh.generate(2)
-#gmsh.fltk.run()
+gmsh.fltk.run()
 
 # Convert mesh to XDMF
 nstr = f'{lc:.2f}'
