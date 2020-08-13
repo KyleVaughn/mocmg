@@ -1,7 +1,7 @@
 import mocmg
 import gmsh
 
-lc = 0.03
+lc = 0.05
 
 # Geometry
 # 17 by 17 lattice, 1.26 cm pitch, 0.54 cm radius
@@ -62,25 +62,20 @@ nodes, elements, elsets = mocmg.readAbaqusINP('uo2_assembly_c5g7_lc' + lcstr + '
 print('Area info')
 mesh = mocmg.Mesh(nodes, elements, elsets)
 total_area = mesh.getSetArea('GRID_L1_001_001')
-uo2_area = mesh.getSetArea('MATERIAL_UO2-3.3')
-gt_area = mesh.getSetArea('MATERIAL_GUIDE_TUBE')
 fc_area = mesh.getSetArea('MATERIAL_FISSION_CHAMBER')
-fis_area = uo2_area + gt_area + fc_area
-pin_area = 0.0
-for i in range(1,290):
-    pin_area = pin_area + mesh.getSetArea(f'PIN_{i:06}')
 mod_area = mesh.getSetArea('MATERIAL_MODERATOR')
+gt_area = mesh.getSetArea('MATERIAL_GUIDE_TUBE')
+uo2_area = mesh.getSetArea('MATERIAL_UO2-3.3')
+print(f'Fissile area:                   {uo2_area}')
+print(f'Fissile area from compliment:   {total_area - fc_area - mod_area - gt_area}')
 print(f'Total area: {total_area}')
-print(f'Fissile area: {fis_area}')
-print(f'Pin area: {pin_area}')
-print(f'Moderator area: {mod_area}\n')
 
-# Error checks
-print('Error checks')
-print('Pin + moderator - total area = 0?', pin_area + mod_area - total_area)
-print('Pin - fissile = 0?', pin_area - fis_area)
+print('\nError checks')
+print(f'Fissile area - from compliment: {uo2_area - (total_area - fc_area - mod_area - gt_area)}')
+print(f'Total actual - computed: {total_area - 21.42**2}')
+
 
 
 del mesh
-mocmg.writeXDMF('uo2_assembly_c5g7_lc' + lcstr + '.xdmf', nodes, elements, elsets)
+#mocmg.writeXDMF('uo2_assembly_c5g7_lc' + lcstr + '.xdmf', nodes, elements, elsets)
 mocmg.finalize()
