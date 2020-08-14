@@ -1,7 +1,7 @@
 import mocmg
 import gmsh
 
-lc = 0.40
+lc = 0.30
 
 # Geometry
 # 1.26 cm pitch, 0.54 cm radius
@@ -26,7 +26,7 @@ gmsh.model.mesh.field.setNumbers(1, "EdgesList", [5])
 
 gmsh.model.mesh.field.add("Threshold", 2)
 gmsh.model.mesh.field.setNumber(2, "IField", 1)
-gmsh.model.mesh.field.setNumber(2, "LcMin", 0.02)
+gmsh.model.mesh.field.setNumber(2, "LcMin", 0.01)
 gmsh.model.mesh.field.setNumber(2, "LcMax", lc)
 gmsh.model.mesh.field.setNumber(2, "DistMin", 0.0)
 gmsh.model.mesh.field.setNumber(2, "DistMax", 0.02)
