@@ -1,7 +1,8 @@
 import mocmg
 import gmsh
 
-lc = 0.30
+lc = 0.20
+lcmin = 0.04
 
 # Geometry
 # 17 by 17 lattice, 1.26 cm pitch, 0.54 cm radius
@@ -29,6 +30,7 @@ for j in range(17):
         p = gmsh.model.addPhysicalGroup(2, [pinID])
         gmsh.model.setPhysicalName(2, p, f'PIN_{pinID:06}')
         pinID = pinID + 1
+
 ent = gmsh.model.getEntities(2)
 tags_UO2 = [t[1] for t in ent]
 tags_guide = [40, 43, 46, 55, 65, 100, 97, 94, 91, 88, 151, 148, 142, 139, 202, 199, 196,
@@ -48,28 +50,35 @@ mocmg.overlayRectGrid(1,1,17,17,bb=[0,0,0,21.42,21.42,0],defaultMat='MATERIAL_MO
 gmsh.model.occ.synchronize()
  
 # Mesh 
-gmsh.model.mesh.field.add("Distance", 1)
-gmsh.model.mesh.field.setNumber(1, "NNodesByEdge", 100)
-gmsh.model.mesh.field.setNumbers(1, "EdgesList", [5])
+# Get all pin entities
+pinEnts = []
+for i in range(1,17*17+1):
+    # should only return 1 entity
+    pinEnts.append(*mocmg.getEntitiesForPhysicalGroupName(f'PIN_{i:06}'))
 
+pinEnts_dimTags = [(2,t) for t in pinEnts]
+pinBounds_dimTags = gmsh.model.getBoundary(pinEnts_dimTags, combined=False, oriented=False)
+pinBounds = [t[1] for t in pinBounds_dimTags]
+
+#gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 0.05)
+gmsh.model.mesh.field.add("Distance", 1)
+gmsh.model.mesh.field.setNumber(1, "NNodesByEdge", 500)
+gmsh.model.mesh.field.setNumbers(1, "EdgesList", pinBounds)
+#
 gmsh.model.mesh.field.add("Threshold", 2)
 gmsh.model.mesh.field.setNumber(2, "IField", 1)
-gmsh.model.mesh.field.setNumber(2, "LcMin", 0.01)
+gmsh.model.mesh.field.setNumber(2, "LcMin", lcmin)
 gmsh.model.mesh.field.setNumber(2, "LcMax", lc) 
-gmsh.model.mesh.field.setNumber(2, "DistMin", 0.0)
-gmsh.model.mesh.field.setNumber(2, "DistMax", 0.02)
+gmsh.model.mesh.field.setNumber(2, "DistMin", 0.5*lcmin)
+gmsh.model.mesh.field.setNumber(2, "DistMax", 0.5*lcmin)
 gmsh.model.mesh.field.setAsBackgroundMesh(2)
-# Makes interior of disk all one size
+## Makes interior of disk all one size
 gmsh.option.setNumber("Mesh.CharacteristicLengthExtendFromBoundary", 0)
 gmsh.option.setNumber("Mesh.CharacteristicLengthFromPoints", 0)
 gmsh.option.setNumber("Mesh.CharacteristicLengthFromCurvature", 0)
 gmsh.model.mesh.generate(2)
-gmsh.fltk.run()
-
-#gmsh.model.mesh.setSize(gmsh.model.getEntities(0), lc)
-#gmsh.model.mesh.generate(2)
-gmsh.fltk.run()
-
+#gmsh.fltk.run()
+#
 # Convert mesh to XDMF
 lcstr = f'{lc:.2f}'
 lcstr = lcstr.replace('.','p')
@@ -95,5 +104,5 @@ print(f'Total actual - computed: {total_area - 21.42**2}')
 
 
 del mesh
-#mocmg.writeXDMF('uo2_assembly_c5g7_lc' + lcstr + '.xdmf', nodes, elements, elsets)
+mocmg.writeXDMF('uo2_assembly_c5g7_lc' + lcstr + '.xdmf', nodes, elements, elsets)
 mocmg.finalize()
