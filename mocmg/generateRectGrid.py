@@ -24,6 +24,7 @@ module_log = logging.getLogger(__name__)
 #   NOTE: gmsh.model.getPhysicalName(2, physicalGroupTagsL1[i]) == physicalGroupNamesL1[i]
 #   This holds for L2 as well
 def generateRectGrid(bb,nx,ny,nnx=1,nny=1):
+    module_log.info('Generating rectangular grid')
     x_min, y_min, z_min = bb[0:3]
     x_max, y_max, z_max = bb[3:6]
     dx = x_max - x_min
@@ -74,9 +75,11 @@ def generateRectGrid(bb,nx,ny,nnx=1,nny=1):
     
 
     # Model must be synchronized for entities to be able to have a physical group
+    module_log.info('Synchronizing model')
     gmsh.model.occ.synchronize()
 
     # Set physical groups
+    module_log.info('Setting grid tags')
     physicalGroupTagsL1 = []
     physicalGroupNamesL1 = list(gridTagsLevel1.keys())
     for name in physicalGroupNamesL1:
@@ -92,4 +95,5 @@ def generateRectGrid(bb,nx,ny,nnx=1,nny=1):
         gmsh.model.setPhysicalName(2, outTag, name)
 
     # NOTE: physical surface tags are NOT elementary entity tags
+    module_log.info('Finished generating rectangular grid')
     return physicalGroupTagsL1, physicalGroupTagsL2, physicalGroupNamesL1, physicalGroupNamesL2

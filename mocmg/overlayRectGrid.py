@@ -80,9 +80,9 @@ def overlayRectGrid(nx,ny,nnx=1,nny=1,defaultMat='Material Void',bb=None):
     module_log.info('Synchronizing model')
     gmsh.model.removePhysicalGroups()
     gmsh.model.occ.synchronize()
-    module_log.info('Model synchronized')
 
     # For each group, create a new group with the appropriate children and name
+    module_log.info('Adjusting tags to new entities')
     for tag in fragmentChildrenGroups.keys():
         outTag = gmsh.model.addPhysicalGroup(2, list(fragmentChildrenGroups[tag]), tag)
         if outTag != tag:
@@ -105,3 +105,4 @@ def overlayRectGrid(nx,ny,nnx=1,nny=1,defaultMat='Material Void',bb=None):
     defaultMatGeom = allEntitiesTags.difference(originalGeom)
     outTag = gmsh.model.addPhysicalGroup(2, list(defaultMatGeom))
     gmsh.model.setPhysicalName(2, outTag, defaultMat)
+    module_log.info('Finished overlaying rectangular grid')

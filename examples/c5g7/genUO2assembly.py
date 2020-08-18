@@ -37,14 +37,14 @@ tags_guide = [40, 43, 46, 55, 65, 100, 97, 94, 91, 88, 151, 148, 142, 139, 202, 
         193, 190, 235, 225, 250, 247, 244]
 for t in tags_guide:
     tags_UO2.remove(t)
-tags_MOX87 = [145]
-for t in tags_MOX87:
+tags_FC = [145]
+for t in tags_FC:
     tags_UO2.remove(t)
 p = gmsh.model.addPhysicalGroup(2, tags_UO2)    
 gmsh.model.setPhysicalName(2, p, 'MATERIAL_UO2-3.3')
 p = gmsh.model.addPhysicalGroup(2, tags_guide)    
 gmsh.model.setPhysicalName(2, p, 'MATERIAL_GUIDE_TUBE')
-p = gmsh.model.addPhysicalGroup(2, tags_MOX87)    
+p = gmsh.model.addPhysicalGroup(2, tags_FC)    
 gmsh.model.setPhysicalName(2, p, 'MATERIAL_FISSION_CHAMBER')
 mocmg.overlayRectGrid(1,1,17,17,bb=[0,0,0,21.42,21.42,0],defaultMat='MATERIAL_MODERATOR')
 gmsh.model.occ.synchronize()
