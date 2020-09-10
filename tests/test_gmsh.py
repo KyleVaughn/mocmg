@@ -10,7 +10,6 @@ def run(cmd):
     return stdout, stderr
 
 class test_gmsh(TestCase):
-
     # nosetests makes capturing output of gmsh difficult, so using subprocess is the solution for now.
     # nose messes with io fileno
     def test_gmshVerbosityDebug(self):

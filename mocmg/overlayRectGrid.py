@@ -105,4 +105,3 @@ def overlayRectGrid(nx,ny,nnx=1,nny=1,defaultMat='Material Void',bb=None):
     defaultMatGeom = allEntitiesTags.difference(originalGeom)
     outTag = gmsh.model.addPhysicalGroup(2, list(defaultMatGeom))
     gmsh.model.setPhysicalName(2, outTag, defaultMat)
-    module_log.info('Finished overlaying rectangular grid')

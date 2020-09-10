@@ -45,6 +45,7 @@ def generateRectGrid(bb,nx,ny,nnx=1,nny=1):
     gridTagsLevel1 = {} # Dictionary of grid level 1 names and tags of grid level 2 rectangles for each name 
     gridTagsLevel2 = {} # Dictionary of grid level 2 names and tags of grid level 2 rectangles for each name 
     x = x_min
+    # Check to make sure divisions is 3 digits or less, otherwise grid naming changes
     if nx*nnx > 999:
         module_log.error('Too many x-divisions of bounding box for the output format')
     if ny*nny > 999:                                                                         
@@ -78,7 +79,7 @@ def generateRectGrid(bb,nx,ny,nnx=1,nny=1):
     module_log.info('Synchronizing model')
     gmsh.model.occ.synchronize()
 
-    # Set physical groups
+    # Set physical groups. This can be slow.
     module_log.info('Setting grid tags')
     physicalGroupTagsL1 = []
     physicalGroupNamesL1 = list(gridTagsLevel1.keys())
@@ -95,5 +96,4 @@ def generateRectGrid(bb,nx,ny,nnx=1,nny=1):
         gmsh.model.setPhysicalName(2, outTag, name)
 
     # NOTE: physical surface tags are NOT elementary entity tags
-    module_log.info('Finished generating rectangular grid')
     return physicalGroupTagsL1, physicalGroupTagsL2, physicalGroupNamesL1, physicalGroupNamesL2

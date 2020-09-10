@@ -5,7 +5,6 @@ from .testingUtils import captured_output
 from unittest import TestCase
 
 # NOTE: You pretty much have to run gmsh.fltk.run() to debug these
-
 class test_overlayRectGrid(TestCase):
 
     def test_gmshDisk(self):
@@ -27,10 +26,15 @@ class test_overlayRectGrid(TestCase):
                 (4 - pi)/4.,
                 (4 - pi)/4.
                 ]
-        out_ref = ['INFO      : mocmg.overlayRectGrid - Overlaying rectangular grid',
+        out_ref = [
+                'INFO      : mocmg.overlayRectGrid - Overlaying rectangular grid',
+                'INFO      : mocmg.generateRectGrid - Generating rectangular grid',
+                'INFO      : mocmg.generateRectGrid - Synchronizing model',
+                'INFO      : mocmg.generateRectGrid - Setting grid tags',
                 'INFO      : mocmg.overlayRectGrid - Fragmenting 1 entities with 1 entities',
                 'INFO      : mocmg.overlayRectGrid - Synchronizing model',
-                'INFO      : mocmg.overlayRectGrid - Model synchronized']
+                'INFO      : mocmg.overlayRectGrid - Adjusting tags to new entities',
+                ]
         err_ref = []
         with captured_output() as (out,err):
             mocmg.initialize(gmshOption='silent')
@@ -88,10 +92,15 @@ class test_overlayRectGrid(TestCase):
                 (64 - pi)/4.,
                 (64 - pi)/4.
                 ]
-        out_ref = ['INFO      : mocmg.overlayRectGrid - Overlaying rectangular grid',
+        out_ref = [
+                'INFO      : mocmg.overlayRectGrid - Overlaying rectangular grid',
+                'INFO      : mocmg.generateRectGrid - Generating rectangular grid',
+                'INFO      : mocmg.generateRectGrid - Synchronizing model',
+                'INFO      : mocmg.generateRectGrid - Setting grid tags',
                 'INFO      : mocmg.overlayRectGrid - Fragmenting 1 entities with 4 entities',
                 'INFO      : mocmg.overlayRectGrid - Synchronizing model',
-                'INFO      : mocmg.overlayRectGrid - Model synchronized']
+                'INFO      : mocmg.overlayRectGrid - Adjusting tags to new entities',
+                ]
         err_ref = ['WARNING   : mocmg.overlayRectGrid - Bounding box for' +\
                 ' rectangular grid manually specified. Use caution. Box: [-4, -4, 0, 4, 4, 0]']
         with captured_output() as (out,err):
