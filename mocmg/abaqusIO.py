@@ -1,6 +1,7 @@
 import logging
 import numpy as np
 import os
+from .mesh import Mesh
 
 module_log = logging.getLogger(__name__)
 
@@ -57,7 +58,7 @@ def readAbaqusINP(filepath):
         else:
             module_log.error(f'Unrecognized mesh element type: {e[0]}')
 
-    return nodes, elements, element_sets
+    return Mesh(nodes, elements, element_sets)
 
 def _readNodes(f, nodes):
     while True:

@@ -21,8 +21,7 @@ mocmg.overlayRectGrid(1,1,bb=[0,0,0,1.26,1.26,0],defaultMat='MATERIAL_MODERATOR'
 gmsh.model.occ.synchronize()
 
 # Mesh
-
-#gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 0.005)
+gmsh.model.mesh.setSize(gmsh.model.getEntities(0), lc)
 #
 gmsh.model.mesh.field.add("MathEval", 1)
 gmsh.model.mesh.field.setString(1, "F", str(lc))
@@ -45,11 +44,11 @@ gmsh.model.mesh.field.setNumbers(4, "FacesList", [1])
 gmsh.model.mesh.field.add("Min", 5)
 gmsh.model.mesh.field.setNumbers(5, "FieldsList", [4, 1])
 
-gmsh.model.mesh.field.setAsBackgroundMesh(3)
+#gmsh.model.mesh.field.setAsBackgroundMesh(3)
 ## Makes interior of disk all one size
-gmsh.option.setNumber("Mesh.CharacteristicLengthExtendFromBoundary", 0)
-gmsh.option.setNumber("Mesh.CharacteristicLengthFromPoints", 0)
-gmsh.option.setNumber("Mesh.CharacteristicLengthFromCurvature", 0)
+#gmsh.option.setNumber("Mesh.CharacteristicLengthExtendFromBoundary", 0)
+#gmsh.option.setNumber("Mesh.CharacteristicLengthFromPoints", 0)
+#gmsh.option.setNumber("Mesh.CharacteristicLengthFromCurvature", 0)
 #gmsh.merge('field.pos')
 #bg_field = gmsh.model.mesh.field.add("PostView")
 #gmsh.model.mesh.field.setAsBackgroundMesh(bg_field)
