@@ -11,6 +11,7 @@ quadratic_edges = {
 }
 
 class Mesh:
+
     def __init__(self, points, cells, cell_sets):
         # points is a dictionary with integer keys and numpy array values, corresponding
         # to point ID and spatial coordinates respectively
@@ -82,7 +83,10 @@ class Mesh:
                         y_quad = np.array([self.points[v][1] for v in vertices[4:8]])
                     else:
                         module_log.error('Unsupported cell type in quadratic area calculation')
-
+                    # No quadratic edges shoelace formula may be used
+                    # https://en.wikipedia.org/wiki/Shoelace_formula
+                    # Assumes that vertices are in clockwise or counterclockwise order
+                    # https://stackoverflow.com/questions/24467972/calculate-area-of-polygon-given-x-y-coordinates                         
                     x_ = x_lin - x_lin.mean()
                     y_ = y_lin - y_lin.mean()
                     correction = x_[-1] * y_[0] - y_[-1]* x_[0]
@@ -156,6 +160,7 @@ class Mesh:
             module_log.error(f'Cell {c} does not exist')
 
     def getSetArea(self, cell_set):
+        module_log.info(f"Computing '{cell_set}' cell set area")
         cells = self.getCells(cell_set) 
         area = 0.0
         for c in cells:

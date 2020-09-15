@@ -118,7 +118,6 @@ def initialize(mocmgOption=None,gmshOption=None, color=True):
             logging_handler_err.setFormatter(formatter)
     logger.addHandler(logging_handler_err)
 
-
     # gmsh
     if gmshOption == 'debug':
         gmshVerbosity = 99
