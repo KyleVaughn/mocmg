@@ -1,11 +1,11 @@
 import gmsh
 import logging
 import mocmg
-from nose.tools import nottest
+import pytest
 from .testingUtils import captured_output
 from unittest import TestCase
 
-@nottest
+@pytest.mark.skip()
 def testMessages(logger):
     logger.debug('Debug message')
     logger.info('Info message')

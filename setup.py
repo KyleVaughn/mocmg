@@ -13,10 +13,9 @@ setuptools.setup(
         'numpy',
         'scipy',
         'h5py',
+        'gmsh-dev',
     ],
     include_package_data=True,
     python_requires='>=3.6',
     zip_safe=False,
-    test_suite='nose.collector',
-    tests_require=['nose']
     )
