@@ -36,7 +36,8 @@ class test_generateRectGrid(TestCase):
             etag = gmsh.model.getEntitiesForPhysicalGroup(2, ptag)
             self.assertEqual(etag, ptag)
             # Area
-            mass = gmsh.model.occ.getMass(2, etag)
+            print(etag)
+            mass = gmsh.model.occ.getMass(2, etag[0])
             self.assertAlmostEqual(6.0, mass, places=5, msg='3 width, 2 height, 6 area')
         # Centroid
         x,y,z = gmsh.model.occ.getCenterOfMass(2, 1)
