@@ -16,13 +16,14 @@ abaqus_to_topo_type = {
     "CPS8": "quad8"
 }
 
+
 def readAbaqusINP(filepath):
-    module_log.info(f'Reading mesh data from {filepath}') 
+    module_log.info(f'Reading mesh data from {filepath}')
     if not os.path.isfile(filepath):
         module_log.error(f'File {filepath} not found')
     # read data in blocks based upon keyword
     nodes = {}
-    elements = [] 
+    elements = []
     element_sets = []
     with open(filepath) as f:
         line = f.readline()
@@ -44,7 +45,7 @@ def readAbaqusINP(filepath):
                 elem_type = _getParam(line, 'TYPE')
                 elem_block, line = _readElements(f)
                 elements.append([elem_type, elem_block])
-            elif keyword == "ELSET":    
+            elif keyword == "ELSET":
                 element_set_name = _getParam(line, 'ELSET')
                 elset, line = _readElementSet(f)
                 element_sets.append([element_set_name, elset])
@@ -60,6 +61,7 @@ def readAbaqusINP(filepath):
 
     return Mesh(nodes, elements, element_sets)
 
+
 def _readNodes(f, nodes):
     while True:
         line = f.readline()
@@ -72,6 +74,7 @@ def _readNodes(f, nodes):
         nodes[int(point_id)] = coords
 
     return nodes, line
+
 
 def _readElements(f):
     elem_block = {}
@@ -87,6 +90,7 @@ def _readElements(f):
 
     return elem_block, line
 
+
 def _readElementSet(f):
     elset = []
     while True:
@@ -96,9 +100,10 @@ def _readElementSet(f):
 
         line = line.strip().strip(",").split(",")
         elems = [int(x) for x in line]
-        elset.extend(elems) 
+        elset.extend(elems)
 
     return np.array(elset, dtype=int), line
+
 
 def _getParam(line, param):
     words = [w.strip().replace("*", "").upper() for w in line.split(",")]
@@ -111,5 +116,5 @@ def _getParam(line, param):
         wordList = wordList[1:]
 
     idx = wordList.index(param)
-    
+
     return wordList[idx + 1]

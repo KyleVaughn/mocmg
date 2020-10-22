@@ -10,6 +10,7 @@ quadratic_edges = {
     "triangle6": True,
 }
 
+
 class Mesh:
 
     def __init__(self, points, cells, cell_sets):
@@ -22,28 +23,28 @@ class Mesh:
         # where the type string is triangle, quad8, etc.
         # The dictionary has integer keys and numpy array values.
         # This dictionary denotes cell ID and the vertex ID that make up the cell.
-        # ex: 
-        #[
-        #   ['triangle', {
-        #             1: np.array([1, 2, 3]),
-        #             2: np.array([2, 3, 4]),
-        #             } 
-        #   ],
-        #   ['quad', {
-        #         3: np.array([1, 2, 5, 6]),
-        #         }
-        #   ]
-        #]
+        # ex:
+        # [
+        #    ['triangle', {
+        #              1: np.array([1, 2, 3]),
+        #              2: np.array([2, 3, 4]),
+        #              }
+        #    ],
+        #    ['quad', {
+        #          3: np.array([1, 2, 5, 6]),
+        #          }
+        #    ]
+        # ]
         self.cells = cells
         # cell_sets is a list of lists. Each sublist is of the form
         # ['label', np.array]
         # where label is the name of the cell set and the numpy array contains the integer IDs
         # of the cells in that set
-        # ex: 
-        #[ 
-        #    ['Material_UO2', np.array([1, 2, 3])],
-        #    ['Material_MOX', np.array([4, 5])],
-        #]
+        # ex:
+        # [
+        #     ['Material_UO2', np.array([1, 2, 3])],
+        #     ['Material_MOX', np.array([4, 5])],
+        # ]
         self.cell_sets = {} if cell_sets is None else cell_sets
 
     # input name of cell set, return the cell IDs
@@ -51,15 +52,15 @@ class Mesh:
         for sname, array in self.cell_sets:
             if cell_set == sname:
                 return array
-        module_log.error(f'No cell set named {cell_set}') 
-    
+        module_log.error(f'No cell set named {cell_set}')
+
     # input cell type, return True if has quad edges, False if not
     def cellHasQuadraticEdges(self, cell_type):
         if cell_type in quadratic_edges:
             return quadratic_edges[cell_type]
         else:
-            module_log.error(f'No cell type {cell_type} in quadratic edge dictionary.') 
-    
+            module_log.error(f'No cell type {cell_type} in quadratic edge dictionary.')
+
     # Input cell ID, return area of cell
     def getCellArea(self, cell):
         cell_exists = False
@@ -86,15 +87,15 @@ class Mesh:
                     # No quadratic edges shoelace formula may be used
                     # https://en.wikipedia.org/wiki/Shoelace_formula
                     # Assumes that vertices are in clockwise or counterclockwise order
-                    # https://stackoverflow.com/questions/24467972/calculate-area-of-polygon-given-x-y-coordinates                         
+# https://stackoverflow.com/questions/24467972/calculate-area-of-polygon-given-x-y-coordinates
                     x_ = x_lin - x_lin.mean()
                     y_ = y_lin - y_lin.mean()
-                    correction = x_[-1] * y_[0] - y_[-1]* x_[0]
+                    correction = x_[-1]*y_[0] - y_[-1]*x_[0]
                     main_area = np.dot(x_[:-1], y_[1:]) - np.dot(y_[:-1], x_[1:])
                     area = 0.5*np.abs(main_area + correction)
                     # Assumed points are in counterclockwise order. Area for the linear
                     # polygon is computed, then adjusted based on integrals for the quad edges.
-                    # If a quadratic vertex is to the left of the linear edge, the area is added. 
+                    # If a quadratic vertex is to the left of the linear edge, the area is added.
                     # Otherwise it is subtracted.
                     # Consider the following quadratic triangle with one quad edge:
                     #        2                   2
@@ -127,12 +128,12 @@ class Mesh:
                                 [np.cos(theta), np.sin(theta)],
                                 [-np.sin(theta), np.cos(theta)]
                                 ])
-                        for j in range(1,3):
+                        for j in range(1, 3):
                             v = np.array([
                                 [x_e[j]],
                                 [y_e[j]]
                                 ])
-                            v_ = np.dot(R,v)
+                            v_ = np.dot(R, v)
                             x_e[j] = v_[0]
                             y_e[j] = v_[1]
                         # Get quadratic coefficients and integrate
@@ -142,7 +143,7 @@ class Mesh:
                         quadarea = P(x_e[1]) - P(0)
                         # quadarea will be opposite of correct sign
                         area = area - quadarea
-                    return area 
+                    return area
                 else:
                     # No quadratic edges shoelace formula may be used
                     # https://en.wikipedia.org/wiki/Shoelace_formula
@@ -153,15 +154,15 @@ class Mesh:
                     y = np.array([self.points[v][1] for v in vertices])
                     x_ = x - x.mean()
                     y_ = y - y.mean()
-                    correction = x_[-1] * y_[0] - y_[-1]* x_[0]
+                    correction = x_[-1]*y_[0] - y_[-1]*x_[0]
                     main_area = np.dot(x_[:-1], y_[1:]) - np.dot(y_[:-1], x_[1:])
                     return 0.5*np.abs(main_area + correction)
         if not cell_exists:
-            module_log.error(f'Cell {c} does not exist')
+            module_log.error(f'Cell {cell} does not exist')
 
     def getSetArea(self, cell_set):
         module_log.info(f"Computing '{cell_set}' cell set area")
-        cells = self.getCells(cell_set) 
+        cells = self.getCells(cell_set)
         area = 0.0
         for c in cells:
             area = area + self.getCellArea(c)

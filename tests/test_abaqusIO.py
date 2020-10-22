@@ -1,6 +1,5 @@
 import mocmg
 import numpy as np
-import os
 from .testingUtils import captured_output
 from unittest import TestCase
 
@@ -9,49 +8,49 @@ class test_abaqusIO(TestCase):
 
     def test_triangleOnlyINP(self):
         points_ref = {
-                1: np.array([ 1.,  0.,  0.]), 
-                2: np.array([ 0.62348980185873,  0.78183148246803, 0.]), 
-                3: np.array([-0.22252093395631,  0.97492791218182, 0.]), 
-                4: np.array([-0.90096886790242,  0.43388373911756, 0.]), 
-                5: np.array([-0.90096886790242, -0.43388373911756, 0.]), 
-                6: np.array([-0.22252093395631, -0.97492791218182, 0.]), 
-                7: np.array([ 0.62348980185873, -0.78183148246803, 0.]), 
+                1: np.array([ 1.,  0.,  0.]),
+                2: np.array([ 0.62348980185873,  0.78183148246803, 0.]),
+                3: np.array([-0.22252093395631,  0.97492791218182, 0.]),
+                4: np.array([-0.90096886790242,  0.43388373911756, 0.]),
+                5: np.array([-0.90096886790242, -0.43388373911756, 0.]),
+                6: np.array([-0.22252093395631, -0.97492791218182, 0.]),
+                7: np.array([ 0.62348980185873, -0.78183148246803, 0.]),
                 8: np.array([ 1.5202888403297e-17, -7.7860210853066e-18, 0.])}
         cells_ref = [
                 ['triangle', {
-                    1: np.array([4, 8, 3]), 
-                    2: np.array([5, 8, 4]), 
-                    3: np.array([3, 8, 2]), 
-                    4: np.array([6, 8, 5]), 
-                    5: np.array([2, 8, 1]), 
-                    6: np.array([7, 8, 6]), 
+                    1: np.array([4, 8, 3]),
+                    2: np.array([5, 8, 4]),
+                    3: np.array([3, 8, 2]),
+                    4: np.array([6, 8, 5]),
+                    5: np.array([2, 8, 1]),
+                    6: np.array([7, 8, 6]),
                     7: np.array([1, 8, 7])
-                    }
-                ]]
+                    }]]
         out_ref = ['INFO      : mocmg.abaqusIO - Reading mesh data from tests/abaqus/triangle_only.inp']
         err_ref = []
         # Caputure output since bb will throw warning on purpose
-        with captured_output() as (out,err):
+        with captured_output() as (out, err):
             mocmg.initialize(gmshOption='silent')
             mesh = mocmg.readAbaqusINP('tests/abaqus/triangle_only.inp')
-            points = mesh.points 
-            cells = mesh.cells 
-            cell_sets = mesh.cell_sets 
+            points = mesh.points
+            cells = mesh.cells
+            cell_sets = mesh.cell_sets
         # points
-        for i in range(1,9):
+        for i in range(1, 9):
             for j in range(3):
                 self.assertAlmostEqual(points[i][j], points_ref[i][j], places=10)
         # cells
         self.assertEqual(len(cells), 1)
         self.assertEqual(cells[0][0], 'triangle')
-        for i in range(1,8):
+        for i in range(1, 8):
             for j in range(3):
                 self.assertEqual(cells[0][1][i][j], cells_ref[0][1][i][j])
         # cell_sets
         self.assertEqual(cell_sets, [])
         # message
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
-        out, err = [l.split(None,1)[1] for l in out], [l.split(None,1)[1] for l in err] # strip times
+        # strip times
+        out, err = [l.split(None, 1)[1] for l in out], [l.split(None, 1)[1] for l in err]
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)
         mocmg.finalize()
@@ -132,37 +131,38 @@ class test_abaqusIO(TestCase):
         out_ref = ['INFO      : mocmg.abaqusIO - Reading mesh data from tests/abaqus/mixed_topology.inp']
         err_ref = []
         # Caputure output since bb will throw warning on purpose
-        with captured_output() as (out,err):
+        with captured_output() as (out, err):
             mocmg.initialize(gmshOption='silent')
             mesh = mocmg.readAbaqusINP('tests/abaqus/mixed_topology.inp')
-            points = mesh.points 
-            cells = mesh.cells 
-            cell_sets = mesh.cell_sets             
+            points = mesh.points
+            cells = mesh.cells
+            cell_sets = mesh.cell_sets
         # points
-        for i in range(1,50):
+        for i in range(1, 50):
             for j in range(3):
                 self.assertAlmostEqual(points[i][j], points_ref[i][j], places=10)
         # cells
         self.assertEqual(len(cells), 2)
         self.assertEqual(cells[0][0], 'triangle6')
-        for i in range(1,8):
+        for i in range(1, 8):
             for j in range(6):
                 self.assertEqual(cells[0][1][i][j], cells_ref[0][1][i][j])
 
         self.assertEqual(cells[1][0], 'quad8')
-        for i in range(8,14):
+        for i in range(8, 14):
             for j in range(8):
                 self.assertEqual(cells[1][1][i][j], cells_ref[1][1][i][j])
         # cell_sets
         self.assertEqual(cell_sets, [])
         # message
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
-        out, err = [l.split(None,1)[1] for l in out], [l.split(None,1)[1] for l in err] # strip times
+        # strip times
+        out, err = [l.split(None, 1)[1] for l in out], [l.split(None, 1)[1] for l in err]
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)
         mocmg.finalize()
 
-    def test_cell_sets(self):                                                                    
+    def test_cell_sets(self):
         points_ref = {
             1 : np.array([ 1, 0, 0]),
             2 : np.array([ 3, 0, 0]),
@@ -214,7 +214,7 @@ class test_abaqusIO(TestCase):
             48: np.array([ 2.1649675154598,  -0.65963968373472,   0]),
             49: np.array([ 1.8282722837808,   0.66421423025096,   0]),
         }
- 
+
         cells_ref = [
                 ['triangle6', {
                     1: np.array([5, 31, 4, 32, 33, 11]),
@@ -235,35 +235,35 @@ class test_abaqusIO(TestCase):
                     }],
                 ]
         cell_sets_ref = [
-                ['MATERIAL_URANIUM', 
-                    np.array([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13])], 
-                ['DISK2', 
-                    np.array([ 8,  9, 10, 11, 12, 13])], 
-                ['DISK1', 
+                ['MATERIAL_URANIUM',
+                    np.array([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13])],
+                ['DISK2',
+                    np.array([ 8,  9, 10, 11, 12, 13])],
+                ['DISK1',
                     np.array([1, 2, 3, 4, 5, 6, 7])]
                 ]
         out_ref = ['INFO      : mocmg.abaqusIO - Reading mesh data from tests/abaqus/disks_mixed.inp']
         err_ref = []
         # Caputure output since bb will throw warning on purpose
-        with captured_output() as (out,err):
+        with captured_output() as (out, err):
             mocmg.initialize(gmshOption='silent')
             mesh = mocmg.readAbaqusINP('tests/abaqus/disks_mixed.inp')
-            points = mesh.points 
-            cells = mesh.cells 
-            cell_sets = mesh.cell_sets 
+            points = mesh.points
+            cells = mesh.cells
+            cell_sets = mesh.cell_sets
         # points
-        for i in range(1,50):
+        for i in range(1, 50):
             for j in range(3):
                 self.assertAlmostEqual(points[i][j], points_ref[i][j], places=10)
         # cells
         self.assertEqual(len(cells), 2)
         self.assertEqual(cells[0][0], 'triangle6')
-        for i in range(1,8):
+        for i in range(1, 8):
             for j in range(6):
                 self.assertEqual(cells[0][1][i][j], cells_ref[0][1][i][j])
 
         self.assertEqual(cells[1][0], 'quad8')
-        for i in range(8,14):
+        for i in range(8, 14):
             for j in range(8):
                 self.assertEqual(cells[1][1][i][j], cells_ref[1][1][i][j])
         # cell_sets
@@ -274,7 +274,8 @@ class test_abaqusIO(TestCase):
                 self.assertEqual(cell_sets[i][1][j], cell_sets_ref[i][1][j])
         # message
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
-        out, err = [l.split(None,1)[1] for l in out], [l.split(None,1)[1] for l in err] # strip times
+        # strip times
+        out, err = [l.split(None, 1)[1] for l in out], [l.split(None, 1)[1] for l in err]
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)
         mocmg.finalize()
@@ -283,14 +284,11 @@ class test_abaqusIO(TestCase):
         out_ref = ['INFO      : mocmg.abaqusIO - Reading mesh data from tests/abaqus/element_error.inp']
         err_ref = ['ERROR     : mocmg.abaqusIO - Unrecognized mesh element type: MADEUPTYPE']
         # Caputure output since bb will throw warning on purpose
-        with captured_output() as (out,err):
+        with captured_output() as (out, err):
             mocmg.initialize(gmshOption='silent')
             mesh = mocmg.readAbaqusINP('tests/abaqus/element_error.inp')
-            points = mesh.points 
-            cells = mesh.cells 
-            cell_sets = mesh.cell_sets 
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
-        out, err = [l.split(None,1)[1] for l in out], [l.split(None,1)[1] for l in err] # strip times
+        out, err = [l.split(None, 1)[1] for l in out], [l.split(None, 1)[1] for l in err]
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)
         mocmg.finalize()

@@ -31,9 +31,11 @@ xdmf_int_to_topo_type = {
 }
 topo_type_to_xdmf_int = {v: k for k, v in xdmf_int_to_topo_type.items()}
 
+
 def _writeXML(filename, root):
     tree = ET.ElementTree(root)
     tree.write(filename)
+
 
 def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, multifile=False):
     module_log.info('Writing mesh data to XDMF file')
@@ -47,7 +49,7 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
     # nodes/geom
     geo = ET.SubElement(grid, "Geometry", GeometryType="XYZ")
     nkeys = list(nodes.keys())
-    dt, prec = numpy_to_xdmf_dtype[ nodes[nkeys[0]].dtype.name ]
+    dt, prec = numpy_to_xdmf_dtype[nodes[nkeys[0]].dtype.name]
     dim = "{} {}".format(len(nkeys), 3)
     nodes_data_item = ET.SubElement(
         geo,
@@ -80,7 +82,7 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
     # adjust elsets element numbering to hdf5
     # elements are written in order of list
     # need to construct global elem map
-    if element_sets != None:
+    if element_sets is not None:
         ecounter = 0
         elemmap = {}
         for eid, msh in enumerate(elements):
@@ -90,7 +92,8 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
             ecounter += len(ekeys)
         # now that we have global map, iterate through each elset
         for sid, eset in enumerate(element_sets):
-            element_sets[sid][1] = np.array([elemmap[elem] for elem in element_sets[sid][1]], dtype=int)            
+            element_sets[sid][1] = np.array([elemmap[elem] for elem in element_sets[sid][1]],
+                                            dtype=int)
         del elemmap, ekeys, ecounter
 
     # elements/topology
@@ -98,10 +101,10 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
     if len(elements) > 1:
         topos = [elem[0] for elem in elements]
         if topos.count(topos[0]) == len(topos):
-            for eid in range(1,len(topos)):
+            for eid in range(1, len(topos)):
                 elements[0][1].update(elements[1][1])
-                del elements[1] 
-        del topos    
+                del elements[1]
+        del topos
 
     # if all elements same topology, write more efficient format
     if len(elements) == 1:
@@ -109,7 +112,7 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
         xdmf_type = topo_to_xdmf_type[topo_type][0]
         num_elems = len(elements[0][1])
         # 1st array in dict
-        first_array = elements[0][1][ list(elements[0][1].keys())[0]]
+        first_array = elements[0][1][list(elements[0][1].keys())[0]]
         nodes_per_elem = len(first_array)
         topo = ET.SubElement(
             grid,
@@ -134,13 +137,13 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
             compression="gzip",
             compression_opts=compression_opts,
         )
-        topo_data_item.text = os.path.basename(h5_filename) + ":/" + "ELEMENTS" 
+        topo_data_item.text = os.path.basename(h5_filename) + ":/" + "ELEMENTS"
         del elements
 
     # mixed topology
     else:
         assert len(elements) > 1
-        total_num_elements = sum(len(e[1].keys()) for e in elements) 
+        total_num_elements = sum(len(e[1].keys()) for e in elements)
         topo = ET.SubElement(
             grid,
             "Topology",
@@ -148,9 +151,9 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
             NumberOfElements=str(total_num_elements),
         )
 
-        total_num_elements_nodes = 0 
+        total_num_elements_nodes = 0
         for e in elements:
-            first_array = e[1][ list(e[1].keys())[0]]
+            first_array = e[1][list(e[1].keys())[0]]
             nodes_per_elem = len(first_array)
             elems = len(e[1].keys())
             total_num_elements_nodes += elems * nodes_per_elem
@@ -170,7 +173,8 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
         for eid, e in enumerate(elements):
             key = e[0]
             xdmf_key = np.array(topo_type_to_xdmf_int[key])
-            elem_data[eid] = [np.concatenate((xdmf_key, array), axis=None) for array in e[1].values()]
+            elem_data[eid] = [np.concatenate((xdmf_key, array),
+                              axis=None) for array in e[1].values()]
 
         elem_data = np.concatenate(list(elem_data.values()), axis=None)
         h5_file.create_dataset(
@@ -184,17 +188,17 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
         del elem_data
 
     # Element set data
-    if element_sets != None:
+    if element_sets is not None:
         # split elsets into material and non-material
         materials = []
         other_sets = []
         for sid in range(len(element_sets)):
             if element_sets[0][0][0:8] == 'MATERIAL':
                 materials.append(element_sets[0])
-            else: 
+            else:
                 other_sets.append(element_sets[0])
             del element_sets[0]
-            
+
         # Just write material for now.
         # All elements must have a material, so material is written as attribute to save space
         # integer to represent unique names of elsets
@@ -208,9 +212,9 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
                 materials_id[i] = mat_ctr
                 mat_name = materials[i][0]
                 materials_name.append(mat_name)
-                for j in range(i,mat_len):
+                for j in range(i, mat_len):
                     if materials[j][0] == mat_name:
-                        materials_id[j] = mat_ctr 
+                        materials_id[j] = mat_ctr
                 mat_ctr += 1
 
         # Construct ordered list of material numbers for each cell
@@ -220,7 +224,7 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
 
         material_array = np.zeros(num_elems, dtype=np.uint32) - 1
         for i in range(mat_len):
-            mat_id = materials_id[i] 
+            mat_id = materials_id[i]
             for eid in materials[0][1]:
                 material_array[eid] = mat_id
             del materials[0]
@@ -232,9 +236,9 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
             Center="Cell",
             Name="MATERIAL_ID",
         )
-        dt, prec = numpy_to_xdmf_dtype[material_array.dtype.name ]
+        dt, prec = numpy_to_xdmf_dtype[material_array.dtype.name]
         mat_data_item = ET.SubElement(
-            material_attribute,    
+            material_attribute,
             "DataItem",
             DataType=dt,
             Dimensions=str(len(material_array)),
@@ -256,7 +260,7 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
             Name="Material_Names",
         )
         material_information.text = " ".join(materials_name)
-        
+
         # other element sets
         for s in other_sets:
             eset = ET.SubElement(
@@ -267,7 +271,7 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
             )
             dt, prec = numpy_to_xdmf_dtype[s[1].dtype.name]
             eset_data_item = ET.SubElement(
-                eset,    
+                eset,
                 "DataItem",
                 DataType=dt,
                 Dimensions=str(len(s[1])),
