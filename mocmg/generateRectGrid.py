@@ -53,8 +53,10 @@ def generateRectGrid(bb, nx, ny, nnx=1, nny=1):
     # Check to make sure divisions is 3 digits or less, otherwise grid naming changes
     if nx*nnx > 999:
         module_log.error('Too many x-divisions of bounding box for the output format')
+        raise ValueError('Too many x-divisions of bounding box for the output format')
     if ny*nny > 999:
         module_log.error('Too many y-divisions of bounding box for the output format')
+        raise ValueError('Too many y-divisions of bounding box for the output format')
     for i in range(nx):
         y = y_min
         for j in range(ny):

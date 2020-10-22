@@ -19,8 +19,6 @@ abaqus_to_topo_type = {
 
 def readAbaqusINP(filepath):
     module_log.info(f'Reading mesh data from {filepath}')
-    if not os.path.isfile(filepath):
-        module_log.error(f'File {filepath} not found')
     # read data in blocks based upon keyword
     nodes = {}
     elements = []

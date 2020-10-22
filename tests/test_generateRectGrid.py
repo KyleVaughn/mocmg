@@ -1,5 +1,6 @@
 import gmsh
 import mocmg
+import pytest
 from contextlib import contextmanager
 from .testingUtils import captured_output
 from unittest import TestCase
@@ -145,3 +146,23 @@ class test_generateRectGrid(TestCase):
                 ' Model expected in 2D x-y plane.'
         self.assertEqual(err[0], err_ref)
         mocmg.finalize()
+
+    def test_rectGridTooManyXDiv(self):
+        nx = 1E6
+        ny = 2
+        nnx = 3
+        nny = 2
+        bb = [0, 0, 0, 9, 4, 1]
+        with pytest.raises(Exception) as e_info:
+            PGTagsL1, PGTagsL2, PGNamesL1, PGNamesL2 = mocmg.generateRectGrid(bb, nx, ny, nnx, nny)
+        e_info.match('Too many x-divisions of bounding box for the output format')
+
+    def test_rectGridTooManyYDiv(self):
+        nx = 2
+        ny = 1E6
+        nnx = 3
+        nny = 2
+        bb = [0, 0, 0, 9, 4, 1]
+        with pytest.raises(ValueError) as e_info:
+            PGTagsL1, PGTagsL2, PGNamesL1, PGNamesL2 = mocmg.generateRectGrid(bb, nx, ny, nnx, nny)
+        e_info.match('Too many y-divisions of bounding box for the output format')
