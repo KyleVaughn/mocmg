@@ -1,9 +1,9 @@
 import gmsh
 import mocmg
 import pytest
-from contextlib import contextmanager
 from .testingUtils import captured_output
 from unittest import TestCase
+
 
 class test_generateRectGrid(TestCase):
 
@@ -11,8 +11,8 @@ class test_generateRectGrid(TestCase):
         mocmg.initialize(mocmgOption='silent', gmshOption='silent')
         bb = [0, 0, 0, 9, 4, 0]
         PGTagsL1, PGTagsL2, PGNamesL1, PGNamesL2 = mocmg.generateRectGrid(bb, 3, 2)
-        IDL1 = list(range(1,7)) 
-        IDL2 = list(range(7,13)) 
+        IDL1 = list(range(1, 7))
+        IDL2 = list(range(7, 13))
         namesL1 = [
                 'GRID_L1_001_001',
                 'GRID_L1_001_002',
@@ -41,11 +41,11 @@ class test_generateRectGrid(TestCase):
             mass = gmsh.model.occ.getMass(2, etag[0])
             self.assertAlmostEqual(6.0, mass, places=5, msg='3 width, 2 height, 6 area')
         # Centroid
-        x,y,z = gmsh.model.occ.getCenterOfMass(2, 1)
+        x, y, z = gmsh.model.occ.getCenterOfMass(2, 1)
         self.assertAlmostEqual(1.5, x, places=5)
         self.assertAlmostEqual(1.0, y, places=5)
         self.assertAlmostEqual(0.0, z, places=5)
-        x,y,z = gmsh.model.occ.getCenterOfMass(2, 4)
+        x, y, z = gmsh.model.occ.getCenterOfMass(2, 4)
         self.assertAlmostEqual(4.5, x, places=5)
         self.assertAlmostEqual(3.0, y, places=5)
         self.assertAlmostEqual(0.0, z, places=5)
@@ -53,7 +53,7 @@ class test_generateRectGrid(TestCase):
 
     def test_rectGridOptionalArgs(self):
         # Capture output since bb will throw warning on purpose
-        with captured_output() as (out,err):
+        with captured_output() as (out, err):
             mocmg.initialize(mocmgOption='warning', gmshOption='silent')
             nx = 3
             ny = 2
@@ -61,8 +61,8 @@ class test_generateRectGrid(TestCase):
             nny = 2
             bb = [0, 0, 0, 9, 4, 1]
             PGTagsL1, PGTagsL2, PGNamesL1, PGNamesL2 = mocmg.generateRectGrid(bb, nx, ny, nnx, nny)
-            IDL1 = list(range(1,7))
-            IDL2 = list(range(7,43))
+            IDL1 = list(range(1, 7))
+            IDL2 = list(range(7, 43))
             namesL1 = [
                     'GRID_L1_001_001',
                     'GRID_L1_001_002',
@@ -114,7 +114,7 @@ class test_generateRectGrid(TestCase):
             self.assertEqual(namesL2, PGNamesL2)
             # Locations/shape of entities
             tagCounter = 1
-            for ptag in IDL1:                                                                       
+            for ptag in IDL1:
                 # Elementary tag
                 etags = list(gmsh.model.getEntitiesForPhysicalGroup(2, ptag))
                 self.assertEqual(etags, list(range(tagCounter, tagCounter+6)))
@@ -124,11 +124,11 @@ class test_generateRectGrid(TestCase):
                     self.assertAlmostEqual(1.0, mass, places=5)
                 tagCounter += 6
             # Centroid
-            x,y,z = gmsh.model.occ.getCenterOfMass(2, 1)
+            x, y, z = gmsh.model.occ.getCenterOfMass(2, 1)
             self.assertAlmostEqual(0.5, x, places=5)
             self.assertAlmostEqual(0.5, y, places=5)
             self.assertAlmostEqual(0.0, z, places=5)
-            x,y,z = gmsh.model.occ.getCenterOfMass(2, 14)
+            x, y, z = gmsh.model.occ.getCenterOfMass(2, 14)
             self.assertAlmostEqual(3.5, x, places=5)
             self.assertAlmostEqual(1.5, y, places=5)
             self.assertAlmostEqual(0.0, z, places=5)
@@ -140,10 +140,11 @@ class test_generateRectGrid(TestCase):
                 mass = gmsh.model.occ.getMass(2, etag[0])
                 self.assertAlmostEqual(1.0, mass, places=5)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
-        out, err = [l.split(None,1)[1] for l in out], [l.split(None,1)[1] for l in err] # strip times
+        # strip times
+        out, err = [l.split(None, 1)[1] for l in out], [l.split(None, 1)[1] for l in err]
         self.assertEqual(out, [])
         err_ref = 'WARNING   : mocmg.generateRectGrid - Model thickness is 1.000000 > 1e-6.' +\
-                ' Model expected in 2D x-y plane.'
+                  ' Model expected in 2D x-y plane.'
         self.assertEqual(err[0], err_ref)
         mocmg.finalize()
 
@@ -153,7 +154,7 @@ class test_generateRectGrid(TestCase):
         nnx = 3
         nny = 2
         bb = [0, 0, 0, 9, 4, 1]
-        with pytest.raises(Exception) as e_info:
+        with pytest.raises(ValueError) as e_info:
             PGTagsL1, PGTagsL2, PGNamesL1, PGNamesL2 = mocmg.generateRectGrid(bb, nx, ny, nnx, nny)
         e_info.match('Too many x-divisions of bounding box for the output format')
 

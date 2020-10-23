@@ -1,11 +1,12 @@
+import copy
 import mocmg
+import pytest
 from numpy import array
 from unittest import TestCase
 
 class test_meshClass(TestCase):
-    # All cases use a disk of radius 1 inscribed in a square
 
-    def test_linearTriangleMesh(self):
+    def setUp(self):
         linear_triangle_points = {
             1: array([-1.00000005e+00,  1.06043306e-15, -5.00000000e-08]), 
             2: array([-1.0000001e+00, -1.0000001e+00, -1.0000000e-07]), 
@@ -24,7 +25,7 @@ class test_meshClass(TestCase):
             15: array([0.19024025, 0.44768302, 0.        ]), 
             16: array([-0.18203951, -0.45107992,  0.        ])
             }
-
+                                                                                                    
         linear_triangle_cells = [
             ['triangle', 
                 {
@@ -53,14 +54,43 @@ class test_meshClass(TestCase):
                     }
                 ]
             ]
-
+                                                                                                    
         linear_triangle_cell_sets = [
             ['DISK', array([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14])], 
             ['MATERIAL_VOID', array([15, 16, 17, 18, 19, 20, 21, 22])]
             ]
+        self.tri_mesh = mocmg.Mesh(
+                                   linear_triangle_points,
+                                   linear_triangle_cells,
+                                   linear_triangle_cell_sets
+                                   )
 
+    def test_getCellsFail(self):
+        with pytest.raises(ValueError) as e_info:
+            cellIDs = self.tri_mesh.getCells('NOT_A_REAL_SET')
+        e_info.match('No cell set named NOT_A_REAL_SET')
+
+    def test_cellHasQuadraticEdgesFail(self):
+        with pytest.raises(ValueError) as e_info:
+            cellIDs = self.tri_mesh.cellHasQuadraticEdges('NOT_A_REAL_CELL_TYPE')
+        e_info.match('No cell type NOT_A_REAL_CELL_TYPE in quadratic edge dictionary.')
+
+    def test_cellCellAreaFailIndex(self):
+        with pytest.raises(ValueError) as e_info:
+            cellIDs = self.tri_mesh.getCellArea(99999999)
+        e_info.match('Cell 99999999 does not exist in this mesh')
+
+    def test_cellCellAreaFailType(self):
+        mesh = copy.deepcopy(self.tri_mesh)
+        mesh.cells[0][0] = 'NOT_A_REAL_CELL_TYPE'
+        with pytest.raises(ValueError) as e_info:
+            cellIDs = mesh.getCellArea(1)
+        e_info.match('No cell type NOT_A_REAL_CELL_TYPE in quadratic edge dictionary.')
+
+    # All cases use a disk of radius 1 inscribed in a square
+    def test_linearTriangleMesh(self):
         # create mesh
-        mesh = mocmg.Mesh(linear_triangle_points, linear_triangle_cells, linear_triangle_cell_sets)
+        mesh = self.tri_mesh 
         # getCells
         cellIDs_ref = array([15, 16, 17, 18, 19, 20, 21, 22])
         cellIDs = mesh.getCells('MATERIAL_VOID')

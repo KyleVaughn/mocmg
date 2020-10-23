@@ -53,6 +53,7 @@ class Mesh:
             if cell_set == sname:
                 return array
         module_log.error(f'No cell set named {cell_set}')
+        raise ValueError(f'No cell set named {cell_set}')
 
     # input cell type, return True if has quad edges, False if not
     def cellHasQuadraticEdges(self, cell_type):
@@ -60,6 +61,7 @@ class Mesh:
             return quadratic_edges[cell_type]
         else:
             module_log.error(f'No cell type {cell_type} in quadratic edge dictionary.')
+            raise ValueError(f'No cell type {cell_type} in quadratic edge dictionary.')
 
     # Input cell ID, return area of cell
     def getCellArea(self, cell):
@@ -82,8 +84,10 @@ class Mesh:
                         y_lin = np.array([self.points[v][1] for v in vertices[0:4]])
                         x_quad = np.array([self.points[v][0] for v in vertices[4:8]])
                         y_quad = np.array([self.points[v][1] for v in vertices[4:8]])
-                    else:
+                    else: # pragma: no cover
                         module_log.error('Unsupported cell type in quadratic area calculation')
+                        raise ValueError('Unsupported cell type in quadratic area calculation')
+
                     # No quadratic edges shoelace formula may be used
                     # https://en.wikipedia.org/wiki/Shoelace_formula
                     # Assumes that vertices are in clockwise or counterclockwise order
@@ -157,8 +161,9 @@ class Mesh:
                     correction = x_[-1]*y_[0] - y_[-1]*x_[0]
                     main_area = np.dot(x_[:-1], y_[1:]) - np.dot(y_[:-1], x_[1:])
                     return 0.5*np.abs(main_area + correction)
-        if not cell_exists:
-            module_log.error(f'Cell {cell} does not exist')
+        if not cell_exists: # pragma: no cover
+            module_log.error(f'Cell {cell} does not exist in this mesh')
+            raise ValueError(f'Cell {cell} does not exist in this mesh')
 
     def getSetArea(self, cell_set):
         module_log.info(f"Computing '{cell_set}' cell set area")

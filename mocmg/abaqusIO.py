@@ -1,6 +1,5 @@
 import logging
 import numpy as np
-import os
 from .mesh import Mesh
 
 module_log = logging.getLogger(__name__)
