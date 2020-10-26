@@ -3,6 +3,7 @@ import sys
 from contextlib import contextmanager
 from io import StringIO
 
+
 @contextmanager
 def captured_output():
     new_out, new_err = StringIO(), StringIO()
@@ -13,10 +14,12 @@ def captured_output():
     finally:
         sys.stdout, sys.stderr = old_out, old_err
 
+
 def runCmd(cmd):
-    proc = subprocess.Popen(cmd,
-        stdout = subprocess.PIPE,
-        stderr = subprocess.PIPE,
-    )   
+    proc = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
     stdout, stderr = proc.communicate()
     return stdout, stderr
