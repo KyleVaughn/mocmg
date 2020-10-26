@@ -21,7 +21,6 @@ def findLinearDiskRadius(r, lc):
     # equal size elements, so an iterative solver is used
     # Call before mocmg.initialize, otherwise gmsh verbosity will be reset
     def f(R):
-        gmsh.initialize()
         s = gmsh.model.occ.addDisk(0, 0, 0, R, R)
         gmsh.model.occ.synchronize()
         p = gmsh.model.addPhysicalGroup(2, [s])
@@ -33,7 +32,7 @@ def findLinearDiskRadius(r, lc):
         _, _, data = gmsh.view.getListData(0)
         total_area = data[0][-1]
         module_log.info(f'Linear Disk area error: {total_area - pi*r*r}')
-        gmsh.finalize()
+        gmsh.clear()
         return total_area - pi*r*r
     R = fsolve(f, r)
     return R[0]

@@ -24,8 +24,8 @@ class test_gmshUtils(TestCase):
     def test_findLinearDiskRadius(self):
         radius = 1.0
         lc = 0.5
-        R = mocmg.findLinearDiskRadius(radius, lc)
         gmsh.initialize()
+        R = mocmg.findLinearDiskRadius(radius, lc)
         s = gmsh.model.occ.addDisk(0, 0, 0, R, R)
         gmsh.model.occ.synchronize()
         p = gmsh.model.addPhysicalGroup(2, [s])
