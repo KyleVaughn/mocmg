@@ -12,12 +12,12 @@ abaqus_to_topo_type = {
     "CPS6": "triangle6",
     # quad
     "CPS4": "quad",
-    "CPS8": "quad8"
+    "CPS8": "quad8",
 }
 
 
 def readAbaqusINP(filepath):
-    module_log.info(f'Reading mesh data from {filepath}')
+    module_log.info(f"Reading mesh data from {filepath}")
     # read data in blocks based upon keyword
     nodes = {}
     elements = []
@@ -39,11 +39,11 @@ def readAbaqusINP(filepath):
             if keyword == "NODE":
                 nodes, line = _readNodes(f, nodes)
             elif keyword == "ELEMENT":
-                elem_type = _getParam(line, 'TYPE')
+                elem_type = _getParam(line, "TYPE")
                 elem_block, line = _readElements(f)
                 elements.append([elem_type, elem_block])
             elif keyword == "ELSET":
-                element_set_name = _getParam(line, 'ELSET')
+                element_set_name = _getParam(line, "ELSET")
                 elset, line = _readElementSet(f)
                 element_sets.append([element_set_name, elset])
             else:
@@ -54,7 +54,7 @@ def readAbaqusINP(filepath):
         if e[0] in abaqus_to_topo_type.keys():
             e[0] = abaqus_to_topo_type[e[0]]
         else:
-            module_log.error(f'Unrecognized mesh element type: {e[0]}')
+            module_log.error(f"Unrecognized mesh element type: {e[0]}")
 
     return Mesh(nodes, elements, element_sets)
 
@@ -109,7 +109,7 @@ def _getParam(line, param):
     for w in words:
         wordList.extend(w)
 
-    if param == 'ELSET':
+    if param == "ELSET":
         wordList = wordList[1:]
 
     idx = wordList.index(param)

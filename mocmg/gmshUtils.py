@@ -3,6 +3,7 @@ import logging
 from .abaqusIO import readAbaqusINP
 from .mesh import Mesh
 from scipy.optimize import fsolve
+
 pi = 3.141592653589793
 
 module_log = logging.getLogger(__name__)
@@ -31,8 +32,9 @@ def findLinearDiskRadius(r, lc):
         gmsh.plugin.run("MeshVolume")
         _, _, data = gmsh.view.getListData(0)
         total_area = data[0][-1]
-        module_log.info(f'Linear Disk area error: {total_area - pi*r*r}')
+        module_log.info(f"Linear Disk area error: {total_area - pi*r*r}")
         gmsh.clear()
-        return total_area - pi*r*r
+        return total_area - pi * r * r
+
     R = fsolve(f, r)
     return R[0]

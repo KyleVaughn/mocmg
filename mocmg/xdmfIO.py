@@ -37,8 +37,10 @@ def _writeXML(filename, root):
     tree.write(filename)
 
 
-def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, multifile=False):
-    module_log.info('Writing mesh data to XDMF file')
+def writeXDMF(
+    filename, nodes, elements, element_sets=None, compression_opts=4, multifile=False
+):
+    module_log.info("Writing mesh data to XDMF file")
     h5_filename = os.path.splitext(filename)[0] + ".h5"
     h5_file = h5py.File(h5_filename, "w")
 
@@ -76,7 +78,9 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
     for eid, msh in enumerate(elements):
         ekeys = msh[1].keys()
         for k in ekeys:
-            elements[eid][1][k] = np.array([nodemap[node] for node in msh[1][k]], dtype=int)
+            elements[eid][1][k] = np.array(
+                [nodemap[node] for node in msh[1][k]], dtype=int
+            )
     del nodemap
 
     # adjust elsets element numbering to hdf5
@@ -92,8 +96,9 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
             ecounter += len(ekeys)
         # now that we have global map, iterate through each elset
         for sid, eset in enumerate(element_sets):
-            element_sets[sid][1] = np.array([elemmap[elem] for elem in element_sets[sid][1]],
-                                            dtype=int)
+            element_sets[sid][1] = np.array(
+                [elemmap[elem] for elem in element_sets[sid][1]], dtype=int
+            )
         del elemmap, ekeys, ecounter
 
     # elements/topology
@@ -173,8 +178,9 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
         for eid, e in enumerate(elements):
             key = e[0]
             xdmf_key = np.array(topo_type_to_xdmf_int[key])
-            elem_data[eid] = [np.concatenate((xdmf_key, array),
-                              axis=None) for array in e[1].values()]
+            elem_data[eid] = [
+                np.concatenate((xdmf_key, array), axis=None) for array in e[1].values()
+            ]
 
         elem_data = np.concatenate(list(elem_data.values()), axis=None)
         h5_file.create_dataset(
@@ -193,7 +199,7 @@ def writeXDMF(filename, nodes, elements, element_sets=None, compression_opts=4, 
         materials = []
         other_sets = []
         for sid in range(len(element_sets)):
-            if element_sets[0][0][0:8] == 'MATERIAL':
+            if element_sets[0][0][0:8] == "MATERIAL":
                 materials.append(element_sets[0])
             else:
                 other_sets.append(element_sets[0])

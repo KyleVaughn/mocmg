@@ -16,35 +16,36 @@ class LessThanFilter(logging.Filter):
 
 # Logging formatter to add colors to messages using ANSI
 class CustomFormatter(logging.Formatter):
-
-    def __init__(self, option=None):
+    def __init__(self, option=None):  # pragma no cover
         self.option = option
 
-        purple   = "\x1b[35;10m"
-        green    = "\x1b[32;10m"
-        default  = "\x1b[39;10m"
+        purple = "\x1b[35;10m"
+        green = "\x1b[32;10m"
+        default = "\x1b[39;10m"
         bold_red = "\x1b[31;1m"
-        reset    = "\x1b[0m"
+        reset = "\x1b[0m"
 
-        fmt      = "%(asctime)s %(levelname)-10s: %(name)s - %(message)s"
-        debugFmt = "%(asctime)s %(levelname)-10s: %(name)s - (line: %(lineno)d) %(message)s"
+        fmt = "%(asctime)s %(levelname)-10s: %(name)s - %(message)s"
+        debugFmt = (
+            "%(asctime)s %(levelname)-10s: %(name)s - (line: %(lineno)d) %(message)s"
+        )
 
-        if option == 'debug':
+        if option == "debug":
             theFormat = debugFmt
         else:
             theFormat = fmt
 
         self.FORMATS = {
-            logging.DEBUG     : green    + theFormat + reset,
-            logging.INFO      : default  + theFormat + reset,
-            logging.WARNING   : purple   + theFormat + reset,
-            logging.ERROR     : bold_red + theFormat + reset,
-            logging.CRITICAL  : bold_red + theFormat + reset
+            logging.DEBUG: green + theFormat + reset,
+            logging.INFO: default + theFormat + reset,
+            logging.WARNING: purple + theFormat + reset,
+            logging.ERROR: bold_red + theFormat + reset,
+            logging.CRITICAL: bold_red + theFormat + reset,
         }
 
-    def format(self, record):
+    def format(self, record):  # pragma no cover
         log_fmt = self.FORMATS.get(record.levelno)
-        formatter = logging.Formatter(log_fmt, datefmt='%H:%M:%S')
+        formatter = logging.Formatter(log_fmt, datefmt="%H:%M:%S")
         return formatter.format(record)
 
 
@@ -62,13 +63,13 @@ class CustomFormatter(logging.Formatter):
 #   color: Option to color the output of log messages from mocmg. True or False
 def initialize(mocmgOption=None, gmshOption=None, color=True):
     # mocmg
-    if mocmgOption == 'debug':
+    if mocmgOption == "debug":
         mocmgVerbosity = logging.DEBUG
-    elif mocmgOption == 'warning':
+    elif mocmgOption == "warning":
         mocmgVerbosity = logging.WARNING
-    elif mocmgOption == 'error':
+    elif mocmgOption == "error":
         mocmgVerbosity = logging.ERROR
-    elif mocmgOption == 'silent':
+    elif mocmgOption == "silent":
         mocmgVerbosity = 99
     else:
         mocmgVerbosity = logging.INFO
@@ -78,10 +79,14 @@ def initialize(mocmgOption=None, gmshOption=None, color=True):
     # Have to set the root logger level, it defaults to logging.WARNING
     logger.setLevel(logging.NOTSET)
     # Format stdout and stderr based upon color and debug mode
-    formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-10s: %(name)s - %(message)s',
-                                  datefmt='%H:%M:%S')
-    debugFormatter = logging.Formatter(fmt='%(asctime)s %(levelname)-10s: %(name)s' +
-                                       ' - (line: %(lineno)d) %(message)s', datefmt='%H:%M:%S')
+    formatter = logging.Formatter(
+        fmt="%(asctime)s %(levelname)-10s: %(name)s - %(message)s", datefmt="%H:%M:%S"
+    )
+    debugFormatter = logging.Formatter(
+        fmt="%(asctime)s %(levelname)-10s: %(name)s"
+        + " - (line: %(lineno)d) %(message)s",
+        datefmt="%H:%M:%S",
+    )
 
     # Stdout
     logging_handler_out = logging.StreamHandler(sys.stdout)
@@ -89,13 +94,13 @@ def initialize(mocmgOption=None, gmshOption=None, color=True):
     logging_handler_out.addFilter(LessThanFilter(logging.WARNING))
 
     # If stdout is terminal, color if desired. Otherwise, don't color.
-    if color and sys.stdout.isatty():
-        if mocmgOption == 'debug':
-            logging_handler_out.setFormatter(CustomFormatter(option='debug'))
+    if color and sys.stdout.isatty():  # pragma no cover
+        if mocmgOption == "debug":
+            logging_handler_out.setFormatter(CustomFormatter(option="debug"))
         else:
             logging_handler_out.setFormatter(CustomFormatter())
     else:
-        if mocmgOption == 'debug':
+        if mocmgOption == "debug":
             logging_handler_out.setFormatter(debugFormatter)
         else:
             logging_handler_out.setFormatter(formatter)
@@ -107,26 +112,26 @@ def initialize(mocmgOption=None, gmshOption=None, color=True):
     logging_handler_err.setLevel(lvl)
 
     # If stderr is terminal, color if desired. Otherwise, don't color.
-    if color and sys.stderr.isatty():
-        if mocmgOption == 'debug':
-            logging_handler_err.setFormatter(CustomFormatter(option='debug'))
+    if color and sys.stderr.isatty():  # pragma no cover
+        if mocmgOption == "debug":
+            logging_handler_err.setFormatter(CustomFormatter(option="debug"))
         else:
             logging_handler_err.setFormatter(CustomFormatter())
     else:
-        if mocmgOption == 'debug':
+        if mocmgOption == "debug":
             logging_handler_err.setFormatter(debugFormatter)
         else:
             logging_handler_err.setFormatter(formatter)
     logger.addHandler(logging_handler_err)
 
     # gmsh
-    if gmshOption == 'debug':
+    if gmshOption == "debug":
         gmshVerbosity = 99
-    elif gmshOption == 'warning':
+    elif gmshOption == "warning":
         gmshVerbosity = 2
-    elif gmshOption == 'error':
+    elif gmshOption == "error":
         gmshVerbosity = 1
-    elif gmshOption == 'silent':
+    elif gmshOption == "silent":
         gmshVerbosity = 0
     else:
         gmshVerbosity = 5
