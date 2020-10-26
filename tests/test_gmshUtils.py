@@ -3,6 +3,7 @@ import mocmg
 import pytest
 import subprocess
 from unittest import TestCase
+pi = 3.141592653589793
 
 class test_gmshUtils(TestCase):
 
@@ -21,10 +22,19 @@ class test_gmshUtils(TestCase):
         mocmg.finalize()
 
     def test_findLinearDiskRadius(self):
-        mocmg.initialize(gmshOption='silent')
         radius = 1.0
         lc = 0.5
         R = mocmg.findLinearDiskRadius(radius, lc)
-        raise ValueError
-        mocmg.finalize()
-
+        gmsh.initialize()
+        s = gmsh.model.occ.addDisk(0, 0, 0, R, R)
+        gmsh.model.occ.synchronize()
+        p = gmsh.model.addPhysicalGroup(2, [s])
+        gmsh.model.mesh.setSize(gmsh.model.getEntities(0), lc) 
+        gmsh.model.mesh.generate(2)
+        gmsh.plugin.setNumber("MeshVolume", "Dimension", 2)
+        gmsh.plugin.setNumber("MeshVolume", "PhysicalGroup", p)
+        gmsh.plugin.run("MeshVolume")
+        _, _, data = gmsh.view.getListData(0)
+        total_area = data[0][-1]
+        self.assertAlmostEqual(total_area, pi, places=10)
+        gmsh.finalize()
