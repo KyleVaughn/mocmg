@@ -1,7 +1,7 @@
+import subprocess
 import sys
 from contextlib import contextmanager
 from io import StringIO
-from unittest import TestCase
 
 @contextmanager
 def captured_output():
@@ -12,3 +12,11 @@ def captured_output():
         yield sys.stdout, sys.stderr
     finally:
         sys.stdout, sys.stderr = old_out, old_err
+
+def runCmd(cmd):
+    proc = subprocess.Popen(cmd,
+        stdout = subprocess.PIPE,
+        stderr = subprocess.PIPE,
+    )   
+    stdout, stderr = proc.communicate()
+    return stdout, stderr
