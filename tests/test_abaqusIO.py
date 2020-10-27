@@ -56,8 +56,8 @@ class test_abaqusIO(TestCase):
         # message
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
         # strip times
-        out, err = [l.split(None, 1)[1] for l in out], [
-            l.split(None, 1)[1] for l in err
+        out, err = [line.split(None, 1)[1] for line in out], [
+            line.split(None, 1)[1] for line in err
         ]
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)
@@ -173,8 +173,8 @@ class test_abaqusIO(TestCase):
         # message
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
         # strip times
-        out, err = [l.split(None, 1)[1] for l in out], [
-            l.split(None, 1)[1] for l in err
+        out, err = [line.split(None, 1)[1] for line in out], [
+            line.split(None, 1)[1] for line in err
         ]
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)
@@ -298,8 +298,8 @@ class test_abaqusIO(TestCase):
         # message
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
         # strip times
-        out, err = [l.split(None, 1)[1] for l in out], [
-            l.split(None, 1)[1] for l in err
+        out, err = [line.split(None, 1)[1] for line in out], [
+            line.split(None, 1)[1] for line in err
         ]
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)
@@ -315,10 +315,10 @@ class test_abaqusIO(TestCase):
         # Caputure output since bb will throw warning on purpose
         with captured_output() as (out, err):
             mocmg.initialize(gmshOption="silent")
-            mesh = mocmg.readAbaqusINP("tests/abaqus/element_error.inp")
+            mocmg.readAbaqusINP("tests/abaqus/element_error.inp")
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
-        out, err = [l.split(None, 1)[1] for l in out], [
-            l.split(None, 1)[1] for l in err
+        out, err = [line.split(None, 1)[1] for line in out], [
+            line.split(None, 1)[1] for line in err
         ]
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)

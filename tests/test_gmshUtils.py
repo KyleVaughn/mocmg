@@ -1,7 +1,6 @@
 import gmsh
 import mocmg
 import pytest
-import subprocess
 from unittest import TestCase
 
 pi = 3.141592653589793

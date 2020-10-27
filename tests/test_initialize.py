@@ -45,8 +45,8 @@ class test_initialize(TestCase):
             log = logging.getLogger(__name__)
             testLogMessages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
-        out, err = [l.split(None, 1)[1] for l in out], [
-            l.split(None, 1)[1] for l in err
+        out, err = [line.split(None, 1)[1] for line in out], [
+            line.split(None, 1)[1] for line in err
         ]  # strip times
         self.assertEqual(out, referenceOut)
         self.assertEqual(err, referenceErr)
@@ -59,8 +59,8 @@ class test_initialize(TestCase):
             log = logging.getLogger(__name__)
             testLogMessages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
-        out, err = [l.split(None, 1)[1] for l in out], [
-            l.split(None, 1)[1] for l in err
+        out, err = [line.split(None, 1)[1] for line in out], [
+            line.split(None, 1)[1] for line in err
         ]  # strip times
         self.assertEqual(out, referenceDebugOut)
         self.assertEqual(err, referenceDebugErr)
@@ -73,8 +73,8 @@ class test_initialize(TestCase):
             log = logging.getLogger(__name__)
             testLogMessages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
-        out, err = [l.split(None, 1)[1] for l in out], [
-            l.split(None, 1)[1] for l in err
+        out, err = [line.split(None, 1)[1] for line in out], [
+            line.split(None, 1)[1] for line in err
         ]  # strip times
         self.assertEqual(out, [])
         self.assertEqual(err, referenceErr)
@@ -87,8 +87,8 @@ class test_initialize(TestCase):
             log = logging.getLogger(__name__)
             testLogMessages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
-        out, err = [l.split(None, 1)[1] for l in out], [
-            l.split(None, 1)[1] for l in err
+        out, err = [line.split(None, 1)[1] for line in out], [
+            line.split(None, 1)[1] for line in err
         ]  # strip times
         self.assertEqual(out, [])
         self.assertEqual(err, referenceErr[1:])
@@ -101,8 +101,8 @@ class test_initialize(TestCase):
             log = logging.getLogger(__name__)
             testLogMessages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
-        out, err = [l.split(None, 1)[1] for l in out], [
-            l.split(None, 1)[1] for l in err
+        out, err = [line.split(None, 1)[1] for line in out], [
+            line.split(None, 1)[1] for line in err
         ]  # strip times
         self.assertEqual(out, [])
         self.assertEqual(err, [])

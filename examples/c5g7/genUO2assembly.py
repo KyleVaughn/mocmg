@@ -100,7 +100,7 @@ gmsh.model.mesh.field.setNumber(2, "LcMax", lc)
 gmsh.model.mesh.field.setNumber(2, "DistMin", 0.5 * lcmin)
 gmsh.model.mesh.field.setNumber(2, "DistMax", 0.5 * lcmin)
 gmsh.model.mesh.field.setAsBackgroundMesh(2)
-## Makes interior of disk all one size
+# Makes interior of disk all one size
 gmsh.option.setNumber("Mesh.CharacteristicLengthExtendFromBoundary", 0)
 gmsh.option.setNumber("Mesh.CharacteristicLengthFromPoints", 0)
 gmsh.option.setNumber("Mesh.CharacteristicLengthFromCurvature", 0)

@@ -66,24 +66,24 @@ class test_meshClass(TestCase):
 
     def test_getCellsFail(self):
         with pytest.raises(ValueError) as e_info:
-            cellIDs = self.tri_mesh.getCells("NOT_A_REAL_SET")
+            self.tri_mesh.getCells("NOT_A_REAL_SET")
         e_info.match("No cell set named NOT_A_REAL_SET")
 
     def test_cellHasQuadraticEdgesFail(self):
         with pytest.raises(ValueError) as e_info:
-            cellIDs = self.tri_mesh.cellHasQuadraticEdges("NOT_A_REAL_CELL_TYPE")
+            self.tri_mesh.cellHasQuadraticEdges("NOT_A_REAL_CELL_TYPE")
         e_info.match("No cell type NOT_A_REAL_CELL_TYPE in quadratic edge dictionary.")
 
     def test_cellCellAreaFailIndex(self):
         with pytest.raises(ValueError) as e_info:
-            cellIDs = self.tri_mesh.getCellArea(99999999)
+            self.tri_mesh.getCellArea(99999999)
         e_info.match("Cell 99999999 does not exist in this mesh")
 
     def test_cellCellAreaFailType(self):
         mesh = copy.deepcopy(self.tri_mesh)
         mesh.cells[0][0] = "NOT_A_REAL_CELL_TYPE"
         with pytest.raises(ValueError) as e_info:
-            cellIDs = mesh.getCellArea(1)
+            mesh.getCellArea(1)
         e_info.match("No cell type NOT_A_REAL_CELL_TYPE in quadratic edge dictionary.")
 
     # All cases use a disk of radius 1 inscribed in a square

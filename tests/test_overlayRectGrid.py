@@ -5,6 +5,8 @@ from .testingUtils import captured_output
 from unittest import TestCase
 
 # NOTE: You pretty much have to run gmsh.fltk.run() to debug these
+
+
 class test_overlayRectGrid(TestCase):
     def test_gmshDisk(self):
         pgroups_ref = [
@@ -48,8 +50,8 @@ class test_overlayRectGrid(TestCase):
 
             mocmg.finalize()
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
-        out, err = [l.split(None, 1)[1] for l in out], [
-            l.split(None, 1)[1] for l in err
+        out, err = [line.split(None, 1)[1] for line in out], [
+            line.split(None, 1)[1] for line in err
         ]  # strip times
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)
@@ -121,8 +123,8 @@ class test_overlayRectGrid(TestCase):
 
             mocmg.finalize()
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
-        out, err = [l.split(None, 1)[1] for l in out], [
-            l.split(None, 1)[1] for l in err
+        out, err = [line.split(None, 1)[1] for line in out], [
+            line.split(None, 1)[1] for line in err
         ]  # strip times
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)

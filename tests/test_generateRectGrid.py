@@ -145,8 +145,8 @@ class test_generateRectGrid(TestCase):
                 self.assertAlmostEqual(1.0, mass, places=5)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
         # strip times
-        out, err = [l.split(None, 1)[1] for l in out], [
-            l.split(None, 1)[1] for l in err
+        out, err = [line.split(None, 1)[1] for line in out], [
+            line.split(None, 1)[1] for line in err
         ]
         self.assertEqual(out, [])
         err_ref = (

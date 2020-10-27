@@ -1,6 +1,5 @@
 import mocmg
 import gmsh
-import os
 
 pi = 3.141592653589793
 
@@ -48,7 +47,7 @@ gmsh.model.mesh.field.add("Min", 5)
 gmsh.model.mesh.field.setNumbers(5, "FieldsList", [4, 1])
 
 # gmsh.model.mesh.field.setAsBackgroundMesh(3)
-## Makes interior of disk all one size
+# Makes interior of disk all one size
 # gmsh.option.setNumber("Mesh.CharacteristicLengthExtendFromBoundary", 0)
 # gmsh.option.setNumber("Mesh.CharacteristicLengthFromPoints", 0)
 # gmsh.option.setNumber("Mesh.CharacteristicLengthFromCurvature", 0)
