@@ -29,17 +29,14 @@ xdmf_int_to_topo_type = {
     0x24: "triangle6",
     0x25: "quad8",
 }
+
 topo_type_to_xdmf_int = {v: k for k, v in xdmf_int_to_topo_type.items()}
 
 
-def _writeXML(filename, root):
-    tree = ET.ElementTree(root)
-    tree.write(filename)
-
-
-def writeXDMF(
-    filename, nodes, elements, element_sets=None, compression_opts=4, multifile=False
-):
+def writeXDMF(filename, mesh, compression_opts=4):
+    nodes = mesh.points
+    elements = mesh.cells
+    element_sets = mesh.cell_sets
     module_log.info("Writing mesh data to XDMF file")
     h5_filename = os.path.splitext(filename)[0] + ".h5"
     h5_file = h5py.File(h5_filename, "w")
@@ -292,4 +289,5 @@ def writeXDMF(
             )
             eset_data_item.text = os.path.basename(h5_filename) + ":/" + s[0]
 
-    _writeXML(filename, xdmf_file)
+    tree = ET.ElementTree(xdmf_file)
+    tree.write(filename)

@@ -102,7 +102,7 @@ def overlayRectGrid(nx, ny, nnx=1, nny=1, defaultMat="Material Void", bb=None):
     module_log.info("Adjusting tags to new entities")
     for tag in fragmentChildrenGroups.keys():
         outTag = gmsh.model.addPhysicalGroup(2, list(fragmentChildrenGroups[tag]), tag)
-        if outTag != tag:
+        if outTag != tag:  # pragma no cover
             module_log.warning(
                 f"Physical group {tag} could not be assigned to"
                 + " children with original tag."
