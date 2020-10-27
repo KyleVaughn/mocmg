@@ -49,18 +49,22 @@ class CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 
-# Initialize mocmg logger and gmsh with desired level of output.
-# The levels are as follows:
-#   silent  : For gmsh only. Don't output anything from gmsh
-#   error   : Display error messages only
-#   warning : Display error and warning messages
-#   info    : Display error, warning, and info messages
-#   debug   : Display error, warning, info, and debug messages
-#
-# Inputs:
-#   mocmgOption: One of the levels above. String
-#   gmshOption: One of the leves above. String
-#   color: Option to color the output of log messages from mocmg. True or False
+"""
+Initialize mocmg logger and gmsh with desired level of output.
+The levels are as follows:
+  silent  : For gmsh only. Don't output anything from gmsh
+  error   : Display error messages only
+  warning : Display error and warning messages
+  info    : Display error, warning, and info messages
+  debug   : Display error, warning, info, and debug messages
+
+Inputs:
+  mocmgOption: One of the levels above. String
+  gmshOption: One of the leves above. String
+  color: Option to color the output of log messages from mocmg. True or False
+"""
+
+
 def initialize(mocmgOption=None, gmshOption=None, color=True):
     # mocmg
     if mocmgOption == "debug":

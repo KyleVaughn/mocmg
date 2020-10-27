@@ -1,7 +1,5 @@
 import gmsh
 import logging
-from .abaqusIO import readAbaqusINP
-from .mesh import Mesh
 from scipy.optimize import fsolve
 
 pi = 3.141592653589793
