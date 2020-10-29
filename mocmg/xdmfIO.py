@@ -61,7 +61,7 @@ def writeXDMF(filename, mesh, compression_opts=4):
     # node numbering lost in hdf5. Need to adjust dict keys in elements, sets
     h5_file.create_dataset(
         "NODES",
-        data=np.stack(nodes.values()),
+        data=np.stack(list(nodes.values())),
         compression="gzip",
         compression_opts=compression_opts,
     )
@@ -135,7 +135,7 @@ def writeXDMF(filename, mesh, compression_opts=4):
         )
         h5_file.create_dataset(
             "ELEMENTS",
-            data=np.stack(elements[0][1].values()),
+            data=np.stack(list(elements[0][1].values())),
             compression="gzip",
             compression_opts=compression_opts,
         )

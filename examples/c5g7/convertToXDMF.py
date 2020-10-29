@@ -4,14 +4,14 @@ import sys
 pi = 3.141592653589793
 
 mocmg.initialize()
-nodes, elements, elsets = mocmg.readAbaqusINP(sys.argv[1])
+mesh = mocmg.readAbaqusINP(sys.argv[1])
+elements = mesh.cells
 # Give mesh info
 num_elem = 0
 for e in elements:
     num_elem = num_elem + len(e[1])
 print("\nElements: ", num_elem)
 
-mesh = mocmg.Mesh(nodes, elements, elsets)
 total_area = mesh.getSetArea("GRID_L1_001_001")
 uo2 = mesh.getSetArea("MATERIAL_UO2-3.3")
 mox70 = mesh.getSetArea("MATERIAL_MOX-7.0")
@@ -23,6 +23,5 @@ print("Total mesh area error: ", total_area - 64.26 ** 2)
 print(f"Fissile mesh area: {fis}")
 print("Fissile mesh area error: ", fis - pi * 0.54 ** 2 * (17 ** 2 - 25) * 4, "\n")
 
-del mesh
-mocmg.writeXDMF("c5g7.xdmf", nodes, elements, elsets)
+mocmg.writeXDMF("c5g7.xdmf", mesh)
 mocmg.finalize()
