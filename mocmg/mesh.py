@@ -128,7 +128,14 @@ class Mesh:
                         x_e = x_e - x_e[0]
                         y_e = y_e - y_e[0]
                         # rotate line to x-axis
-                        theta = np.arctan(y_e[1] / x_e[1])
+                        if x_e[1] == 0.0:
+                            if y_e[1] >= 0.0:
+                                theta = np.pi/2.0
+                            else:
+                                theta = -np.pi/2.0
+                        else:
+                            theta = np.arctan(y_e[1] / x_e[1])
+
                         if x_e[1] < 0:
                             theta = theta + np.pi
                         R = np.array(

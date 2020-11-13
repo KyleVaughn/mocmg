@@ -3,7 +3,7 @@ import gmsh
 
 pi = 3.141592653589793
 
-lc = 0.10
+lc = 0.40
 lcmin = 0.04
 
 # Geometry
