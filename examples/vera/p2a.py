@@ -6,7 +6,7 @@ lc = 0.40
 mocmg.initialize()
 
 # Geometry
-# 8.5 by 8.5 lattice, 1.26 cm pitch, 
+# 17 by 17 lattice, 1.26 cm pitch, 
 # Label pinID like MPACT does
 #        x 1   2   3   4   5
 #      y ---------------------
@@ -31,19 +31,17 @@ R_f = [R0_f, R1_f, R2_f]
 
 # Set (x, y) locations for pins
 coords_GT = [
-        (0, 0),
-        (3, 0),
-        (6, 0),
-        (0, 3),
-        (3, 3),
-        (6, 3),
-        (0, 6),
-        (3, 6),
-        (5, 5),
+        (6, 15), (9, 15), (12, 15),
+        (4, 14), (14, 14),
+        (3, 12), (6, 12), (9, 12), (12, 12), (15, 12),
+        (3, 9), (6, 9), (9, 9), (12, 9), (15, 9),
+        (3, 6), (6, 6), (9, 6), (12, 6), (15, 6),
+        (4, 4), (14, 4),
+        (6, 3), (9, 3), (12, 3),
         ]
 coords_f = []
-for i in range(0, 9):
-    for j in range(0, 9):
+for i in range(1, 18):
+    for j in range(1, 18):
         if not (i, j) in coords_GT:
             coords_f.append((i, j)) 
 
@@ -51,35 +49,53 @@ for i in range(0, 9):
 # Guide tubes
 for i, j in coords_GT:
     for radius in R_gt:
-        gmsh.model.occ.addDisk(1.26 * i, 1.26 * j, 0, radius, radius)
+        gmsh.model.occ.addDisk(1.26 * i - 1.26/2 + 0.04, 1.26 * j - 1.26/2 + 0.04, 0, radius, radius)
 # Fuel
 for i, j in coords_f:
     for radius in R_f:
-        gmsh.model.occ.addDisk(1.26 * i, 1.26 * j, 0, radius, radius)
+        gmsh.model.occ.addDisk(1.26 * i - 1.26/2 + 0.04, 1.26 * j - 1.26/2 + 0.04, 0, radius, radius)
 ent = gmsh.model.occ.getEntities(2)
 gmsh.model.occ.fragment(ent,ent)
-
-# Trim geometry
-ent = gmsh.model.occ.getEntities(2)
-t = gmsh.model.occ.addRectangle(0, 0, 0, 1.26*8.5, 1.26*8.5)
-gmsh.model.occ.intersect([(2, t)], ent)
 gmsh.model.occ.synchronize()
 
 # Materials
 ent = gmsh.model.occ.getEntities(2)
 tags_fuel = [t[1] for t in ent]
 
-tags_clad = [
-        ]
+tags_gap = []
+for i in range(869, 1397, 2):
+    tags_gap.append(i)
 
-tags_gap = [
-        257,
-        ]
+tags_clad = []
+for t in tags_gap:
+    tags_clad.append(t-1)
+for i in range(843, 868):
+    tags_clad.append(i)
+
+tags_mod = []
+for i in range(2,52,2):
+    tags_mod.append(i)
+
+for t in tags_gap:
+    tags_fuel.remove(t)
+for t in tags_clad:
+    tags_fuel.remove(t)
+for t in tags_mod:
+    tags_fuel.remove(t)
+
+
 
 p = gmsh.model.addPhysicalGroup(2, tags_gap)
 gmsh.model.setPhysicalName(2, p, "MATERIAL_GAP")
+p = gmsh.model.addPhysicalGroup(2, tags_clad)
+gmsh.model.setPhysicalName(2, p, "MATERIAL_CLAD")
+p = gmsh.model.addPhysicalGroup(2, tags_mod)
+gmsh.model.setPhysicalName(2, p, "MATERIAL_MOD_GT")
+p = gmsh.model.addPhysicalGroup(2, tags_fuel)
+gmsh.model.setPhysicalName(2, p, "MATERIAL_UO2-3.1")
+
 mocmg.overlayRectGrid(
-    1, 1, 17, 17, bb=[0, 0, 0, 21.5/2, 21.5/2, 0], defaultMat="MATERIAL_MODERATOR"
+    1, 1, 17, 17, bb=[0, 0, 0, 21.5, 21.5, 0], defaultMat="MATERIAL_MODERATOR"
 )
 gmsh.model.occ.synchronize()
 
