@@ -2,8 +2,8 @@ import gmsh
 import mocmg
 import numpy as np
 
-lc = 0.30
-lcmin = lc/4
+lc = 0.40
+lcmin = lc/1.6
 
 mocmg.initialize()
 
