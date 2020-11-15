@@ -2,7 +2,7 @@ import gmsh
 import mocmg
 import numpy as np
 
-lc = 0.30
+lc = 0.20
 
 mocmg.initialize()
 
@@ -23,8 +23,8 @@ mocmg.initialize()
 R0_gt = 0.602 # clad
 R1_gt = 0.561 # water
 #R_gt = [R0_gt, R1_gt]
-R_mod_gt = mocmg.findLinearDiskRadius(R1_gt, lc) 
-R_clad_gt = mocmg.findLinearRingRadius(R_mod_gt, np.pi*(R0_gt**2 - R1_gt**2), lc) 
+R_mod_gt = mocmg.findLinearDiskRadius_flatField(R1_gt, lc) 
+R_clad_gt = mocmg.findLinearRingRadius_flatField(R_mod_gt, np.pi*(R0_gt**2 - R1_gt**2), lc) 
 R_gt = [R_clad_gt, R_mod_gt]
 #R_gt = [R0_gt, R_mod_gt]
 
@@ -33,9 +33,9 @@ R0_f = 0.475   # clad
 R1_f = 0.418   # gap 
 R2_f = 0.4096  # fuel
 #R_f = [R0_f, R1_f, R2_f]
-R_fuel_f = mocmg.findLinearDiskRadius(R2_f, lc) 
-R_gap_f = mocmg.findLinearRingRadius(R_fuel_f, np.pi*(R1_f**2 - R2_f**2), lc) 
-R_clad_f = mocmg.findLinearRingRadius(R_gap_f, np.pi*(R0_f**2 - R1_f**2), lc) 
+R_fuel_f = mocmg.findLinearDiskRadius_flatField(R2_f, lc) 
+R_gap_f  = mocmg.findLinearRingRadius_flatField(R_fuel_f, np.pi*(R1_f**2 - R2_f**2), lc) 
+R_clad_f = mocmg.findLinearRingRadius_flatField(R_gap_f, np.pi*(R0_f**2 - R1_f**2), lc) 
 R_f = [R_clad_f, R_gap_f, R_fuel_f]
 
 
