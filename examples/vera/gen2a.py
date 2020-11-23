@@ -23,21 +23,20 @@ mocmg.initialize()
 # Guide tube
 R0_gt = 0.602 # clad
 R1_gt = 0.561 # water
-#R_gt = [R0_gt, R1_gt]
-R_mod_gt = mocmg.findLinearDiskRadius_flatField(R1_gt, lcmin) 
-R_clad_gt = mocmg.findLinearRingRadius_flatField(R_mod_gt, np.pi*(R0_gt**2 - R1_gt**2), lcmin) 
-R_gt = [R_clad_gt, R_mod_gt]
-#R_gt = [R0_gt, R_mod_gt]
+R_gt = [R0_gt, R1_gt]
+#R_mod_gt = mocmg.findLinearDiskRadius_flatField(R1_gt, lcmin) 
+#R_clad_gt = mocmg.findLinearRingRadius_flatField(R_mod_gt, np.pi*(R0_gt**2 - R1_gt**2), lcmin) 
+#R_gt = [R_clad_gt, R_mod_gt]
 
 # Fuel
 R0_f = 0.475   # clad
 R1_f = 0.418   # gap 
 R2_f = 0.4096  # fuel
-#R_f = [R0_f, R1_f, R2_f]
-R_fuel_f = mocmg.findLinearDiskRadius_flatField(R2_f, lcmin) 
-R_gap_f  = mocmg.findLinearRingRadius_flatField(R_fuel_f, np.pi*(R1_f**2 - R2_f**2), lcmin) 
-R_clad_f = mocmg.findLinearRingRadius_flatField(R_gap_f, np.pi*(R0_f**2 - R1_f**2), lcmin) 
-R_f = [R_clad_f, R_gap_f, R_fuel_f]
+R_f = [R0_f, R1_f, R2_f]
+#R_fuel_f = mocmg.findLinearDiskRadius_flatField(R2_f, lcmin) 
+#R_gap_f  = mocmg.findLinearRingRadius_flatField(R_fuel_f, np.pi*(R1_f**2 - R2_f**2), lcmin) 
+#R_clad_f = mocmg.findLinearRingRadius_flatField(R_gap_f, np.pi*(R0_f**2 - R1_f**2), lcmin) 
+#R_f = [R_clad_f, R_gap_f, R_fuel_f]
 
 
 # Set (x, y) locations for pins
@@ -114,51 +113,51 @@ gmsh.model.occ.synchronize()
 # Mesh
 #gmsh.model.mesh.setSize(gmsh.model.getEntities(0), lc)
 
-gapEnts = mocmg.getEntitiesForPhysicalGroupName(f"MATERIAL_GAP")
-gapEnts_dimTags = [(2, t) for t in gapEnts]
-gapBounds_dimTags = gmsh.model.getBoundary(
-    gapEnts_dimTags, combined=False, oriented=False
-)
-gapBounds = [t[1] for t in gapBounds_dimTags]
-
-cladEnts = mocmg.getEntitiesForPhysicalGroupName(f"MATERIAL_CLAD")
-cladEnts_dimTags = [(2, t) for t in cladEnts]
-cladBounds_dimTags = gmsh.model.getBoundary(
-    cladEnts_dimTags, combined=False, oriented=False
-)
-cladBounds = [t[1] for t in cladBounds_dimTags]
+#gapEnts = mocmg.getEntitiesForPhysicalGroupName(f"MATERIAL_GAP")
+#gapEnts_dimTags = [(2, t) for t in gapEnts]
+#gapBounds_dimTags = gmsh.model.getBoundary(
+#    gapEnts_dimTags, combined=False, oriented=False
+#)
+#gapBounds = [t[1] for t in gapBounds_dimTags]
+#
+#cladEnts = mocmg.getEntitiesForPhysicalGroupName(f"MATERIAL_CLAD")
+#cladEnts_dimTags = [(2, t) for t in cladEnts]
+#cladBounds_dimTags = gmsh.model.getBoundary(
+#    cladEnts_dimTags, combined=False, oriented=False
+#)
+#cladBounds = [t[1] for t in cladBounds_dimTags]
 
 gmsh.model.mesh.field.add("MathEval", 1)
 gmsh.model.mesh.field.setString(1, "F", f"{lc:.6f}" )
 
-gmsh.model.mesh.field.add("Distance", 2)
-gmsh.model.mesh.field.setNumber(2, "NNodesByEdge", 500)
-gmsh.model.mesh.field.setNumbers(2, "EdgesList", gapBounds)
+#gmsh.model.mesh.field.add("Distance", 2)
+#gmsh.model.mesh.field.setNumber(2, "NNodesByEdge", 500)
+#gmsh.model.mesh.field.setNumbers(2, "EdgesList", gapBounds)
+#
+#gmsh.model.mesh.field.add("Threshold", 3)
+#gmsh.model.mesh.field.setNumber(3, "IField", 2)
+#gmsh.model.mesh.field.setNumber(3, "LcMin", lcmin)
+#gmsh.model.mesh.field.setNumber(3, "LcMax", lc)
+#gmsh.model.mesh.field.setNumber(3, "DistMin", 0.5 * lcmin)
+#gmsh.model.mesh.field.setNumber(3, "DistMax", 0.5 * lcmin)
+#
+#gmsh.model.mesh.field.add("Distance", 4)
+#gmsh.model.mesh.field.setNumber(4, "NNodesByEdge", 500)
+#gmsh.model.mesh.field.setNumbers(4, "EdgesList", cladBounds)
+#
+#gmsh.model.mesh.field.add("Threshold", 5)
+#gmsh.model.mesh.field.setNumber(5, "IField", 4)
+#gmsh.model.mesh.field.setNumber(5, "LcMin", lcmin)
+#gmsh.model.mesh.field.setNumber(5, "LcMax", lc)
+#gmsh.model.mesh.field.setNumber(5, "DistMin", 0.5 * lcmin)
+#gmsh.model.mesh.field.setNumber(5, "DistMax", 0.5 * lcmin)
+#
+#
+#gmsh.model.mesh.field.add("Min", 6)
+#gmsh.model.mesh.field.setNumbers(6, "FieldsList", [5, 3])
 
-gmsh.model.mesh.field.add("Threshold", 3)
-gmsh.model.mesh.field.setNumber(3, "IField", 2)
-gmsh.model.mesh.field.setNumber(3, "LcMin", lcmin)
-gmsh.model.mesh.field.setNumber(3, "LcMax", lc)
-gmsh.model.mesh.field.setNumber(3, "DistMin", 0.5 * lcmin)
-gmsh.model.mesh.field.setNumber(3, "DistMax", 0.5 * lcmin)
 
-gmsh.model.mesh.field.add("Distance", 4)
-gmsh.model.mesh.field.setNumber(4, "NNodesByEdge", 500)
-gmsh.model.mesh.field.setNumbers(4, "EdgesList", cladBounds)
-
-gmsh.model.mesh.field.add("Threshold", 5)
-gmsh.model.mesh.field.setNumber(5, "IField", 4)
-gmsh.model.mesh.field.setNumber(5, "LcMin", lcmin)
-gmsh.model.mesh.field.setNumber(5, "LcMax", lc)
-gmsh.model.mesh.field.setNumber(5, "DistMin", 0.5 * lcmin)
-gmsh.model.mesh.field.setNumber(5, "DistMax", 0.5 * lcmin)
-
-
-gmsh.model.mesh.field.add("Min", 6)
-gmsh.model.mesh.field.setNumbers(6, "FieldsList", [5, 3])
-
-
-gmsh.model.mesh.field.setAsBackgroundMesh(6)
+gmsh.model.mesh.field.setAsBackgroundMesh(1)
 gmsh.option.setNumber("Mesh.CharacteristicLengthExtendFromBoundary", 0)
 gmsh.option.setNumber("Mesh.CharacteristicLengthFromPoints", 0)
 gmsh.option.setNumber("Mesh.CharacteristicLengthFromCurvature", 0)
@@ -170,8 +169,9 @@ gmsh.fltk.run()
 # Convert mesh to XDMF
 lcstr = f"{lc:.2f}"
 lcstr = lcstr.replace(".", "p")
-gmsh.write("p2a_" + lcstr + ".inp")
-mesh = mocmg.readAbaqusINP("p2a_" + lcstr + ".inp")
+#gmsh.write("p2a_" + lcstr + ".inp")
+gmsh.write("p2a.inp")
+mesh = mocmg.readAbaqusINP("p2a.inp")
 
 # Area info
 print("\nArea info")
@@ -219,5 +219,5 @@ print(f'Moderator area (computed): {mod_mesh_area + mod_gt_area}')
 print(f'Moderator area error: {100*(mod_mesh_area + mod_gt_area - mod_area)/mod_area} %\n')
 
 
-#mocmg.writeXDMF("p2a_" + lcstr + ".xdmf", mesh)
+mocmg.writeXDMF("p2a.xdmf", mesh)
 mocmg.finalize()
