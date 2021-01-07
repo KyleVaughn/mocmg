@@ -1,4 +1,4 @@
 # mocmg
 Mesh generator for solving the neutron transport equation with the method of characteristics.
 
-See the wiki for installation instructions, testing, examples, etc.
+Installation instructions may be found in the [documentation](https://mocmg.readthedocs.io/en/latest/index.html).
