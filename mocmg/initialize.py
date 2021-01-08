@@ -102,6 +102,7 @@ def initialize(verbosity="info", color=True):
         color (bool, optional): Display log messages with color coded levels.
 
     """
+
     if verbosity == "info":
         mocmgVerbosity = logging.INFO
     elif verbosity == "debug":
