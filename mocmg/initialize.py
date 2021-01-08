@@ -5,8 +5,7 @@
 
 import logging
 import sys
-
-import gmsh
+import warnings
 
 
 class LessThanFilter(logging.Filter):
@@ -79,33 +78,46 @@ class CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 
-"""
-Initialize mocmg logger and gmsh with desired level of output.
-The levels are as follows:
-  silent  : For gmsh only. Don't output anything from gmsh
-  error   : Display error messages only
-  warning : Display error and warning messages
-  info    : Display error, warning, and info messages
-  debug   : Display error, warning, info, and debug messages
+def initialize(verbosity="info", color=True):
+    """Initializes the mocmg logger with the desired output options.
 
-Inputs:
-  mocmgOption: One of the levels above. String
-  gmshOption: One of the leves above. String
-  color: Option to color the output of log messages from mocmg. True or False
-"""
+    Args:
+        verbosity (str): Verbosity level for mocmg. All messages below this level will not be
+            displayed. The levels are as follows:
 
+            +-----------+----------------------------------------------------+
+            |   Level   |   Description                                      |
+            +===========+====================================================+
+            |   silent  |   Don't output anything                            |
+            +-----------+----------------------------------------------------+
+            |   error   |   Display error messages only                      |
+            +-----------+----------------------------------------------------+
+            |   warning |   Display error and warning messages               |
+            +-----------+----------------------------------------------------+
+            |   info    |   Display error, warning, and info messages        |
+            +-----------+----------------------------------------------------+
+            |   debug   |   Display error, warning, info, and debug messages |
+            +-----------+----------------------------------------------------+
 
-def initialize(mocmgOption=None, gmshOption=None, color=True):
-    # mocmg
-    if mocmgOption == "debug":
+        color (bool, optional): Display log messages with color coded levels.
+
+    """
+    if verbosity == "info":
+        mocmgVerbosity = logging.INFO
+    elif verbosity == "debug":
         mocmgVerbosity = logging.DEBUG
-    elif mocmgOption == "warning":
+    elif verbosity == "warning":
         mocmgVerbosity = logging.WARNING
-    elif mocmgOption == "error":
+    elif verbosity == "error":
         mocmgVerbosity = logging.ERROR
-    elif mocmgOption == "silent":
+    elif verbosity == "silent":
         mocmgVerbosity = 99
     else:
+        warnings.warn(
+            f"No verbosity option for '{verbosity}'. Defaulting to 'info'."
+            + "Next time please choose from one of: "
+            + "'silent', 'error', 'warning', 'info', or 'debug'"
+        )
         mocmgVerbosity = logging.INFO
 
     # Get the root logger
@@ -127,13 +139,14 @@ def initialize(mocmgOption=None, gmshOption=None, color=True):
     logging_handler_out.addFilter(LessThanFilter(logging.WARNING))
 
     # If stdout is terminal, color if desired. Otherwise, don't color.
+    # Omitted from coverage due to no way to retrieve contents on screen.
     if color and sys.stdout.isatty():  # pragma no cover
-        if mocmgOption == "debug":
+        if verbosity == "debug":
             logging_handler_out.setFormatter(CustomFormatter(debug=True))
         else:
             logging_handler_out.setFormatter(CustomFormatter())
     else:
-        if mocmgOption == "debug":
+        if verbosity == "debug":
             logging_handler_out.setFormatter(debugFormatter)
         else:
             logging_handler_out.setFormatter(formatter)
@@ -145,30 +158,15 @@ def initialize(mocmgOption=None, gmshOption=None, color=True):
     logging_handler_err.setLevel(lvl)
 
     # If stderr is terminal, color if desired. Otherwise, don't color.
+    # Omitted from coverage due to no way to retrieve contents on screen.
     if color and sys.stderr.isatty():  # pragma no cover
-        if mocmgOption == "debug":
+        if verbosity == "debug":
             logging_handler_err.setFormatter(CustomFormatter(debug=True))
         else:
             logging_handler_err.setFormatter(CustomFormatter())
     else:
-        if mocmgOption == "debug":
+        if verbosity == "debug":
             logging_handler_err.setFormatter(debugFormatter)
         else:
             logging_handler_err.setFormatter(formatter)
     logger.addHandler(logging_handler_err)
-
-    # gmsh
-    if gmshOption == "debug":
-        gmshVerbosity = 99
-    elif gmshOption == "warning":
-        gmshVerbosity = 2
-    elif gmshOption == "error":
-        gmshVerbosity = 1
-    elif gmshOption == "silent":
-        gmshVerbosity = 0
-    else:
-        gmshVerbosity = 5
-
-    gmsh.initialize()
-    gmsh.option.setNumber("General.Terminal", 1)
-    gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
