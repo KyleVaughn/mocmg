@@ -3,9 +3,10 @@
 """
 
 
-import gmsh
 import logging
 import sys
+
+import gmsh
 
 
 class LessThanFilter(logging.Filter):
