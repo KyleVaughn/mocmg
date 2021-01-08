@@ -1,10 +1,24 @@
+"""Used to initialize both mocmg and gmsh and set log settings.
+
+"""
+
+
 import gmsh
 import logging
 import sys
 
 
-# Filters messages of severity less than argument
 class LessThanFilter(logging.Filter):
+    """Filters messages of level value less than exclusive_maximum.
+
+    Args:
+        exclusive_maximum (int): Numeric value of minimum message level to be logged.
+
+    Example:
+        LessThanFilter(logging.WARNING)
+
+    """
+
     def __init__(self, exclusive_maximum, name=""):
         super(LessThanFilter, self).__init__(name)
         self.max_level = exclusive_maximum
@@ -14,10 +28,19 @@ class LessThanFilter(logging.Filter):
         return 1 if record.levelno < self.max_level else 0
 
 
-# Logging formatter to add colors to messages using ANSI
 class CustomFormatter(logging.Formatter):
-    def __init__(self, option=None):  # pragma no cover
-        self.option = option
+    """Logging formatter to add colors to messages using ANSI
+
+    Args:
+        debug (bool, optional): Defaults to False.
+
+    Attributes:
+        debug (bool): Print verbose
+
+    """
+
+    def __init__(self, debug=False):  # pragma no cover
+        self.debug = debug
 
         purple = "\x1b[35;10m"
         green = "\x1b[32;10m"
@@ -26,11 +49,9 @@ class CustomFormatter(logging.Formatter):
         reset = "\x1b[0m"
 
         fmt = "%(asctime)s %(levelname)-10s: %(name)s - %(message)s"
-        debugFmt = (
-            "%(asctime)s %(levelname)-10s: %(name)s - (line: %(lineno)d) %(message)s"
-        )
+        debugFmt = "%(asctime)s %(levelname)-10s: %(name)s - (line: %(lineno)d) %(message)s"
 
-        if option == "debug":
+        if debug:
             theFormat = debugFmt
         else:
             theFormat = fmt
@@ -87,8 +108,7 @@ def initialize(mocmgOption=None, gmshOption=None, color=True):
         fmt="%(asctime)s %(levelname)-10s: %(name)s - %(message)s", datefmt="%H:%M:%S"
     )
     debugFormatter = logging.Formatter(
-        fmt="%(asctime)s %(levelname)-10s: %(name)s"
-        + " - (line: %(lineno)d) %(message)s",
+        fmt="%(asctime)s %(levelname)-10s: %(name)s" + " - (line: %(lineno)d) %(message)s",
         datefmt="%H:%M:%S",
     )
 
@@ -100,7 +120,7 @@ def initialize(mocmgOption=None, gmshOption=None, color=True):
     # If stdout is terminal, color if desired. Otherwise, don't color.
     if color and sys.stdout.isatty():  # pragma no cover
         if mocmgOption == "debug":
-            logging_handler_out.setFormatter(CustomFormatter(option="debug"))
+            logging_handler_out.setFormatter(CustomFormatter(debug=True))
         else:
             logging_handler_out.setFormatter(CustomFormatter())
     else:
@@ -118,7 +138,7 @@ def initialize(mocmgOption=None, gmshOption=None, color=True):
     # If stderr is terminal, color if desired. Otherwise, don't color.
     if color and sys.stderr.isatty():  # pragma no cover
         if mocmgOption == "debug":
-            logging_handler_err.setFormatter(CustomFormatter(option="debug"))
+            logging_handler_err.setFormatter(CustomFormatter(debug=True))
         else:
             logging_handler_err.setFormatter(CustomFormatter())
     else:

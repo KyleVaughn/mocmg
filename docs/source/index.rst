@@ -6,3 +6,4 @@ Contents
    :maxdepth: 1
 
    install
+   modules

@@ -8,4 +8,4 @@ repos:
     rev: 3.8.1
     hooks:
     - id: flake8
-      exclude: ^examples, ^tests, ^docs
+      exclude: ^examples/, ^tests/, ^docs/
