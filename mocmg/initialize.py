@@ -1,4 +1,4 @@
-"""Used to initialize both mocmg and gmsh and set log settings.
+"""Used to initialize both mocmg and gmsh and to set log message settings.
 
 """
 
@@ -17,6 +17,10 @@ class LessThanFilter(logging.Filter):
     Example:
         LessThanFilter(logging.WARNING)
 
+    Note:
+        See `Python logging library <https://docs.python.org/3/library/logging.html>`_ documentation
+        for logging level numeric values, or simply use 'logging.INFO', 'logging.WARNING', etc.
+
     """
 
     def __init__(self, exclusive_maximum, name=""):
@@ -29,16 +33,19 @@ class LessThanFilter(logging.Filter):
 
 
 class CustomFormatter(logging.Formatter):
-    """Logging formatter to add colors to messages using ANSI
+    """Specifies the format of log messages, including date, time, and colors using ANSI color codes.
 
     Args:
-        debug (bool, optional): Defaults to False.
+        debug (bool, optional): Enable printing of line numbers within the code where the message
+            was written.
 
     Attributes:
-        debug (bool): Print verbose
+        debug (bool): Enable printing of line numbers within the code where the message
+            was written.
 
     """
 
+    # Omitted from coverage due to no way to retrieve contents on screen.
     def __init__(self, debug=False):  # pragma no cover
         self.debug = debug
 
@@ -64,6 +71,7 @@ class CustomFormatter(logging.Formatter):
             logging.CRITICAL: bold_red + theFormat + reset,
         }
 
+    # Omitted from coverage due to no way to retrieve contents on screen.
     def format(self, record):  # pragma no cover
         log_fmt = self.FORMATS.get(record.levelno)
         formatter = logging.Formatter(log_fmt, datefmt="%H:%M:%S")
