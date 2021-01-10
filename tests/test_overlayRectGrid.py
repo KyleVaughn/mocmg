@@ -1,8 +1,11 @@
-import gmsh
-import mocmg
 from math import pi
-from .testingUtils import captured_output
 from unittest import TestCase
+
+import gmsh
+
+import mocmg
+
+from .testingUtils import captured_output
 
 # NOTE: You pretty much have to run gmsh.fltk.run() to debug these
 
@@ -28,7 +31,12 @@ class test_overlayRectGrid(TestCase):
         ]
         err_ref = []
         with captured_output() as (out, err):
-            mocmg.initialize(gmshOption="silent")
+            mocmg.initialize()
+            gmshVerbosity = 0
+            gmsh.initialize()
+            gmsh.option.setNumber("General.Terminal", 1)
+            gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
+
             gmsh.model.occ.addDisk(0, 0, 0, 1, 1)
             gmsh.model.occ.synchronize()
             gmsh.model.addPhysicalGroup(2, [1], 1)
@@ -100,7 +108,11 @@ class test_overlayRectGrid(TestCase):
             + " rectangular grid manually specified. Use caution. Box: [-4, -4, 0, 4, 4, 0]"
         ]
         with captured_output() as (out, err):
-            mocmg.initialize(gmshOption="silent")
+            mocmg.initialize()
+            gmshVerbosity = 0
+            gmsh.initialize()
+            gmsh.option.setNumber("General.Terminal", 1)
+            gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
             gmsh.model.occ.addDisk(0, 0, 0, 1, 1)
             gmsh.model.occ.synchronize()
             gmsh.model.addPhysicalGroup(2, [1], 1)
@@ -148,7 +160,12 @@ class test_overlayRectGrid(TestCase):
         ]
         err_ref = []
         with captured_output() as (out, err):
-            mocmg.initialize(gmshOption="silent")
+            mocmg.initialize()
+            gmshVerbosity = 0
+            gmsh.initialize()
+            gmsh.option.setNumber("General.Terminal", 1)
+            gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
+
             gmsh.model.occ.addDisk(0, 0, 0, 1, 1)
             gmsh.model.occ.synchronize()
             mocmg.overlayRectGrid(1, 1)

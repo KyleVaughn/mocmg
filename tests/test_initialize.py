@@ -1,9 +1,12 @@
-import gmsh
 import logging
-import mocmg
-import pytest
-from .testingUtils import captured_output
 from unittest import TestCase
+
+import gmsh
+import pytest
+
+import mocmg
+
+from .testingUtils import captured_output
 
 
 @pytest.mark.skip()
@@ -42,6 +45,10 @@ class test_initialize(TestCase):
     def test_optionDefault(self):
         with captured_output() as (out, err):
             mocmg.initialize()
+            gmshVerbosity = 5
+            gmsh.initialize()
+            gmsh.option.setNumber("General.Terminal", 1)
+            gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
             log = logging.getLogger(__name__)
             testLogMessages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
@@ -55,7 +62,12 @@ class test_initialize(TestCase):
 
     def test_optionDebug(self):
         with captured_output() as (out, err):
-            mocmg.initialize(mocmgOption="debug", gmshOption="debug")
+            mocmg.initialize(verbosity="debug")
+            gmshVerbosity = 99
+            gmsh.initialize()
+            gmsh.option.setNumber("General.Terminal", 1)
+            gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
+
             log = logging.getLogger(__name__)
             testLogMessages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
@@ -69,7 +81,11 @@ class test_initialize(TestCase):
 
     def test_optionWarning(self):
         with captured_output() as (out, err):
-            mocmg.initialize(mocmgOption="warning", gmshOption="warning")
+            mocmg.initialize(verbosity="warning")
+            gmshVerbosity = 2
+            gmsh.initialize()
+            gmsh.option.setNumber("General.Terminal", 1)
+            gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
             log = logging.getLogger(__name__)
             testLogMessages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
@@ -83,7 +99,11 @@ class test_initialize(TestCase):
 
     def test_optionError(self):
         with captured_output() as (out, err):
-            mocmg.initialize(mocmgOption="error", gmshOption="error")
+            mocmg.initialize(verbosity="error")
+            gmshVerbosity = 1
+            gmsh.initialize()
+            gmsh.option.setNumber("General.Terminal", 1)
+            gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
             log = logging.getLogger(__name__)
             testLogMessages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
@@ -97,7 +117,11 @@ class test_initialize(TestCase):
 
     def test_optionSilent(self):
         with captured_output() as (out, err):
-            mocmg.initialize(mocmgOption="silent", gmshOption="silent")
+            mocmg.initialize(verbosity="silent")
+            gmshVerbosity = 0
+            gmsh.initialize()
+            gmsh.option.setNumber("General.Terminal", 1)
+            gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
             log = logging.getLogger(__name__)
             testLogMessages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()

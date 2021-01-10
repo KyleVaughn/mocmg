@@ -1,13 +1,21 @@
-import gmsh
-import mocmg
-import pytest
-from .testingUtils import captured_output
 from unittest import TestCase
+
+import gmsh
+import pytest
+
+import mocmg
+
+from .testingUtils import captured_output
 
 
 class test_generateRectGrid(TestCase):
     def test_rectGridDefault(self):
-        mocmg.initialize(mocmgOption="silent", gmshOption="silent")
+        mocmg.initialize(verbosity="silent")
+        gmshVerbosity = 0
+        gmsh.initialize()
+        gmsh.option.setNumber("General.Terminal", 1)
+        gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
+
         bb = [0, 0, 0, 9, 4, 0]
         PGTagsL1, PGTagsL2, PGNamesL1, PGNamesL2 = mocmg.generateRectGrid(bb, 3, 2)
         IDL1 = list(range(1, 7))
@@ -55,15 +63,18 @@ class test_generateRectGrid(TestCase):
     def test_rectGridOptionalArgs(self):
         # Capture output since bb will throw warning on purpose
         with captured_output() as (out, err):
-            mocmg.initialize(mocmgOption="warning", gmshOption="silent")
+            mocmg.initialize(verbosity="warning")
+            gmshVerbosity = 0
+            gmsh.initialize()
+            gmsh.option.setNumber("General.Terminal", 1)
+            gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
+
             nx = 3
             ny = 2
             nnx = 3
             nny = 2
             bb = [0, 0, 0, 9, 4, 1]
-            PGTagsL1, PGTagsL2, PGNamesL1, PGNamesL2 = mocmg.generateRectGrid(
-                bb, nx, ny, nnx, nny
-            )
+            PGTagsL1, PGTagsL2, PGNamesL1, PGNamesL2 = mocmg.generateRectGrid(bb, nx, ny, nnx, nny)
             IDL1 = list(range(1, 7))
             IDL2 = list(range(7, 43))
             namesL1 = [
@@ -163,9 +174,7 @@ class test_generateRectGrid(TestCase):
         nny = 2
         bb = [0, 0, 0, 9, 4, 1]
         with pytest.raises(ValueError) as e_info:
-            PGTagsL1, PGTagsL2, PGNamesL1, PGNamesL2 = mocmg.generateRectGrid(
-                bb, nx, ny, nnx, nny
-            )
+            PGTagsL1, PGTagsL2, PGNamesL1, PGNamesL2 = mocmg.generateRectGrid(bb, nx, ny, nnx, nny)
         e_info.match("Too many x-divisions of bounding box for the output format")
 
     def test_rectGridTooManyYDiv(self):
@@ -175,7 +184,5 @@ class test_generateRectGrid(TestCase):
         nny = 2
         bb = [0, 0, 0, 9, 4, 1]
         with pytest.raises(ValueError) as e_info:
-            PGTagsL1, PGTagsL2, PGNamesL1, PGNamesL2 = mocmg.generateRectGrid(
-                bb, nx, ny, nnx, nny
-            )
+            PGTagsL1, PGTagsL2, PGNamesL1, PGNamesL2 = mocmg.generateRectGrid(bb, nx, ny, nnx, nny)
         e_info.match("Too many y-divisions of bounding box for the output format")

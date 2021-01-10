@@ -1,14 +1,21 @@
-import gmsh
-import mocmg
-import pytest
 from unittest import TestCase
+
+import gmsh
+import pytest
+
+import mocmg
 
 pi = 3.141592653589793
 
 
 class test_gmshUtils(TestCase):
     def test_getEntitiesForPhysicalGroupName(self):
-        mocmg.initialize(gmshOption="silent")
+        mocmg.initialize()
+        gmshVerbosity = 99
+        gmsh.initialize()
+        gmsh.option.setNumber("General.Terminal", 1)
+        gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
+
         gmsh.model.occ.addDisk(0, 0, 0, 1, 1)
         gmsh.model.occ.addDisk(0, 0, 0, 1, 1)
         gmsh.model.occ.synchronize()

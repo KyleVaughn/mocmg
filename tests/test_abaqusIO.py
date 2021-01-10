@@ -1,7 +1,11 @@
-import mocmg
-import numpy as np
-from .testingUtils import captured_output
 from unittest import TestCase
+
+import gmsh
+import numpy as np
+
+import mocmg
+
+from .testingUtils import captured_output
 
 
 class test_abaqusIO(TestCase):
@@ -36,7 +40,12 @@ class test_abaqusIO(TestCase):
         err_ref = []
         # Caputure output since bb will throw warning on purpose
         with captured_output() as (out, err):
-            mocmg.initialize(gmshOption="silent")
+            mocmg.initialize()
+            gmshVerbosity = 0
+            gmsh.initialize()
+            gmsh.option.setNumber("General.Terminal", 1)
+            gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
+
             mesh = mocmg.readAbaqusINP("tests/abaqus/triangle_only.inp")
             points = mesh.points
             cells = mesh.cells
@@ -148,7 +157,12 @@ class test_abaqusIO(TestCase):
         err_ref = []
         # Caputure output since bb will throw warning on purpose
         with captured_output() as (out, err):
-            mocmg.initialize(gmshOption="silent")
+            mocmg.initialize()
+            gmshVerbosity = 0
+            gmsh.initialize()
+            gmsh.option.setNumber("General.Terminal", 1)
+            gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
+
             mesh = mocmg.readAbaqusINP("tests/abaqus/mixed_topology.inp")
             points = mesh.points
             cells = mesh.cells
@@ -269,7 +283,12 @@ class test_abaqusIO(TestCase):
         err_ref = []
         # Caputure output since bb will throw warning on purpose
         with captured_output() as (out, err):
-            mocmg.initialize(gmshOption="silent")
+            mocmg.initialize()
+            gmshVerbosity = 0
+            gmsh.initialize()
+            gmsh.option.setNumber("General.Terminal", 1)
+            gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
+
             mesh = mocmg.readAbaqusINP("tests/abaqus/disks_mixed.inp")
             points = mesh.points
             cells = mesh.cells
@@ -309,12 +328,14 @@ class test_abaqusIO(TestCase):
         out_ref = [
             "INFO      : mocmg.abaqusIO - Reading mesh data from tests/abaqus/element_error.inp"
         ]
-        err_ref = [
-            "ERROR     : mocmg.abaqusIO - Unrecognized mesh element type: MADEUPTYPE"
-        ]
+        err_ref = ["ERROR     : mocmg.abaqusIO - Unrecognized mesh element type: MADEUPTYPE"]
         # Caputure output since bb will throw warning on purpose
         with captured_output() as (out, err):
-            mocmg.initialize(gmshOption="silent")
+            mocmg.initialize()
+            gmshVerbosity = 0
+            gmsh.initialize()
+            gmsh.option.setNumber("General.Terminal", 1)
+            gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
             mocmg.readAbaqusINP("tests/abaqus/element_error.inp")
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
         out, err = [line.split(None, 1)[1] for line in out], [
