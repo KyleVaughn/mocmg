@@ -27,13 +27,13 @@ referenceErr = [
 
 # NOTE: line numbers correspond to the testLogMessages function.
 referenceDebugOut = [
-    "DEBUG     : tests.test_initialize - (line: 11) Debug message",
-    "INFO      : tests.test_initialize - (line: 12) Info message",
+    "DEBUG     : tests.test_initialize - (line: 14) Debug message",
+    "INFO      : tests.test_initialize - (line: 15) Info message",
 ]
 referenceDebugErr = [
-    "WARNING   : tests.test_initialize - (line: 13) Warning message",
-    "ERROR     : tests.test_initialize - (line: 14) Error message",
-    "CRITICAL  : tests.test_initialize - (line: 15) Critical message",
+    "WARNING   : tests.test_initialize - (line: 16) Warning message",
+    "ERROR     : tests.test_initialize - (line: 17) Error message",
+    "CRITICAL  : tests.test_initialize - (line: 18) Critical message",
 ]
 
 
