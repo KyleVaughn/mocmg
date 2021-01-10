@@ -1,15 +1,6 @@
 [tool.black]
 line-length = 100
 target-version = ['py36', 'py37', 'py38']
-exclude = '''
-^/(
-  (
-      \.eggs
-    | \.git
-    | docs
-  )/ 
-)
-'''
 
 [tool.isort]
 multi_line_output = 3

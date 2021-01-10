@@ -7,3 +7,4 @@ Contents
 
    install
    modules
+   devguide
