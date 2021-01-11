@@ -13,7 +13,7 @@ setuptools.setup(
         "numpy>=1.19",
         "scipy>=1.6",
         "h5py>=3.1",
-        "gmsh-dev>=4.7.1",
+        "gmsh-dev>=4.7",
     ],
     include_package_data=True,
     python_requires=">=3.6",
