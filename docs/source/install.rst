@@ -14,8 +14,6 @@ Installation of mocmg requires `git <https://git-scm.com/>`_,
 and `pip <https://pip.pypa.io/en/stable/>`_.
 Optional testing of the installation may be performed using `pytest <https://docs.pytest.org/en/stable/>`_.
 
-.. note:: As of Python version 3.4, pip is included by default, so this should not be an issue.
-
 ----------------------------------------
 Installation on Linux/Mac with pip
 ----------------------------------------
@@ -36,12 +34,11 @@ Using pip to install mocmg will also install the following dependencies if they 
     h5py
     gmsh-dev
 
-To install mocmg:
+To install mocmg from the directory containing the mocmg git repository:
 
 .. code-block:: sh
 
-   cd mocmg
-   pip3 install . 
+   pip3 install mocmg/ 
 
 ----------------------------------------
 Testing
