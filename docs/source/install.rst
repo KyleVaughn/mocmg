@@ -41,6 +41,11 @@ To install mocmg from the directory containing the mocmg git repository:
 
    pip3 install mocmg/ 
 
+.. note:: Due to local installation of packages with pip, you may need to add the 
+          install location to your PATH before you can use mocmg, pytest, etc. 
+          Please check the pip install warnings to see if you need to add this location to your PATH
+          (typically /home/<user>/.local/bin).
+
 Testing
 ----------------------------------------
 
@@ -50,8 +55,6 @@ Once installation is complete, testing can be performed using `pytest <https://d
 
    pytest
 
-To examine test coverage:
-
-.. code-block:: sh
-
-   pytest --cov-report term-missing --cov-branch --cov=mocmg tests/
+If all tests were either passed or skipped, your install was successful and you shouldn't have
+any problems using mocmg. If any of the tests failed, your installation requires troubleshooting
+and may not work as intended.

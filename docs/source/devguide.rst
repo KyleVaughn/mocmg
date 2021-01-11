@@ -47,3 +47,15 @@ Error/violation specifications
 isort
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 isort
+
+
+
+testing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To examine test coverage:
+
+.. code-block:: sh
+
+   pytest --cov-report term-missing --cov-branch --cov=mocmg tests/
+
