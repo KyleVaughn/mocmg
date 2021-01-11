@@ -1,20 +1,21 @@
 .. _install:
 
-===================
 Installation
 ===================
 
 To download and install mocmg, you will need to first install the required software, then follow the instructions for installation with pip.
 
----------------------------------------
 Requirements
 ---------------------------------------
-Installation of mocmg requires `git <https://git-scm.com/>`_, 
-`Python <https://www.python.org/>`_ (version 3.6 or greater), 
-and `pip <https://pip.pypa.io/en/stable/>`_.
+
+Installation of mocmg requires: 
+
+- `git <https://git-scm.com/>`_, 
+- `Python <https://www.python.org/>`_ (version 3.6 or greater), 
+- and `pip <https://pip.pypa.io/en/stable/>`_.
+
 Optional testing of the installation may be performed using `pytest <https://docs.pytest.org/en/stable/>`_.
 
-----------------------------------------
 Installation on Linux/Mac with pip
 ----------------------------------------
 
@@ -40,7 +41,6 @@ To install mocmg from the directory containing the mocmg git repository:
 
    pip3 install mocmg/ 
 
-----------------------------------------
 Testing
 ----------------------------------------
 
