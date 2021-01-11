@@ -1,5 +1,6 @@
-import mocmg
 import sys
+
+import mocmg
 
 pi = 3.141592653589793
 

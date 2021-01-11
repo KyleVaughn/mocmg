@@ -1,5 +1,6 @@
-import gmsh
 import logging
+
+import gmsh
 
 module_log = logging.getLogger(__name__)
 
@@ -35,9 +36,7 @@ def generateRectGrid(bb, nx, ny, nnx=1, nny=1):
     dy = y_max - y_min
     dz = z_max - z_min
     if abs(dz > 1e-6):
-        module_log.warning(
-            f"Model thickness is {dz:.6f} > 1e-6. Model expected in 2D x-y plane."
-        )
+        module_log.warning(f"Model thickness is {dz:.6f} > 1e-6. Model expected in 2D x-y plane.")
 
     width1 = dx / float(nx)  # width of rectangle in grid level 1
     height1 = dy / float(ny)  # height of rectangle in grid level 1
@@ -49,12 +48,8 @@ def generateRectGrid(bb, nx, ny, nnx=1, nny=1):
     # Generate only grid level 2 rectangles and group them based upon location to fit
     # inside grid level 1 rectangles
     gridTags = []  # Tags of all grid level 2 rectangles
-    gridTagsLevel1 = (
-        {}
-    )  # Dict of grid lvl 1 names and tags of grid lvl 2 rectangles for each name
-    gridTagsLevel2 = (
-        {}
-    )  # Dict of grid lvl 2 names and tags of grid lvl 2 rectangles for each name
+    gridTagsLevel1 = {}  # Dict of grid lvl 1 names and tags of grid lvl 2 rectangles for each name
+    gridTagsLevel2 = {}  # Dict of grid lvl 2 names and tags of grid lvl 2 rectangles for each name
     x = x_min
     # Check to make sure divisions is 3 digits or less, otherwise grid naming changes
     if nx * nnx > 999:

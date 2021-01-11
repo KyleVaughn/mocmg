@@ -1,5 +1,7 @@
-import gmsh
 import logging
+
+import gmsh
+
 from .generateRectGrid import generateRectGrid
 
 module_log = logging.getLogger(__name__)
@@ -21,8 +23,7 @@ def overlayRectGrid(nx, ny, nnx=1, nny=1, defaultMat="Material Void", bb=None):
         module_log.debug(f"Model bounding box: {bb}")
     else:
         module_log.warning(
-            "Bounding box for rectangular grid manually specified."
-            + f" Use caution. Box: {bb}"
+            "Bounding box for rectangular grid manually specified." + f" Use caution. Box: {bb}"
         )
 
     # 3. Generate rectangular grid
@@ -40,13 +41,10 @@ def overlayRectGrid(nx, ny, nnx=1, nny=1, defaultMat="Material Void", bb=None):
     gridElemTags = list(gridElemTags)
     gridElemDimTags = [(2, tag) for tag in gridElemTags]
     module_log.info(
-        f"Fragmenting {len(modelDimTags)} entities"
-        + f" with {len(gridElemDimTags)} entities"
+        f"Fragmenting {len(modelDimTags)} entities" + f" with {len(gridElemDimTags)} entities"
     )
     # fragment outputs the NEW entities and the parent-child relationships for ALL input entities
-    fragmentTags, fragmentChildren = gmsh.model.occ.fragment(
-        modelDimTags, gridElemDimTags
-    )
+    fragmentTags, fragmentChildren = gmsh.model.occ.fragment(modelDimTags, gridElemDimTags)
     #
     #
     # NOTE
@@ -68,9 +66,7 @@ def overlayRectGrid(nx, ny, nnx=1, nny=1, defaultMat="Material Void", bb=None):
         children = fragmentChildren[i]  # dim tags of child entities
         module_log.debug(f"Entity {e} had children {children}")
         childTags = [t[1] for t in children]  # tags of child entities
-        pGroupTags = list(
-            gmsh.model.getPhysicalGroupsForEntity(*e)
-        )  # physical group tags
+        pGroupTags = list(gmsh.model.getPhysicalGroupsForEntity(*e))  # physical group tags
         if len(pGroupTags) > 0:
             module_log.debug(f"Entity {e} had {len(pGroupTags)} physical groups")
             for tag in pGroupTags:
@@ -78,9 +74,7 @@ def overlayRectGrid(nx, ny, nnx=1, nny=1, defaultMat="Material Void", bb=None):
                 # otherwise, add it and its name to dictionaries.
                 if tag in fragmentChildrenGroupNames:
                     # Union the current set and the child tags
-                    fragmentChildrenGroups[tag] = fragmentChildrenGroups[tag].union(
-                        set(childTags)
-                    )
+                    fragmentChildrenGroups[tag] = fragmentChildrenGroups[tag].union(set(childTags))
                 else:
                     # Add the key and children to the dict
                     fragmentChildrenGroupNames[tag] = gmsh.model.getPhysicalName(2, tag)
@@ -88,9 +82,7 @@ def overlayRectGrid(nx, ny, nnx=1, nny=1, defaultMat="Material Void", bb=None):
         else:
             module_log.debug(f"Entity {e} had no physical groups")
         # Report group names and children
-        module_log.debug(
-            f"Group tag/name dictionary is now : {fragmentChildrenGroupNames}"
-        )
+        module_log.debug(f"Group tag/name dictionary is now : {fragmentChildrenGroupNames}")
         module_log.debug(f"Group tag/child dictionary is now: {fragmentChildrenGroups}")
 
     # Synchronize and remove old groups

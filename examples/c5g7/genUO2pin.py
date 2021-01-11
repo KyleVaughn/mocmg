@@ -1,17 +1,18 @@
-import mocmg
 import gmsh
+
+import mocmg
 
 pi = 3.141592653589793
 
 lc = 0.20
-lcmin = lc/16.0
+lcmin = lc / 16.0
 radius = 0.54
 
 # Geometry
 # 1.26 cm pitch, 0.54 cm radius
 mocmg.initialize(mocmgOption="debug", gmshOption="debug")
 R = mocmg.findLinearDiskRadius(radius, lcmin)
-#R = 0.54
+# R = 0.54
 gmsh.model.occ.addDisk(1.26 / 2, 1.26 / 2, 0, R, R)
 gmsh.model.occ.synchronize()
 
@@ -20,13 +21,11 @@ p = gmsh.model.addPhysicalGroup(2, [1])
 gmsh.model.setPhysicalName(2, p, "MATERIAL_UO2-3.3")
 p = gmsh.model.addPhysicalGroup(2, [1])
 gmsh.model.setPhysicalName(2, p, "PIN_000001")
-mocmg.overlayRectGrid(
-    1, 1, bb=[0, 0, 0, 1.26, 1.26, 0], defaultMat="MATERIAL_MODERATOR"
-)
+mocmg.overlayRectGrid(1, 1, bb=[0, 0, 0, 1.26, 1.26, 0], defaultMat="MATERIAL_MODERATOR")
 gmsh.model.occ.synchronize()
 
 # Mesh
-#gmsh.model.mesh.setSize(gmsh.model.getEntities(0), lc)
+# gmsh.model.mesh.setSize(gmsh.model.getEntities(0), lc)
 #
 gmsh.model.mesh.field.add("MathEval", 1)
 gmsh.model.mesh.field.setString(1, "F", str(lc))

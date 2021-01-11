@@ -1,8 +1,9 @@
-import mocmg
 import gmsh
 
+import mocmg
+
 lc = 0.15
-lcmin = lc/4.0
+lcmin = lc / 4.0
 radius = 0.54
 
 # Geometry
@@ -65,16 +66,14 @@ p = gmsh.model.addPhysicalGroup(2, tags_guide)
 gmsh.model.setPhysicalName(2, p, "MATERIAL_GUIDE_TUBE")
 p = gmsh.model.addPhysicalGroup(2, tags_FC)
 gmsh.model.setPhysicalName(2, p, "MATERIAL_FISSION_CHAMBER")
-mocmg.overlayRectGrid(
-    1, 1, 17, 17, bb=[0, 0, 0, 21.42, 21.42, 0], defaultMat="MATERIAL_MODERATOR"
-)
+mocmg.overlayRectGrid(1, 1, 17, 17, bb=[0, 0, 0, 21.42, 21.42, 0], defaultMat="MATERIAL_MODERATOR")
 gmsh.model.occ.synchronize()
 
 # Mesh
 gmsh.model.mesh.setSize(gmsh.model.getEntities(0), lc)
 
 gmsh.model.mesh.field.add("MathEval", 1)
-gmsh.model.mesh.field.setString(1, "F", f"{lc:.6f}" )
+gmsh.model.mesh.field.setString(1, "F", f"{lc:.6f}")
 
 gmsh.model.mesh.field.setAsBackgroundMesh(1)
 gmsh.option.setNumber("Mesh.CharacteristicLengthExtendFromBoundary", 0)
@@ -107,9 +106,7 @@ print(f"Fissile area from compliment:   {total_area - fc_area - mod_area - gt_ar
 print(f"Total area: {total_area}")
 
 print("\nError checks")
-print(
-    f"Fissile area - from compliment: {uo2_area - (total_area - fc_area - mod_area - gt_area)}"
-)
+print(f"Fissile area - from compliment: {uo2_area - (total_area - fc_area - mod_area - gt_area)}")
 print(f"Total actual - computed: {total_area - 21.42**2}")
 
 

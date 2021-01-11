@@ -1,8 +1,8 @@
-import gmsh
 import logging
+
+import gmsh
 import numpy as np
 from scipy.optimize import fsolve
-
 
 module_log = logging.getLogger(__name__)
 
@@ -37,6 +37,7 @@ def findLinearDiskRadius(r, lc):
     R = fsolve(f, r)
     return R[0]
 
+
 def findLinearRingRadius(r_inner, ring_area, lc):
     # Finding the correct radius is quite hard, and does not match predicted results for
     # equal size elements, so an iterative solver is used
@@ -58,8 +59,8 @@ def findLinearRingRadius(r_inner, ring_area, lc):
         module_log.info(f"Radius: {r[0]}, linear ring area error: {total_area - ring_area}")
         gmsh.clear()
         return total_area - ring_area
-    
-    r_guess = np.sqrt(ring_area/np.pi + r_inner**2)
+
+    r_guess = np.sqrt(ring_area / np.pi + r_inner ** 2)
     R = fsolve(f, r_guess, args=(r_inner, ring_area))
     return R[0]
 
@@ -76,7 +77,7 @@ def findLinearRingRadius_flatField(r_inner, ring_area, lc):
         gmsh.model.occ.synchronize()
         p = gmsh.model.addPhysicalGroup(2, [tag])
         gmsh.model.mesh.field.add("MathEval", 1)
-        gmsh.model.mesh.field.setString(1, "F", f"{lc:.6f}" )
+        gmsh.model.mesh.field.setString(1, "F", f"{lc:.6f}")
         gmsh.model.mesh.field.setAsBackgroundMesh(1)
         gmsh.option.setNumber("Mesh.CharacteristicLengthExtendFromBoundary", 0)
         gmsh.option.setNumber("Mesh.CharacteristicLengthFromPoints", 0)
@@ -90,10 +91,11 @@ def findLinearRingRadius_flatField(r_inner, ring_area, lc):
         module_log.info(f"Radius: {r[0]}, linear ring area error: {total_area - ring_area}")
         gmsh.clear()
         return total_area - ring_area
-    
-    r_guess = np.sqrt(ring_area/np.pi + r_inner**2)
+
+    r_guess = np.sqrt(ring_area / np.pi + r_inner ** 2)
     R = fsolve(f, r_guess, args=(r_inner, ring_area))
     return R[0]
+
 
 def findLinearDiskRadius_flatField(r, lc):
     # Finding the correct radius is quite hard, and does not match predicted results for
@@ -104,7 +106,7 @@ def findLinearDiskRadius_flatField(r, lc):
         gmsh.model.occ.synchronize()
         p = gmsh.model.addPhysicalGroup(2, [s])
         gmsh.model.mesh.field.add("MathEval", 1)
-        gmsh.model.mesh.field.setString(1, "F", f"{lc:.6f}" )
+        gmsh.model.mesh.field.setString(1, "F", f"{lc:.6f}")
         gmsh.model.mesh.field.setAsBackgroundMesh(1)
         gmsh.option.setNumber("Mesh.CharacteristicLengthExtendFromBoundary", 0)
         gmsh.option.setNumber("Mesh.CharacteristicLengthFromPoints", 0)

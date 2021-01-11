@@ -1,8 +1,10 @@
 import copy
-import mocmg
+from unittest import TestCase
+
 import pytest
 from numpy import array
-from unittest import TestCase
+
+import mocmg
 
 
 class test_meshClass(TestCase):

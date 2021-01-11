@@ -1,8 +1,9 @@
-import h5py
 import logging
-import numpy as np
 import os
 import xml.etree.ElementTree as ET
+
+import h5py
+import numpy as np
 
 module_log = logging.getLogger(__name__)
 
@@ -75,9 +76,7 @@ def writeXDMF(filename, mesh, compression_opts=4):
     for eid, msh in enumerate(elements):
         ekeys = msh[1].keys()
         for k in ekeys:
-            elements[eid][1][k] = np.array(
-                [nodemap[node] for node in msh[1][k]], dtype=int
-            )
+            elements[eid][1][k] = np.array([nodemap[node] for node in msh[1][k]], dtype=int)
     del nodemap
 
     # adjust elsets element numbering to hdf5

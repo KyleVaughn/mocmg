@@ -1,5 +1,6 @@
-import gmsh
 import sys
+
+import gmsh
 
 
 def test_gmshVerbosity(N):

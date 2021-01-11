@@ -1,5 +1,10 @@
 [flake8]
 ignore = E203, E501, W503, RST203, RST301
-select = F,E,W,C,B,B9,D,RST
+select = F,E,W,B,B9,RST
 max-line-length = 100
 max-complexity = 10
+exclude = 
+  docs/source/conf.py, 
+  setup.py, 
+  mocmg/__init__.py,
+  examples, 

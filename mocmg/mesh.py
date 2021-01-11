@@ -1,4 +1,5 @@
 import logging
+
 import numpy as np
 
 module_log = logging.getLogger(__name__)
@@ -84,12 +85,8 @@ class Mesh:
                         x_quad = np.array([self.points[v][0] for v in vertices[4:8]])
                         y_quad = np.array([self.points[v][1] for v in vertices[4:8]])
                     else:  # pragma: no cover
-                        module_log.error(
-                            "Unsupported cell type in quadratic area calculation"
-                        )
-                        raise ValueError(
-                            "Unsupported cell type in quadratic area calculation"
-                        )
+                        module_log.error("Unsupported cell type in quadratic area calculation")
+                        raise ValueError("Unsupported cell type in quadratic area calculation")
 
                     # No quadratic edges shoelace formula may be used
                     # https://en.wikipedia.org/wiki/Shoelace_formula
@@ -130,9 +127,9 @@ class Mesh:
                         # rotate line to x-axis
                         if x_e[1] == 0.0:
                             if y_e[1] >= 0.0:
-                                theta = np.pi/2.0
+                                theta = np.pi / 2.0
                             else:
-                                theta = -np.pi/2.0
+                                theta = -np.pi / 2.0
                         else:
                             theta = np.arctan(y_e[1] / x_e[1])
 
