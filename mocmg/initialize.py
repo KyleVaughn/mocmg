@@ -1,6 +1,4 @@
-"""Used to initialize both mocmg and gmsh and to set log message settings.
-
-"""
+"""Used to initialize both mocmg and gmsh and to set log message settings."""
 
 
 import logging
@@ -8,7 +6,7 @@ import sys
 import warnings
 
 
-class LessThanFilter(logging.Filter):
+class _LessThanFilter(logging.Filter):
     """Filters messages of level value less than exclusive_maximum.
 
     Args:
@@ -24,7 +22,7 @@ class LessThanFilter(logging.Filter):
     """
 
     def __init__(self, exclusive_maximum, name=""):
-        super(LessThanFilter, self).__init__(name)
+        super(_LessThanFilter, self).__init__(name)
         self.max_level = exclusive_maximum
 
     def filter(self, record):
@@ -32,7 +30,7 @@ class LessThanFilter(logging.Filter):
         return 1 if record.levelno < self.max_level else 0
 
 
-class CustomFormatter(logging.Formatter):
+class _CustomFormatter(logging.Formatter):
     """Specifies the format of log messages, including date, time, and colors using ANSI color codes.
 
     Args:
@@ -78,8 +76,53 @@ class CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 
+def _getVerbosityNumber(verbosity):
+    """Get the numerical level associated with the verbosity.
+
+    Args:
+        verbosity (str): Verbosity level for mocmg. The levels are as follows:
+
+            +-----------+----------------------------------------------------+
+            |   Level   |   Description                                      |
+            +===========+====================================================+
+            |   silent  |   Don't output anything                            |
+            +-----------+----------------------------------------------------+
+            |   error   |   Display error messages only                      |
+            +-----------+----------------------------------------------------+
+            |   warning |   Display error and warning messages               |
+            +-----------+----------------------------------------------------+
+            |   info    |   Display error, warning, and info messages        |
+            +-----------+----------------------------------------------------+
+            |   debug   |   Display error, warning, info, and debug messages |
+            +-----------+----------------------------------------------------+
+
+    Returns:
+        int: Integer verbosity level for mocmg
+
+    """
+    if verbosity == "info":
+        num = logging.INFO
+    elif verbosity == "debug":
+        num = logging.DEBUG
+    elif verbosity == "warning":
+        num = logging.WARNING
+    elif verbosity == "error":
+        num = logging.ERROR
+    elif verbosity == "silent":
+        num = 99
+    else:
+        warnings.warn(
+            f"No verbosity option for '{verbosity}'. Defaulting to 'info'."
+            + "Next time please choose from one of: "
+            + "'silent', 'error', 'warning', 'info', or 'debug'"
+        )
+        num = logging.INFO
+
+    return num
+
+
 def initialize(verbosity="info", color=True):
-    """Initializes the mocmg logger with the desired output options.
+    """Initialize the mocmg logger with the desired output options.
 
     Args:
         verbosity (str): Verbosity level for mocmg. All messages below this level will not be
@@ -102,25 +145,8 @@ def initialize(verbosity="info", color=True):
         color (bool, optional): Display log messages with color coded levels.
 
     """
-
-    if verbosity == "info":
-        mocmgVerbosity = logging.INFO
-    elif verbosity == "debug":
-        mocmgVerbosity = logging.DEBUG
-    elif verbosity == "warning":
-        mocmgVerbosity = logging.WARNING
-    elif verbosity == "error":
-        mocmgVerbosity = logging.ERROR
-    elif verbosity == "silent":
-        mocmgVerbosity = 99
-    else:
-        warnings.warn(
-            f"No verbosity option for '{verbosity}'. Defaulting to 'info'."
-            + "Next time please choose from one of: "
-            + "'silent', 'error', 'warning', 'info', or 'debug'"
-        )
-        mocmgVerbosity = logging.INFO
-
+    # Get the numerical level for the verbosity
+    verbosity_number = _getVerbosityNumber(verbosity)
     # Get the root logger
     logger = logging.getLogger()
     # Have to set the root logger level, it defaults to logging.WARNING
@@ -134,39 +160,39 @@ def initialize(verbosity="info", color=True):
         datefmt="%H:%M:%S",
     )
 
-    # Stdout
+    # Format stdout
     logging_handler_out = logging.StreamHandler(sys.stdout)
-    logging_handler_out.setLevel(mocmgVerbosity)
-    logging_handler_out.addFilter(LessThanFilter(logging.WARNING))
+    logging_handler_out.setLevel(verbosity_number)
+    logging_handler_out.addFilter(_LessThanFilter(logging.WARNING))
 
     # If stdout is terminal, color if desired. Otherwise, don't color.
     # Omitted from coverage due to no way to retrieve contents on screen.
     if color and sys.stdout.isatty():  # pragma no cover
-        if verbosity == "debug":
-            logging_handler_out.setFormatter(CustomFormatter(debug=True))
+        if verbosity_number == logging.DEBUG:
+            logging_handler_out.setFormatter(_CustomFormatter(debug=True))
         else:
-            logging_handler_out.setFormatter(CustomFormatter())
+            logging_handler_out.setFormatter(_CustomFormatter())
     else:
-        if verbosity == "debug":
+        if verbosity_number == logging.DEBUG:
             logging_handler_out.setFormatter(debugFormatter)
         else:
             logging_handler_out.setFormatter(formatter)
     logger.addHandler(logging_handler_out)
 
-    # Stderr
+    # Format stderr
     logging_handler_err = logging.StreamHandler(sys.stderr)
-    lvl = max(logging.WARNING, mocmgVerbosity)
+    lvl = max(logging.WARNING, verbosity_number)
     logging_handler_err.setLevel(lvl)
 
     # If stderr is terminal, color if desired. Otherwise, don't color.
     # Omitted from coverage due to no way to retrieve contents on screen.
     if color and sys.stderr.isatty():  # pragma no cover
-        if verbosity == "debug":
-            logging_handler_err.setFormatter(CustomFormatter(debug=True))
+        if verbosity_number == logging.DEBUG:
+            logging_handler_err.setFormatter(_CustomFormatter(debug=True))
         else:
-            logging_handler_err.setFormatter(CustomFormatter())
+            logging_handler_err.setFormatter(_CustomFormatter())
     else:
-        if verbosity == "debug":
+        if verbosity_number == logging.DEBUG:
             logging_handler_err.setFormatter(debugFormatter)
         else:
             logging_handler_err.setFormatter(formatter)
