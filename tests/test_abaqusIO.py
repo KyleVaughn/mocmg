@@ -1,3 +1,5 @@
+"""Test reading and writing of Abaqus files"""
+
 from unittest import TestCase
 
 import gmsh
