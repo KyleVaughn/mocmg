@@ -53,20 +53,20 @@ class _CustomFormatter(logging.Formatter):
         bold_red = "\x1b[31;1m"
         reset = "\x1b[0m"
 
-        fmt = "%(asctime)s %(levelname)-10s: %(name)s - %(message)s"
-        debugFmt = "%(asctime)s %(levelname)-10s: %(name)s - (line: %(lineno)d) %(message)s"
+        default_fmt = "%(asctime)s %(levelname)-10s: %(name)s - %(message)s"
+        debug_fmt = "%(asctime)s %(levelname)-10s: %(name)s - (line: %(lineno)d) %(message)s"
 
         if debug:
-            theFormat = debugFmt
+            the_format = debug_fmt
         else:
-            theFormat = fmt
+            the_format = default_fmt
 
         self.FORMATS = {
-            logging.DEBUG: green + theFormat + reset,
-            logging.INFO: default + theFormat + reset,
-            logging.WARNING: purple + theFormat + reset,
-            logging.ERROR: bold_red + theFormat + reset,
-            logging.CRITICAL: bold_red + theFormat + reset,
+            logging.DEBUG: green + the_format + reset,
+            logging.INFO: default + the_format + reset,
+            logging.WARNING: purple + the_format + reset,
+            logging.ERROR: bold_red + the_format + reset,
+            logging.CRITICAL: bold_red + the_format + reset,
         }
 
     # Omitted from coverage due to no way to retrieve contents on screen.
@@ -76,7 +76,7 @@ class _CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 
-def _getVerbosityNumber(verbosity):
+def _get_verbosity_number(verbosity):
     """Get the numerical level associated with the verbosity.
 
     Args:
@@ -146,7 +146,7 @@ def initialize(verbosity="info", color=True):
 
     """
     # Get the numerical level for the verbosity
-    verbosity_number = _getVerbosityNumber(verbosity)
+    verbosity_number = _get_verbosity_number(verbosity)
     # Get the root logger
     logger = logging.getLogger()
     # Have to set the root logger level, it defaults to logging.WARNING
@@ -155,7 +155,7 @@ def initialize(verbosity="info", color=True):
     formatter = logging.Formatter(
         fmt="%(asctime)s %(levelname)-10s: %(name)s - %(message)s", datefmt="%H:%M:%S"
     )
-    debugFormatter = logging.Formatter(
+    debug_formatter = logging.Formatter(
         fmt="%(asctime)s %(levelname)-10s: %(name)s" + " - (line: %(lineno)d) %(message)s",
         datefmt="%H:%M:%S",
     )
@@ -174,7 +174,7 @@ def initialize(verbosity="info", color=True):
             logging_handler_out.setFormatter(_CustomFormatter())
     else:
         if verbosity_number == logging.DEBUG:
-            logging_handler_out.setFormatter(debugFormatter)
+            logging_handler_out.setFormatter(debug_formatter)
         else:
             logging_handler_out.setFormatter(formatter)
     logger.addHandler(logging_handler_out)
@@ -193,7 +193,7 @@ def initialize(verbosity="info", color=True):
             logging_handler_err.setFormatter(_CustomFormatter())
     else:
         if verbosity_number == logging.DEBUG:
-            logging_handler_err.setFormatter(debugFormatter)
+            logging_handler_err.setFormatter(debug_formatter)
         else:
             logging_handler_err.setFormatter(formatter)
     logger.addHandler(logging_handler_err)
