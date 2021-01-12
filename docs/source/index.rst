@@ -7,4 +7,4 @@ Contents
 
    install
    modules
-   devguide
+   devguide/index
