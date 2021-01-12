@@ -56,7 +56,7 @@ class test_overlayRectGrid(TestCase):
                 area = gmsh.model.occ.getMass(*e)
                 self.assertAlmostEqual(area, areas[i], places=6)
 
-            mocmg.finalize()
+            gmsh.finalize()
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
         out, err = [line.split(None, 1)[1] for line in out], [
             line.split(None, 1)[1] for line in err
@@ -133,7 +133,7 @@ class test_overlayRectGrid(TestCase):
                 area = gmsh.model.occ.getMass(*e)
                 self.assertAlmostEqual(area, areas[i], places=6)
 
-            mocmg.finalize()
+            gmsh.finalize()
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
         out, err = [line.split(None, 1)[1] for line in out], [
             line.split(None, 1)[1] for line in err
@@ -183,7 +183,7 @@ class test_overlayRectGrid(TestCase):
                 area = gmsh.model.occ.getMass(*e)
                 self.assertAlmostEqual(area, areas[i], places=6)
 
-            mocmg.finalize()
+            gmsh.finalize()
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
         out, err = [line.split(None, 1)[1] for line in out], [
             line.split(None, 1)[1] for line in err

@@ -1,5 +1,4 @@
 from .abaqusIO import readAbaqusINP
-from .finalize import finalize
 from .generateRectGrid import generateRectGrid
 from .gmshUtils import (
     findLinearDiskRadius,

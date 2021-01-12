@@ -70,7 +70,7 @@ class test_abaqusIO(TestCase):
         ]
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)
-        mocmg.finalize()
+        gmsh.finalize()
 
     def test_mixedTopology2ndOrderINP(self):
         # mixed topology and 2nd order cells
@@ -192,7 +192,7 @@ class test_abaqusIO(TestCase):
         ]
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)
-        mocmg.finalize()
+        gmsh.finalize()
 
     def test_cell_sets(self):
         points_ref = {
@@ -322,7 +322,7 @@ class test_abaqusIO(TestCase):
         ]
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)
-        mocmg.finalize()
+        gmsh.finalize()
 
     def test_elementTypeError(self):
         out_ref = [
@@ -343,4 +343,4 @@ class test_abaqusIO(TestCase):
         ]
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)
-        mocmg.finalize()
+        gmsh.finalize()

@@ -58,7 +58,7 @@ class test_initialize(TestCase):
         self.assertEqual(out, referenceOut)
         self.assertEqual(err, referenceErr)
         self.assertEqual(gmsh.option.getNumber("General.Verbosity"), 5)
-        mocmg.finalize()
+        gmsh.finalize()
 
     def test_optionDebug(self):
         with captured_output() as (out, err):
@@ -77,7 +77,7 @@ class test_initialize(TestCase):
         self.assertEqual(out, referenceDebugOut)
         self.assertEqual(err, referenceDebugErr)
         self.assertEqual(gmsh.option.getNumber("General.Verbosity"), 99)
-        mocmg.finalize()
+        gmsh.finalize()
 
     def test_optionWarning(self):
         with captured_output() as (out, err):
@@ -95,7 +95,7 @@ class test_initialize(TestCase):
         self.assertEqual(out, [])
         self.assertEqual(err, referenceErr)
         self.assertEqual(gmsh.option.getNumber("General.Verbosity"), 2)
-        mocmg.finalize()
+        gmsh.finalize()
 
     def test_optionError(self):
         with captured_output() as (out, err):
@@ -113,7 +113,7 @@ class test_initialize(TestCase):
         self.assertEqual(out, [])
         self.assertEqual(err, referenceErr[1:])
         self.assertEqual(gmsh.option.getNumber("General.Verbosity"), 1)
-        mocmg.finalize()
+        gmsh.finalize()
 
     def test_optionSilent(self):
         with captured_output() as (out, err):
@@ -131,4 +131,4 @@ class test_initialize(TestCase):
         self.assertEqual(out, [])
         self.assertEqual(err, [])
         self.assertEqual(gmsh.option.getNumber("General.Verbosity"), 0)
-        mocmg.finalize()
+        gmsh.finalize()

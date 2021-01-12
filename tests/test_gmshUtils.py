@@ -26,7 +26,7 @@ class test_gmshUtils(TestCase):
         with pytest.raises(ValueError) as e_info:
             ents = mocmg.getEntitiesForPhysicalGroupName("NOT_A_REAL_GROUP")
         e_info.match("'NOT_A_REAL_GROUP' is not in list")
-        mocmg.finalize()
+        gmsh.finalize()
 
     def test_findLinearDiskRadius(self):
         radius = 1.0

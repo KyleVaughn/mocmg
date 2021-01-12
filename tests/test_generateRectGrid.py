@@ -58,7 +58,7 @@ class test_generateRectGrid(TestCase):
         self.assertAlmostEqual(4.5, x, places=5)
         self.assertAlmostEqual(3.0, y, places=5)
         self.assertAlmostEqual(0.0, z, places=5)
-        mocmg.finalize()
+        gmsh.finalize()
 
     def test_rectGridOptionalArgs(self):
         # Capture output since bb will throw warning on purpose
@@ -165,7 +165,7 @@ class test_generateRectGrid(TestCase):
             + " Model expected in 2D x-y plane."
         )
         self.assertEqual(err[0], err_ref)
-        mocmg.finalize()
+        gmsh.finalize()
 
     def test_rectGridTooManyXDiv(self):
         nx = 1e6
