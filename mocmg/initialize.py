@@ -3,7 +3,6 @@
 
 import logging
 import sys
-import warnings
 
 
 class _LessThanFilter(logging.Filter):
@@ -111,10 +110,12 @@ def _get_verbosity_number(verbosity):
     elif verbosity == "silent":
         num = 99
     else:
-        warnings.warn(
-            f"No verbosity option for '{verbosity}'. Defaulting to 'info'."
-            + "Next time please choose from one of: "
-            + "'silent', 'error', 'warning', 'info', or 'debug'"
+        print(
+            f"N Invalid verbosity option '{verbosity}'."
+            + " Defaulting to 'info'."
+            + " Next time please choose from one of: "
+            + "'silent', 'error', 'warning', 'info', or 'debug'",
+            file=sys.stderr,
         )
         num = logging.INFO
 

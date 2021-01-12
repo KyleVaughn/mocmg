@@ -1,16 +1,14 @@
+"""Test the initialize function."""
 import logging
 from unittest import TestCase
-
-import gmsh
-import pytest
 
 import mocmg
 
 from .testingUtils import captured_output
 
 
-@pytest.mark.skip()
-def testLogMessages(logger):
+def _test_log_messages(logger):
+    """Produce messages at each log level."""
     logger.debug("Debug message")
     logger.info("Info message")
     logger.warning("Warning message")
@@ -18,117 +16,138 @@ def testLogMessages(logger):
     logger.critical("Critical message")
 
 
-referenceOut = ["INFO      : tests.test_initialize - Info message"]
-referenceErr = [
+# Expected output for stdout and stderr when NOT in debug mode
+reference_out = ["INFO      : tests.test_initialize - Info message"]
+reference_err = [
     "WARNING   : tests.test_initialize - Warning message",
     "ERROR     : tests.test_initialize - Error message",
     "CRITICAL  : tests.test_initialize - Critical message",
 ]
 
-# NOTE: line numbers correspond to the testLogMessages function.
-referenceDebugOut = [
-    "DEBUG     : tests.test_initialize - (line: 14) Debug message",
-    "INFO      : tests.test_initialize - (line: 15) Info message",
+# Expected output for stdout and stderr when in debug mode
+# NOTE: line numbers correspond to the _test_log_messages function.
+reference_debug_out = [
+    "DEBUG     : tests.test_initialize - (line: 12) Debug message",
+    "INFO      : tests.test_initialize - (line: 13) Info message",
 ]
-referenceDebugErr = [
-    "WARNING   : tests.test_initialize - (line: 16) Warning message",
-    "ERROR     : tests.test_initialize - (line: 17) Error message",
-    "CRITICAL  : tests.test_initialize - (line: 18) Critical message",
+reference_debug_err = [
+    "WARNING   : tests.test_initialize - (line: 14) Warning message",
+    "ERROR     : tests.test_initialize - (line: 15) Error message",
+    "CRITICAL  : tests.test_initialize - (line: 16) Critical message",
+]
+
+# Expected output when given a bad value for the verbosity
+badvalue_err = [
+    "Invalid verbosity option 'badvalue'. Defaulting to 'info'. Next time please choose "
+    + "from one of: 'silent', 'error', 'warning', 'info', or 'debug'",
+    "WARNING   : tests.test_initialize - Warning message",
+    "ERROR     : tests.test_initialize - Error message",
+    "CRITICAL  : tests.test_initialize - Critical message",
 ]
 
 
-class test_initialize(TestCase):
-    # Run with gmshOption='warning' or greater, otherwise gmsh will output
-    # 'Info    : No current model available: creating one'
-    # even though gmsh.finalize() has been called. Therefore, it is assumed that gmshOption is being set correctly
+class TestInitialize(TestCase):
+    """Test the initialize function.
 
-    def test_optionDefault(self):
+    Tests the following initialize arguments:
+
+    - initialize()
+    - initialize(verbosity="debug")
+    - initialize(verbosity="warning")
+    - initialize(verbosity="error")
+    - initialize(verbosity="silent")
+    - initialize(verbosity="badvalue"), expect warning
+
+    color
+    """
+
+    def test_verbosity_default(self):
+        """Test the default initialize options."""
         with captured_output() as (out, err):
             mocmg.initialize()
-            gmshVerbosity = 5
-            gmsh.initialize()
-            gmsh.option.setNumber("General.Terminal", 1)
-            gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
             log = logging.getLogger(__name__)
-            testLogMessages(log)
+            _test_log_messages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
         out, err = [line.split(None, 1)[1] for line in out], [
             line.split(None, 1)[1] for line in err
         ]  # strip times
-        self.assertEqual(out, referenceOut)
-        self.assertEqual(err, referenceErr)
-        self.assertEqual(gmsh.option.getNumber("General.Verbosity"), 5)
-        gmsh.finalize()
+        self.assertEqual(out, reference_out)
+        self.assertEqual(err, reference_err)
 
-    def test_optionDebug(self):
+    def test_verbosity_info(self):
+        """Test verbosity='info'."""
+        with captured_output() as (out, err):
+            mocmg.initialize(verbosity="info")
+            log = logging.getLogger(__name__)
+            _test_log_messages(log)
+        out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
+        out, err = [line.split(None, 1)[1] for line in out], [
+            line.split(None, 1)[1] for line in err
+        ]  # strip times
+        self.assertEqual(out, reference_out)
+        self.assertEqual(err, reference_err)
+
+    def test_verbosity_debug(self):
+        """Test verbosity='debug'."""
         with captured_output() as (out, err):
             mocmg.initialize(verbosity="debug")
-            gmshVerbosity = 99
-            gmsh.initialize()
-            gmsh.option.setNumber("General.Terminal", 1)
-            gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
-
             log = logging.getLogger(__name__)
-            testLogMessages(log)
+            _test_log_messages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
         out, err = [line.split(None, 1)[1] for line in out], [
             line.split(None, 1)[1] for line in err
         ]  # strip times
-        self.assertEqual(out, referenceDebugOut)
-        self.assertEqual(err, referenceDebugErr)
-        self.assertEqual(gmsh.option.getNumber("General.Verbosity"), 99)
-        gmsh.finalize()
+        self.assertEqual(out, reference_debug_out)
+        self.assertEqual(err, reference_debug_err)
 
-    def test_optionWarning(self):
+    def test_verbosity_warning(self):
+        """Test verbosity='warning'."""
         with captured_output() as (out, err):
             mocmg.initialize(verbosity="warning")
-            gmshVerbosity = 2
-            gmsh.initialize()
-            gmsh.option.setNumber("General.Terminal", 1)
-            gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
             log = logging.getLogger(__name__)
-            testLogMessages(log)
+            _test_log_messages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
         out, err = [line.split(None, 1)[1] for line in out], [
             line.split(None, 1)[1] for line in err
         ]  # strip times
         self.assertEqual(out, [])
-        self.assertEqual(err, referenceErr)
-        self.assertEqual(gmsh.option.getNumber("General.Verbosity"), 2)
-        gmsh.finalize()
+        self.assertEqual(err, reference_err)
 
-    def test_optionError(self):
+    def test_verbosity_error(self):
+        """Test verbosity='error'."""
         with captured_output() as (out, err):
             mocmg.initialize(verbosity="error")
-            gmshVerbosity = 1
-            gmsh.initialize()
-            gmsh.option.setNumber("General.Terminal", 1)
-            gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
             log = logging.getLogger(__name__)
-            testLogMessages(log)
+            _test_log_messages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
         out, err = [line.split(None, 1)[1] for line in out], [
             line.split(None, 1)[1] for line in err
         ]  # strip times
         self.assertEqual(out, [])
-        self.assertEqual(err, referenceErr[1:])
-        self.assertEqual(gmsh.option.getNumber("General.Verbosity"), 1)
-        gmsh.finalize()
+        self.assertEqual(err, reference_err[1:])
 
-    def test_optionSilent(self):
+    def test_verbosity_silent(self):
+        """Test verbosity='silent'."""
         with captured_output() as (out, err):
             mocmg.initialize(verbosity="silent")
-            gmshVerbosity = 0
-            gmsh.initialize()
-            gmsh.option.setNumber("General.Terminal", 1)
-            gmsh.option.setNumber("General.Verbosity", gmshVerbosity)
             log = logging.getLogger(__name__)
-            testLogMessages(log)
+            _test_log_messages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
         out, err = [line.split(None, 1)[1] for line in out], [
             line.split(None, 1)[1] for line in err
         ]  # strip times
         self.assertEqual(out, [])
         self.assertEqual(err, [])
-        self.assertEqual(gmsh.option.getNumber("General.Verbosity"), 0)
-        gmsh.finalize()
+
+    def test_verbosity_badvalue(self):
+        """Test verbosity='badvalue'."""
+        with captured_output() as (out, err):
+            mocmg.initialize(verbosity="badvalue")
+            log = logging.getLogger(__name__)
+            _test_log_messages(log)
+        out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
+        out, err = [line.split(None, 1)[1] for line in out], [
+            line.split(None, 1)[1] for line in err
+        ]  # strip times
+        self.assertEqual(out, reference_out)
+        self.assertEqual(err, badvalue_err)
