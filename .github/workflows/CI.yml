@@ -39,6 +39,11 @@ jobs:
           isort --check-only mocmg/
           isort --check-only tests/
           isort --check-only examples/
+      - name: Test with black
+        run: |
+          black --check mocmg/
+          black --check tests/
+          black --check examples/
       - name: Test with pytest
         run: |
           pytest
