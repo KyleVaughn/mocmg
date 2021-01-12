@@ -12,14 +12,6 @@ mocmg.abaqusIO module
    :undoc-members:
    :show-inheritance:
 
-mocmg.finalize module
----------------------
-
-.. automodule:: mocmg.finalize
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 mocmg.generateRectGrid module
 -----------------------------
 

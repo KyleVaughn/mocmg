@@ -11,3 +11,4 @@ how to run tests, and other related topics.
     :maxdepth: 2
 
     styleguide
+    testing
