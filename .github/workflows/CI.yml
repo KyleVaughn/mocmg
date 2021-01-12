@@ -33,6 +33,7 @@ jobs:
           pip install --upgrade gmsh-dev
           pip install --upgrade isort
           pip install --upgrade black
+          pip install --upgrade flake8
           pip install --upgrade pytest
           pip install --upgrade pytest-cov
       - name: Test with isort
@@ -45,6 +46,10 @@ jobs:
           black --check mocmg/
           black --check tests/
           black --check examples/
+      - name: Test with flake8
+        run: |
+          flake8 mocmg/
+          flake8 tests/
       - name: Test with pytest
         run: |
           pytest
