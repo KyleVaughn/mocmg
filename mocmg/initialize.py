@@ -1,4 +1,4 @@
-"""Used to initialize both mocmg and to set log message settings."""
+"""Used to initialize mocmg and to set log message settings."""
 
 
 import logging
@@ -203,14 +203,10 @@ def initialize(verbosity="info", color=True):
 
     # Format log file
     logging_handler_file = logging.FileHandler("mocmg.log", mode="w")
-    # Omitted from coverage due to no way to test with isatty() == True.
-    #    if not (sys.stdout.isatty() or sys.stderr.isatty()):  # pragma no cover
     if verbosity_number == logging.DEBUG:
         logging_handler_file.setFormatter(debug_formatter)
     else:
         logging_handler_file.setFormatter(formatter)
-    #    else:
-    #            logging_handler_file.setLevel(99)
     logging_handler_file.setLevel(verbosity_number)
 
     logger.addHandler(logging_handler_file)
