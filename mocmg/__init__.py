@@ -1,5 +1,4 @@
 from .abaqusIO import readAbaqusINP
-from .generateRectGrid import generateRectGrid
 from .gmshUtils import (
     findLinearDiskRadius,
     findLinearDiskRadius_flatField,
@@ -10,4 +9,5 @@ from .gmshUtils import (
 from .initialize import initialize
 from .mesh import Mesh
 from .overlayRectGrid import overlayRectGrid
+from .rectangular_grid import rectangular_grid
 from .xdmfIO import writeXDMF

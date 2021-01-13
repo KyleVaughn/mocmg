@@ -1,4 +1,4 @@
-"""Used to initialize both mocmg and gmsh and to set log message settings."""
+"""Used to initialize both mocmg and to set log message settings."""
 
 
 import logging

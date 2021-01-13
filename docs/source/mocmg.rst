@@ -12,10 +12,10 @@ mocmg.abaqusIO module
    :undoc-members:
    :show-inheritance:
 
-mocmg.generateRectGrid module
+mocmg.rectangular_grid module
 -----------------------------
 
-.. automodule:: mocmg.generateRectGrid
+.. automodule:: mocmg.rectangular_grid
    :members:
    :undoc-members:
    :show-inheritance:
