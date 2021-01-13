@@ -150,6 +150,8 @@ def initialize(verbosity="info", color=True):
     verbosity_number = _get_verbosity_number(verbosity)
     # Get the root logger
     logger = logging.getLogger()
+    if logger.hasHandlers():
+        logger.handlers.clear()
     # Have to set the root logger level, it defaults to logging.WARNING
     logger.setLevel(logging.NOTSET)
     # Format stdout and stderr based upon color and debug mode
@@ -198,3 +200,17 @@ def initialize(verbosity="info", color=True):
         else:
             logging_handler_err.setFormatter(formatter)
     logger.addHandler(logging_handler_err)
+
+    # Format log file
+    logging_handler_file = logging.FileHandler("mocmg.log", mode="w")
+    # Omitted from coverage due to no way to test with isatty() == True.
+    #    if not (sys.stdout.isatty() or sys.stderr.isatty()):  # pragma no cover
+    if verbosity_number == logging.DEBUG:
+        logging_handler_file.setFormatter(debug_formatter)
+    else:
+        logging_handler_file.setFormatter(formatter)
+    #    else:
+    #            logging_handler_file.setLevel(99)
+    logging_handler_file.setLevel(verbosity_number)
+
+    logger.addHandler(logging_handler_file)

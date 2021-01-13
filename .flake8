@@ -7,4 +7,5 @@ exclude =
   docs/source/conf.py, 
   setup.py, 
   mocmg/__init__.py,
+  tests/__init__.py,
   examples, 
