@@ -36,13 +36,10 @@ reference_debug_err = [
     "CRITICAL  : tests.test_initialize - (line: 16) Critical message",
 ]
 
-# Expected output when given a bad value for the verbosity
+# Expected warning when given a bad value for the verbosity
 badvalue_err = [
-    "Invalid verbosity option 'badvalue'. Defaulting to 'info'. Next time please choose "
-    + "from one of: 'silent', 'error', 'warning', 'info', or 'debug'",
-    "WARNING   : tests.test_initialize - Warning message",
-    "ERROR     : tests.test_initialize - Error message",
-    "CRITICAL  : tests.test_initialize - Critical message",
+    "WARNING   : root - Invalid verbosity option 'badvalue'. Defaulting to 'info'. "
+    + "Next time please choose from one of: 'silent', 'error', 'warning', 'info', or 'debug'",
 ]
 
 
@@ -73,6 +70,12 @@ class TestInitialize(TestCase):
         ]  # strip times
         self.assertEqual(out, reference_out)
         self.assertEqual(err, reference_err)
+        # check log file
+        f = open("mocmg.log", "r")
+        lines = f.readlines()
+        f.close()
+        lines = [line.split(None, 1)[1].rstrip("\n") for line in lines]
+        self.assertEqual(reference_out + reference_err, lines)
 
     def test_verbosity_info(self):
         """Test verbosity='info'."""
@@ -86,6 +89,12 @@ class TestInitialize(TestCase):
         ]  # strip times
         self.assertEqual(out, reference_out)
         self.assertEqual(err, reference_err)
+        # check log file
+        f = open("mocmg.log", "r")
+        lines = f.readlines()
+        f.close()
+        lines = [line.split(None, 1)[1].rstrip("\n") for line in lines]
+        self.assertEqual(out + err, lines)
 
     def test_verbosity_debug(self):
         """Test verbosity='debug'."""
@@ -99,6 +108,12 @@ class TestInitialize(TestCase):
         ]  # strip times
         self.assertEqual(out, reference_debug_out)
         self.assertEqual(err, reference_debug_err)
+        # check log file
+        f = open("mocmg.log", "r")
+        lines = f.readlines()
+        f.close()
+        lines = [line.split(None, 1)[1].rstrip("\n") for line in lines]
+        self.assertEqual(reference_debug_out + reference_debug_err, lines)
 
     def test_verbosity_warning(self):
         """Test verbosity='warning'."""
@@ -112,6 +127,12 @@ class TestInitialize(TestCase):
         ]  # strip times
         self.assertEqual(out, [])
         self.assertEqual(err, reference_err)
+        # check log file
+        f = open("mocmg.log", "r")
+        lines = f.readlines()
+        f.close()
+        lines = [line.split(None, 1)[1].rstrip("\n") for line in lines]
+        self.assertEqual(reference_err, lines)
 
     def test_verbosity_error(self):
         """Test verbosity='error'."""
@@ -125,6 +146,12 @@ class TestInitialize(TestCase):
         ]  # strip times
         self.assertEqual(out, [])
         self.assertEqual(err, reference_err[1:])
+        # check log file
+        f = open("mocmg.log", "r")
+        lines = f.readlines()
+        f.close()
+        lines = [line.split(None, 1)[1].rstrip("\n") for line in lines]
+        self.assertEqual(reference_err[1:], lines)
 
     def test_verbosity_silent(self):
         """Test verbosity='silent'."""
@@ -138,6 +165,12 @@ class TestInitialize(TestCase):
         ]  # strip times
         self.assertEqual(out, [])
         self.assertEqual(err, [])
+        # check log file
+        f = open("mocmg.log", "r")
+        lines = f.readlines()
+        f.close()
+        lines = [line.split(None, 1)[1].rstrip("\n") for line in lines]
+        self.assertEqual([], lines)
 
     def test_verbosity_badvalue(self):
         """Test verbosity='badvalue'."""
@@ -150,4 +183,10 @@ class TestInitialize(TestCase):
             line.split(None, 1)[1] for line in err
         ]  # strip times
         self.assertEqual(out, reference_out)
-        self.assertEqual(err, badvalue_err)
+        self.assertEqual(err, badvalue_err + reference_err)
+        # check log file
+        f = open("mocmg.log", "r")
+        lines = f.readlines()
+        f.close()
+        lines = [line.split(None, 1)[1].rstrip("\n") for line in lines]
+        self.assertEqual(badvalue_err + reference_out + reference_err, lines)

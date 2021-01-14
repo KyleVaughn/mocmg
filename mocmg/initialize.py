@@ -110,13 +110,8 @@ def _get_verbosity_number(verbosity):
     elif verbosity == "silent":
         num = 99
     else:
-        print(
-            f"N Invalid verbosity option '{verbosity}'."
-            + " Defaulting to 'info'."
-            + " Next time please choose from one of: "
-            + "'silent', 'error', 'warning', 'info', or 'debug'",
-            file=sys.stderr,
-        )
+        # If bad value, set to info. Throw error in initialize once logger is setup, so
+        # the error is captured in the log file
         num = logging.INFO
 
     return num
@@ -210,3 +205,12 @@ def initialize(verbosity="info", color=True):
     logging_handler_file.setLevel(verbosity_number)
 
     logger.addHandler(logging_handler_file)
+
+    # print warning about bad verbosity value now that logger is setup
+    if verbosity not in ["info", "debug", "warning", "error", "silent"]:
+        logger.warning(
+            f"Invalid verbosity option '{verbosity}'."
+            + " Defaulting to 'info'."
+            + " Next time please choose from one of: "
+            + "'silent', 'error', 'warning', 'info', or 'debug'"
+        )
