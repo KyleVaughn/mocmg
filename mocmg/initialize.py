@@ -4,6 +4,8 @@
 import logging
 import sys
 
+module_log = logging.getLogger(__name__)
+
 
 class _LessThanFilter(logging.Filter):
     """Filters messages of level value less than exclusive_maximum.
@@ -208,7 +210,7 @@ def initialize(verbosity="info", color=True):
 
     # print warning about bad verbosity value now that logger is setup
     if verbosity not in ["info", "debug", "warning", "error", "silent"]:
-        logger.warning(
+        module_log.warning(
             f"Invalid verbosity option '{verbosity}'."
             + " Defaulting to 'info'.\n"
             + "    Next time please choose from one of: "

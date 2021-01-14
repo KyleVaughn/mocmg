@@ -39,7 +39,7 @@ reference_debug_err = [
 # Expected warning when given a bad value for the verbosity
 # Note the work "Next" is ommited from the second string simply for ease of testing
 badvalue_err = [
-    "WARNING   : root - Invalid verbosity option 'badvalue'. Defaulting to 'info'.",
+    "WARNING   : mocmg.initialize - Invalid verbosity option 'badvalue'. Defaulting to 'info'.",
     "time please choose from one of: 'silent', 'error', 'warning', 'info', or 'debug'",
 ]
 
