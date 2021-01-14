@@ -210,7 +210,7 @@ def initialize(verbosity="info", color=True):
     if verbosity not in ["info", "debug", "warning", "error", "silent"]:
         logger.warning(
             f"Invalid verbosity option '{verbosity}'."
-            + " Defaulting to 'info'."
-            + " Next time please choose from one of: "
+            + " Defaulting to 'info'.\n"
+            + "    Next time please choose from one of: "
             + "'silent', 'error', 'warning', 'info', or 'debug'"
         )
