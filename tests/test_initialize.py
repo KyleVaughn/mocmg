@@ -2,6 +2,8 @@
 import logging
 from unittest import TestCase
 
+import pytest
+
 import mocmg
 
 from .testingUtils import captured_output
@@ -27,13 +29,13 @@ reference_err = [
 # Expected output for stdout and stderr when in debug mode
 # NOTE: line numbers correspond to the _test_log_messages function.
 reference_debug_out = [
-    "DEBUG     : tests.test_initialize - (line: 12) Debug message",
-    "INFO      : tests.test_initialize - (line: 13) Info message",
+    "DEBUG     : tests.test_initialize - (line: 13) Debug message",
+    "INFO      : tests.test_initialize - (line: 14) Info message",
 ]
 reference_debug_err = [
-    "WARNING   : tests.test_initialize - (line: 14) Warning message",
-    "ERROR     : tests.test_initialize - (line: 15) Error message",
-    "CRITICAL  : tests.test_initialize - (line: 16) Critical message",
+    "WARNING   : tests.test_initialize - (line: 15) Warning message",
+    "ERROR     : tests.test_initialize - (line: 16) Error message",
+    "CRITICAL  : tests.test_initialize - (line: 17) Critical message",
 ]
 
 # Expected warning when given a bad value for the verbosity
@@ -62,7 +64,7 @@ class TestInitialize(TestCase):
     def test_verbosity_default(self):
         """Test the default initialize options."""
         with captured_output() as (out, err):
-            mocmg.initialize()
+            mocmg.initialize(exit_on_error=False)
             log = logging.getLogger(__name__)
             _test_log_messages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
@@ -81,7 +83,7 @@ class TestInitialize(TestCase):
     def test_verbosity_info(self):
         """Test verbosity='info'."""
         with captured_output() as (out, err):
-            mocmg.initialize(verbosity="info")
+            mocmg.initialize(verbosity="info", exit_on_error=False)
             log = logging.getLogger(__name__)
             _test_log_messages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
@@ -100,7 +102,7 @@ class TestInitialize(TestCase):
     def test_verbosity_debug(self):
         """Test verbosity='debug'."""
         with captured_output() as (out, err):
-            mocmg.initialize(verbosity="debug")
+            mocmg.initialize(verbosity="debug", exit_on_error=False)
             log = logging.getLogger(__name__)
             _test_log_messages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
@@ -119,7 +121,7 @@ class TestInitialize(TestCase):
     def test_verbosity_warning(self):
         """Test verbosity='warning'."""
         with captured_output() as (out, err):
-            mocmg.initialize(verbosity="warning")
+            mocmg.initialize(verbosity="warning", exit_on_error=False)
             log = logging.getLogger(__name__)
             _test_log_messages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
@@ -138,7 +140,7 @@ class TestInitialize(TestCase):
     def test_verbosity_error(self):
         """Test verbosity='error'."""
         with captured_output() as (out, err):
-            mocmg.initialize(verbosity="error")
+            mocmg.initialize(verbosity="error", exit_on_error=False)
             log = logging.getLogger(__name__)
             _test_log_messages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
@@ -157,7 +159,7 @@ class TestInitialize(TestCase):
     def test_verbosity_silent(self):
         """Test verbosity='silent'."""
         with captured_output() as (out, err):
-            mocmg.initialize(verbosity="silent")
+            mocmg.initialize(verbosity="silent", exit_on_error=False)
             log = logging.getLogger(__name__)
             _test_log_messages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
@@ -176,7 +178,7 @@ class TestInitialize(TestCase):
     def test_verbosity_badvalue(self):
         """Test verbosity='badvalue'."""
         with captured_output() as (out, err):
-            mocmg.initialize(verbosity="badvalue")
+            mocmg.initialize(verbosity="badvalue", exit_on_error=False)
             log = logging.getLogger(__name__)
             _test_log_messages(log)
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
@@ -191,3 +193,26 @@ class TestInitialize(TestCase):
         f.close()
         lines = [line.split(None, 1)[1].rstrip("\n") for line in lines]
         self.assertEqual(badvalue_err + reference_out + reference_err, lines)
+
+    def test_exit_on_error_true(self):
+        """Test exit_on_error=True."""
+        with pytest.raises(SystemExit):
+            with captured_output() as (out, err):
+                mocmg.initialize(exit_on_error=True)
+                log = logging.getLogger(__name__)
+                log.debug("Debug message")
+                log.info("Info message")
+                log.warning("Warning message")
+                log.error("Error message")
+        out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
+        print(err[1].split(None, 1)[1])
+        out = [line.split(None, 1)[1] for line in out]
+        err = [line.split(None, 1)[1] for line in err[0:2]]  # strip times
+        self.assertEqual(out, reference_out)
+        self.assertEqual(err, reference_err[0:2])
+        # check log file
+        f = open("mocmg.log", "r")
+        lines = f.readlines()
+        f.close()
+        lines = [line.split(None, 1)[1].rstrip("\n") for line in lines]
+        self.assertEqual(reference_out + reference_err[0:2], lines)

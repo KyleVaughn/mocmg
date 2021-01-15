@@ -3,6 +3,7 @@
 
 import logging
 import sys
+import traceback
 
 module_log = logging.getLogger(__name__)
 
@@ -22,8 +23,8 @@ class _LessThanFilter(logging.Filter):
 
     """
 
-    def __init__(self, exclusive_maximum, name=""):
-        super(_LessThanFilter, self).__init__(name)
+    def __init__(self, exclusive_maximum):
+        super().__init__()
         self.max_level = exclusive_maximum
 
     def filter(self, record):
@@ -77,6 +78,26 @@ class _CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 
+class _ErrorHandler(logging.StreamHandler):
+    """Handles messages to sys.stderr.
+
+    Args:
+        exit_on_error (bool, optional): In the event of an error, call sys.exit() and stop the program.
+
+    """
+
+    def __init__(self, exit_on_error=True):
+        super().__init__(stream=sys.stderr)
+        self.exit_on_error = exit_on_error
+
+    def emit(self, record):
+        super().emit(record)
+        if (record.levelno >= logging.ERROR) and self.exit_on_error:
+            traceback.print_stack()
+            logging.shutdown()
+            sys.exit(1)
+
+
 def _get_verbosity_number(verbosity):
     """Get the numerical level associated with the verbosity.
 
@@ -119,11 +140,11 @@ def _get_verbosity_number(verbosity):
     return num
 
 
-def initialize(verbosity="info", color=True):
+def initialize(verbosity="info", color=True, exit_on_error=True):
     """Initialize the mocmg logger with the desired output options.
 
     Args:
-        verbosity (str): Verbosity level for mocmg. All messages below this level will not be
+        verbosity (str, optional): Verbosity level for mocmg. All messages below this level will not be
             displayed. The levels are as follows:
 
             +-----------+----------------------------------------------------+
@@ -141,12 +162,14 @@ def initialize(verbosity="info", color=True):
             +-----------+----------------------------------------------------+
 
         color (bool, optional): Display log messages with color coded levels.
+        exit_on_error (bool, optional): In the event of an error, call sys.exit()
 
     """
     # Get the numerical level for the verbosity
     verbosity_number = _get_verbosity_number(verbosity)
     # Get the root logger
     logger = logging.getLogger()
+    # Clear any handlers if it already has them. Used primarily in test suite.
     if logger.hasHandlers():
         logger.handlers.clear()
     # Have to set the root logger level, it defaults to logging.WARNING
@@ -159,6 +182,16 @@ def initialize(verbosity="info", color=True):
         fmt="%(asctime)s %(levelname)-10s: %(name)s" + " - (line: %(lineno)d) %(message)s",
         datefmt="%H:%M:%S",
     )
+
+    # Format log file
+    logging_handler_file = logging.FileHandler("mocmg.log", mode="w")
+    if verbosity_number == logging.DEBUG:
+        logging_handler_file.setFormatter(debug_formatter)
+    else:
+        logging_handler_file.setFormatter(formatter)
+    logging_handler_file.setLevel(verbosity_number)
+
+    logger.addHandler(logging_handler_file)
 
     # Format stdout
     logging_handler_out = logging.StreamHandler(sys.stdout)
@@ -180,7 +213,7 @@ def initialize(verbosity="info", color=True):
     logger.addHandler(logging_handler_out)
 
     # Format stderr
-    logging_handler_err = logging.StreamHandler(sys.stderr)
+    logging_handler_err = _ErrorHandler(exit_on_error=exit_on_error)
     lvl = max(logging.WARNING, verbosity_number)
     logging_handler_err.setLevel(lvl)
 
@@ -197,16 +230,6 @@ def initialize(verbosity="info", color=True):
         else:
             logging_handler_err.setFormatter(formatter)
     logger.addHandler(logging_handler_err)
-
-    # Format log file
-    logging_handler_file = logging.FileHandler("mocmg.log", mode="w")
-    if verbosity_number == logging.DEBUG:
-        logging_handler_file.setFormatter(debug_formatter)
-    else:
-        logging_handler_file.setFormatter(formatter)
-    logging_handler_file.setLevel(verbosity_number)
-
-    logger.addHandler(logging_handler_file)
 
     # print warning about bad verbosity value now that logger is setup
     if verbosity not in ["info", "debug", "warning", "error", "silent"]:
