@@ -15,6 +15,8 @@ def _test_log_messages(logger):
     logger.info("Info message")
     logger.warning("Warning message")
     logger.error("Error message")
+    logger.require(True, "Condition met")
+    logger.require(False, "Condition not met")
     logger.critical("Critical message")
 
 
@@ -23,19 +25,22 @@ reference_out = ["INFO      : tests.test_initialize - Info message"]
 reference_err = [
     "WARNING   : tests.test_initialize - Warning message",
     "ERROR     : tests.test_initialize - Error message",
+    "ERROR     : tests.test_initialize - Condition not met",
     "CRITICAL  : tests.test_initialize - Critical message",
 ]
 
 # Expected output for stdout and stderr when in debug mode
-# NOTE: line numbers correspond to the _test_log_messages function.
+# NOTE: line numbers correspond to the _test_log_messages function, except for require,
+# which corresponds tothe self.log call in the "require" function in initialize.py.
 reference_debug_out = [
-    "DEBUG     : tests.test_initialize - (line: 13) Debug message",
-    "INFO      : tests.test_initialize - (line: 14) Info message",
+    "DEBUG     : tests.test_initialize - (line: 14) Debug message",
+    "INFO      : tests.test_initialize - (line: 15) Info message",
 ]
 reference_debug_err = [
-    "WARNING   : tests.test_initialize - (line: 15) Warning message",
-    "ERROR     : tests.test_initialize - (line: 16) Error message",
-    "CRITICAL  : tests.test_initialize - (line: 17) Critical message",
+    "WARNING   : tests.test_initialize - (line: 16) Warning message",
+    "ERROR     : tests.test_initialize - (line: 17) Error message",
+    "ERROR     : tests.test_initialize - (line: 117) Condition not met",
+    "CRITICAL  : tests.test_initialize - (line: 20) Critical message",
 ]
 
 # Expected warning when given a bad value for the verbosity
@@ -43,6 +48,11 @@ reference_debug_err = [
 badvalue_err = [
     "WARNING   : mocmg.initialize - Invalid verbosity option 'badvalue'. Defaulting to 'info'.",
     "time please choose from one of: 'silent', 'error', 'warning', 'info', or 'debug'",
+]
+
+# Expected error for the "require" log level given a non-bool condition argument
+require_err = [
+    "ERROR     : mocmg.initialize - In requre(condition, message), 'condition' argument must be bool.",
 ]
 
 
@@ -205,7 +215,6 @@ class TestInitialize(TestCase):
                 log.warning("Warning message")
                 log.error("Error message")
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
-        print(err[1].split(None, 1)[1])
         out = [line.split(None, 1)[1] for line in out]
         err = [line.split(None, 1)[1] for line in err[0:2]]  # strip times
         self.assertEqual(out, reference_out)
@@ -216,3 +225,68 @@ class TestInitialize(TestCase):
         f.close()
         lines = [line.split(None, 1)[1].rstrip("\n") for line in lines]
         self.assertEqual(reference_out + reference_err[0:2], lines)
+
+    def test_require_exit_on_error_true(self):
+        """Test the "require" log level with exit_on_error=True."""
+        with pytest.raises(SystemExit):
+            with captured_output() as (out, err):
+                mocmg.initialize(exit_on_error=True)
+                log = logging.getLogger(__name__)
+                log.debug("Debug message")
+                log.info("Info message")
+                log.warning("Warning message")
+                log.require(True, "Condition met")
+                log.require(False, "Condition not met")
+        out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
+        out = [line.split(None, 1)[1] for line in out]
+        err = [line.split(None, 1)[1] for line in err[0:2]]  # strip times
+        self.assertEqual(out, reference_out)
+        self.assertEqual(err, [reference_err[0], reference_err[2]])
+        # check log file
+        f = open("mocmg.log", "r")
+        lines = f.readlines()
+        f.close()
+        lines = [line.split(None, 1)[1].rstrip("\n") for line in lines]
+        self.assertEqual(reference_out + [reference_err[0], reference_err[2]], lines)
+
+    def test_require_condition_not_bool(self):
+        """Test the "require" log level with not isinstance(condition, bool)."""
+        with pytest.raises(SystemExit):
+            with captured_output() as (out, err):
+                mocmg.initialize(exit_on_error=True)
+                log = logging.getLogger(__name__)
+                log.debug("Debug message")
+                log.info("Info message")
+                log.warning("Warning message")
+                log.require("not a bool", "Condition met")
+        out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
+        out = [line.split(None, 1)[1] for line in out]
+        err = [line.split(None, 1)[1] for line in err[0:2]]  # strip times
+        self.assertEqual(out, reference_out)
+        self.assertEqual(err, [reference_err[0], require_err[0]])
+        # check log file
+        f = open("mocmg.log", "r")
+        lines = f.readlines()
+        f.close()
+        lines = [line.split(None, 1)[1].rstrip("\n") for line in lines]
+        self.assertEqual(reference_out + [reference_err[0], require_err[0]], lines)
+
+    def test_double_init(self):
+        """Test behavior if initialize is called twice."""
+        with captured_output() as (out, err):
+            mocmg.initialize(exit_on_error=False)
+            mocmg.initialize(exit_on_error=False)
+            log = logging.getLogger(__name__)
+            _test_log_messages(log)
+        out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
+        out, err = [line.split(None, 1)[1] for line in out], [
+            line.split(None, 1)[1] for line in err
+        ]  # strip times
+        self.assertEqual(out, reference_out)
+        self.assertEqual(err, reference_err)
+        # check log file
+        f = open("mocmg.log", "r")
+        lines = f.readlines()
+        f.close()
+        lines = [line.split(None, 1)[1].rstrip("\n") for line in lines]
+        self.assertEqual(reference_out + reference_err, lines)

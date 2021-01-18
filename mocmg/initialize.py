@@ -94,8 +94,32 @@ class _ErrorHandler(logging.StreamHandler):
         super().emit(record)
         if (record.levelno >= logging.ERROR) and self.exit_on_error:
             traceback.print_stack()
-            logging.shutdown()
             sys.exit(1)
+
+
+def _add_require_log_level():
+    """Add the "require" log level to the logger.
+
+    The "require" log level takes an additional boolean argument to determine if an error should
+    be logged. This is used in error checking to avoid numerous "if" statements, adding unnecessary
+    cyclomatic complexity.
+
+    Example:
+        module_log.require(1 == 1, "Message if condition == False") # No message logged
+        module_log.require(1 == 2, "Message if condition == False") # Message logged at error level
+
+    """
+    # Add 'requre' logger level
+    def require(self, condition, message, *args, **kws):
+        if isinstance(condition, bool):
+            if not condition:
+                # Yes, logger takes its '*args' as 'args'.
+                self.log(logging.ERROR, message, *args, **kws)
+        else:
+            module_log.error("In requre(condition, message), 'condition' argument must be bool.")
+
+    logging.addLevelName(logging.ERROR + 1, "REQUIRE")
+    logging.Logger.require = require
 
 
 def _get_verbosity_number(verbosity):
@@ -165,13 +189,14 @@ def initialize(verbosity="info", color=True, exit_on_error=True):
         exit_on_error (bool, optional): In the event of an error, call sys.exit()
 
     """
+    # Add the additional log level "require".
+    _add_require_log_level()
     # Get the numerical level for the verbosity
     verbosity_number = _get_verbosity_number(verbosity)
     # Get the root logger
     logger = logging.getLogger()
     # Clear any handlers if it already has them. Used primarily in test suite.
-    if logger.hasHandlers():
-        logger.handlers.clear()
+    logger.handlers.clear()
     # Have to set the root logger level, it defaults to logging.WARNING
     logger.setLevel(logging.NOTSET)
     # Format stdout and stderr based upon color and debug mode
@@ -183,7 +208,7 @@ def initialize(verbosity="info", color=True, exit_on_error=True):
         datefmt="%H:%M:%S",
     )
 
-    # Format log file
+    # Format log file ##############################################
     logging_handler_file = logging.FileHandler("mocmg.log", mode="w")
     if verbosity_number == logging.DEBUG:
         logging_handler_file.setFormatter(debug_formatter)
@@ -193,7 +218,7 @@ def initialize(verbosity="info", color=True, exit_on_error=True):
 
     logger.addHandler(logging_handler_file)
 
-    # Format stdout
+    # Format stdout #################################################
     logging_handler_out = logging.StreamHandler(sys.stdout)
     logging_handler_out.setLevel(verbosity_number)
     logging_handler_out.addFilter(_LessThanFilter(logging.WARNING))
@@ -212,7 +237,7 @@ def initialize(verbosity="info", color=True, exit_on_error=True):
             logging_handler_out.setFormatter(formatter)
     logger.addHandler(logging_handler_out)
 
-    # Format stderr
+    # Format stderr #################################################
     logging_handler_err = _ErrorHandler(exit_on_error=exit_on_error)
     lvl = max(logging.WARNING, verbosity_number)
     logging_handler_err.setLevel(lvl)
