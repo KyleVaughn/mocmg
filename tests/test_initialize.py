@@ -6,7 +6,7 @@ import pytest
 
 import mocmg
 
-from .testingUtils import captured_output
+from .testing_utils import captured_output
 
 
 def _test_log_messages(logger):
