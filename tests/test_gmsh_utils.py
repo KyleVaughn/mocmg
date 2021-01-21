@@ -343,11 +343,13 @@ class TestRectangularGrid(TestCase):
     #        gmsh.finalize()
     #        self.assertEqual(1,2)
 
-    def test_n(self):
-        """Test nx=[0]."""
-        mocmg.initialize()
-        gmsh.initialize()
-        rectangular_grid(bb_11, x=[[0.5], [0.25, 0.75]], y=[[0.5], [0.25, 0.75]])
-        gmsh.clear()
-        gmsh.finalize()
-        self.assertEqual(1, 2)
+
+#    def test_n(self):
+#        """Test nx=[0]."""
+#        mocmg.initialize()
+#        gmsh.initialize()
+#        rectangular_grid(bb_11, x=[[0.5], [0.25, 0.75]], y=[[0.5], [0.25, 0.75]])
+#        gmsh.fltk.run()
+#        gmsh.clear()
+#        gmsh.finalize()
+#        self.assertEqual(1, 2)
