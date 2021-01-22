@@ -51,13 +51,13 @@ def rectangular_grid(bb, x=None, y=None, nx=None, ny=None):
     # If using nx, ny, ensure that the members are empty or int
     if nx is not None:
         module_log.require(
-            not nx or all(isinstance(i, int) for i in nx),
-            "nx must be empty or contain integer elements only.",
+            all(isinstance(i, int) for i in nx) and all(xx > 0 for xx in nx),
+            "nx must contain positive integer elements only.",
         )
     if ny is not None:
         module_log.require(
-            not ny or all(isinstance(i, int) for i in ny),
-            "ny must be empty or contain integer elements only.",
+            all(isinstance(i, int) for i in ny) and all(yy > 0 for yy in ny),
+            "ny must contain positive integer elements only.",
         )
     # If x, y, ensure that elements are iterable
     if x is not None:
@@ -87,8 +87,6 @@ def rectangular_grid(bb, x=None, y=None, nx=None, ny=None):
         # Get first level intervals
         x = []
         div = nx[0]
-        if div == 0:
-            div = 1
         x.append(list(np.linspace(x_min, x_max, div + 1, endpoint=True)))
         # If there is more than one level, divide intervals further
         for lvl in range(1, nlevels):
@@ -103,8 +101,6 @@ def rectangular_grid(bb, x=None, y=None, nx=None, ny=None):
         # Get first level intervals
         y = []
         div = ny[0]
-        if div == 0:
-            div = 1
         y.append(list(np.linspace(y_min, y_max, div + 1, endpoint=True)))
         # If there is more than one level, divide intervals further
         for lvl in range(1, nlevels):
