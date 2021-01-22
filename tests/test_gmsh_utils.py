@@ -5,64 +5,67 @@ import gmsh
 import pytest
 
 import mocmg
-from mocmg.gmsh_utils import rectangular_grid
+
+# from mocmg.gmsh_utils import get_entities_for_physical_group_name
+from mocmg.grid import rectangular_grid
 
 from .testing_utils import captured_output
 
 bb_11 = [0.0, 0.0, 0.0, 1.0, 1.0, 0.0]
+bb_44 = [0.0, 0.0, 0.0, 4.0, 4.0, 0.0]
 bb_dz = [0.0, 0.0, 0.0, 1.0, 1.0, 10.0]
 
 # Expected output for generating rectangular grid
 reference_out = [
-    "INFO      : mocmg.gmsh_utils - Generating rectangular grid",
+    "INFO      : mocmg.grid - Generating rectangular grid",
 ]
 
 # Expected error for a bad bounding box that produces negative dx, dy, dz
 bad_bb = [
-    "ERROR     : mocmg.gmsh_utils - Invalid bounding box.",
+    "ERROR     : mocmg.grid - Invalid bounding box.",
 ]
 
 # Expected error for argument of incorrect type
 bad_type = [
-    "ERROR     : mocmg.gmsh_utils - Arguments should be iterable.",
+    "ERROR     : mocmg.grid - Arguments should be iterable.",
 ]
 
 # Expected error for mismatch of x and y size
 len_mismatch = [
-    "ERROR     : mocmg.gmsh_utils - Length of arguments differ (2 and 1). "
+    "ERROR     : mocmg.grid - Length of arguments differ (2 and 1). "
     + "They should have the same number of levels.",
 ]
 
 # Expected error for too many arguments
 num_args = [
-    "ERROR     : mocmg.gmsh_utils - Incorrect number of arguments given."
+    "ERROR     : mocmg.grid - Incorrect number of arguments given."
     + " Provide one of (x or nx) and one of (ny or y).",
 ]
 
 # Expected error for overly thick model
 thick_dz = [
-    "ERROR     : mocmg.gmsh_utils - Bounding box thickness is greater than 1e-6"
+    "ERROR     : mocmg.grid - Bounding box thickness is greater than 1e-6"
     + " (10.000000). Bounding box expected in 2D x-y plane.",
 ]
 
 # Expected error for non-int nx elements
-nx_type = ["ERROR     : mocmg.gmsh_utils - nx must be empty or contain integer elements only."]
+nx_type = ["ERROR     : mocmg.grid - nx must be empty or contain integer elements only."]
 
 # Expected error for non-int nx elements
-ny_type = ["ERROR     : mocmg.gmsh_utils - ny must be empty or contain integer elements only."]
+ny_type = ["ERROR     : mocmg.grid - ny must be empty or contain integer elements only."]
 
 # Expected error for non-list x elements
-x_nonlist_type = ["ERROR     : mocmg.gmsh_utils - x must have iterable elements."]
+x_nonlist_type = ["ERROR     : mocmg.grid - x must have iterable elements."]
 
 # Expected error for non-list y elements
-y_nonlist_type = ["ERROR     : mocmg.gmsh_utils - y must have iterable elements."]
+y_nonlist_type = ["ERROR     : mocmg.grid - y must have iterable elements."]
 
 # Expected error when divisions outside of bb
-out_of_bb = ["ERROR     : mocmg.gmsh_utils - Divisions must be within the bounding box."]
+out_of_bb = ["ERROR     : mocmg.grid - Divisions must be within the bounding box."]
 
 
 class TestRectangularGrid(TestCase):
-    """Test the gmsh_utils.rectangular_grid function."""
+    """Test the grid.rectangular_grid function."""
 
     def test_bad_bounding_box(self):
         """Test rect grid with non-list args."""
@@ -315,6 +318,22 @@ class TestRectangularGrid(TestCase):
         f.close()
         lines = [line.split(None, 1)[1].rstrip("\n") for line in lines]
         self.assertEqual(lines, reference_out + out_of_bb)
+
+    def test_x1_y1(self):
+        """Test a single level gridi."""
+        mocmg.initialize()
+        gmsh.initialize()
+        rectangular_grid(bb_44, x=[[2.0]], y=[[2.0]])
+        #        groups = gmsh.model.getPhysicalGroups()
+        #        print(groups)
+        #        names = [gmsh.model.getPhysicalName(*group) for group in groups]
+        #        print(names)
+        #        index = names.index(name)
+        #        ents = gmsh.model.getEntitiesForPhysicalGroup(*groups[index])
+        #        print(ents)
+        gmsh.clear()
+        gmsh.finalize()
+        self.assertEqual(1, 2)
 
     #    def test_nx_0_ny_0(self):
     #        """Test nx=[0]."""
