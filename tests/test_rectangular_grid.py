@@ -14,6 +14,7 @@ from .testing_utils import captured_output
 bb_11 = [0.0, 0.0, 0.0, 1.0, 1.0, 0.0]
 bb_44 = [0.0, 0.0, 0.0, 4.0, 4.0, 0.0]
 bb_dz = [0.0, 0.0, 0.0, 1.0, 1.0, 10.0]
+bb_12_4 = [0.0, 0.0, 0.0, 12.0, 4.0, 0.0]
 
 # Expected output for generating rectangular grid
 reference_out = [
@@ -64,7 +65,7 @@ y_nonlist_type = ["ERROR     : mocmg.grid - y must have iterable elements."]
 out_of_bb = ["ERROR     : mocmg.grid - Divisions must be within the bounding box."]
 
 """
-For 2 by 2 single level
+For single level 1 division in x and y
 -------------------------------------- (4,4)
 |                 |                  |
 |                 |                  |
@@ -84,14 +85,14 @@ For 2 by 2 single level
 --------------------------------------
 (0,0)           (2,0)              (4,0)
 """
-ents_21 = [(2, 1), (2, 2), (2, 3), (2, 4)]
-groups_21 = {
+ents_11 = [(2, 1), (2, 2), (2, 3), (2, 4)]
+groups_11 = {
     "Grid_L1_1_1": [1],
     "Grid_L1_2_1": [2],
     "Grid_L1_1_2": [3],
     "Grid_L1_2_2": [4],
 }
-centroids_21 = {
+centroids_11 = {
     1: (1.0, 1.0, 0.0),
     2: (3.0, 1.0, 0.0),
     3: (1.0, 3.0, 0.0),
@@ -100,7 +101,7 @@ centroids_21 = {
 
 """
 
-# For 2 by ) with second level 2 by 2
+# For 2 level grid with 1 division in each level
 -------------------------------------- (4,4)
 |                 |                  |
 |                 |                  |
@@ -120,8 +121,8 @@ centroids_21 = {
 --------------------------------------
 (0,0)           (2,0)              (4,0)
 """
-ents_22 = [(2, 1), (2, 2), (2, 3), (2, 4)]
-groups_22 = {
+ents_21 = [(2, 1), (2, 2), (2, 3), (2, 4)]
+groups_21 = {
     "Grid_L1_1_1": [1, 2, 5, 6],
     "Grid_L1_2_1": [3, 4, 7, 8],
     "Grid_L1_1_2": [9, 10, 13, 14],
@@ -144,7 +145,7 @@ groups_22 = {
     "Grid_L2_4_4": [16],
 }
 
-centroids_22 = {
+centroids_21 = {
     1: (0.5, 0.5, 0.0),
     2: (1.5, 0.5, 0.0),
     3: (2.5, 0.5, 0.0),
@@ -161,6 +162,128 @@ centroids_22 = {
     14: (1.5, 3.5, 0.0),
     15: (2.5, 3.5, 0.0),
     16: (3.5, 3.5, 0.0),
+}
+
+"""
+For single level non-uniform in x and y
+-------------------------------------- (12,4)
+|    |                         |    |
+|  4 |            5            |  6 |
+|    |                         |    |
+|------------------------------------ (12,2)
+|    |                         |    |
+|  1 |            2            |  3 |
+|    |                         |    |
+--------------------------------------
+   (2,0)                    (10,0)  (12,0)
+"""
+ents_nu1 = [
+    (2, 1),
+    (2, 2),
+    (2, 3),
+    (2, 4),
+    (2, 5),
+    (2, 6),
+]
+groups_nu1 = {
+    "Grid_L1_1_1": [1],
+    "Grid_L1_2_1": [2],
+    "Grid_L1_3_1": [3],
+    "Grid_L1_1_2": [4],
+    "Grid_L1_2_2": [5],
+    "Grid_L1_3_2": [6],
+}
+centroids_nu1 = {
+    1: (1.0, 1.0, 0.0),
+    2: (6.0, 1.0, 0.0),
+    3: (11.0, 1.0, 0.0),
+    4: (1.0, 3.0, 0.0),
+    5: (6.0, 3.0, 0.0),
+    6: (11.0, 3.0, 0.0),
+}
+areas_nu1 = {
+    1: 4.0,
+    2: 16.0,
+    3: 4.0,
+    4: 4.0,
+    5: 16.0,
+    6: 4.0,
+}
+
+"""
+For two level non-uniform in x and y
+------------------------------------- (12,4)
+|  10|            11           | 12 |
+|----|-------------------------|----|
+|  7 |            8            | 9  |
+|------------------------------------ (12,2)
+|  4 |            5            | 6  |
+|----|-------------------------|----|
+|  1 |            2            | 3  |
+--------------------------------------
+   (2,0)                    (10,0)  (12,0)
+"""
+ents_nu2 = [
+    (2, 1),
+    (2, 2),
+    (2, 3),
+    (2, 4),
+    (2, 5),
+    (2, 6),
+    (2, 7),
+    (2, 8),
+    (2, 9),
+    (2, 10),
+    (2, 11),
+    (2, 12),
+]
+groups_nu2 = {
+    "Grid_L1_1_1": [1, 4],
+    "Grid_L1_2_1": [2, 5],
+    "Grid_L1_3_1": [3, 6],
+    "Grid_L1_1_2": [7, 10],
+    "Grid_L1_2_2": [8, 11],
+    "Grid_L1_3_2": [9, 12],
+    "Grid_L2_1_1": [1],
+    "Grid_L2_2_1": [2],
+    "Grid_L2_3_1": [3],
+    "Grid_L2_1_2": [4],
+    "Grid_L2_2_2": [5],
+    "Grid_L2_3_2": [6],
+    "Grid_L2_1_3": [7],
+    "Grid_L2_2_3": [8],
+    "Grid_L2_3_3": [9],
+    "Grid_L2_1_4": [10],
+    "Grid_L2_2_4": [11],
+    "Grid_L2_3_4": [12],
+}
+centroids_nu2 = {
+    1: (1.0, 0.5, 0.0),
+    2: (6.0, 0.5, 0.0),
+    3: (11.0, 0.5, 0.0),
+    4: (1.0, 1.5, 0.0),
+    5: (6.0, 1.5, 0.0),
+    6: (11.0, 1.5, 0.0),
+    7: (1.0, 2.5, 0.0),
+    8: (6.0, 2.5, 0.0),
+    9: (11.0, 2.5, 0.0),
+    10: (1.0, 3.5, 0.0),
+    11: (6.0, 3.5, 0.0),
+    12: (11.0, 3.5, 0.0),
+}
+areas_nu2 = {
+    1: 2.0,
+    2: 8.0,
+    3: 2.0,
+    4: 2.0,
+    5: 8.0,
+    6: 2.0,
+    7: 2.0,
+    8: 8.0,
+    9: 2.0,
+    10: 2.0,
+    11: 8.0,
+    12: 2.0,
 }
 
 
@@ -482,10 +605,10 @@ class TestRectangularGrid(TestCase):
         lines = [line.split(None, 1)[1].rstrip("\n") for line in lines]
         self.assertEqual(lines, reference_out + ny_type)
 
-    def test_x_y_21(self):
+    def test_x_y_11(self):
         """Test xy with 1 division."""
-        ref_groups = groups_21
-        ref_centroids = centroids_21
+        ref_groups = groups_11
+        ref_centroids = centroids_11
         mocmg.initialize()
         gmsh.initialize()
         rectangular_grid(bb_44, x=[[2.0]], y=[[2.0]])
@@ -511,10 +634,10 @@ class TestRectangularGrid(TestCase):
         gmsh.clear()
         gmsh.finalize()
 
-    def test_nx_ny_21(self):
+    def test_nx_ny_11(self):
         """Test nx, ny with 1 division."""
-        ref_groups = groups_21
-        ref_centroids = centroids_21
+        ref_groups = groups_11
+        ref_centroids = centroids_11
         mocmg.initialize()
         gmsh.initialize()
         rectangular_grid(bb_44, nx=[2], ny=[2])
@@ -540,10 +663,10 @@ class TestRectangularGrid(TestCase):
         gmsh.clear()
         gmsh.finalize()
 
-    def test_x_ny_21(self):
+    def test_x_ny_11(self):
         """Test x, ny with 1 division."""
-        ref_groups = groups_21
-        ref_centroids = centroids_21
+        ref_groups = groups_11
+        ref_centroids = centroids_11
         mocmg.initialize()
         gmsh.initialize()
         rectangular_grid(bb_44, x=[[2.0]], ny=[2])
@@ -569,10 +692,10 @@ class TestRectangularGrid(TestCase):
         gmsh.clear()
         gmsh.finalize()
 
-    def test_nx_y_21(self):
+    def test_nx_y_11(self):
         """Test nx, y with 1 division."""
-        ref_groups = groups_21
-        ref_centroids = centroids_21
+        ref_groups = groups_11
+        ref_centroids = centroids_11
         mocmg.initialize()
         gmsh.initialize()
         rectangular_grid(bb_44, nx=[2], y=[[2.0]])
@@ -598,10 +721,10 @@ class TestRectangularGrid(TestCase):
         gmsh.clear()
         gmsh.finalize()
 
-    def test_x_y_22(self):
+    def test_x_y_21(self):
         """Test x, y with 2 levels of 1 division."""
-        ref_groups = groups_22
-        ref_centroids = centroids_22
+        ref_groups = groups_21
+        ref_centroids = centroids_21
         mocmg.initialize()
         gmsh.initialize()
         rectangular_grid(bb_44, x=[[2.0], [1.0, 3.0]], y=[[2.0], [1.0, 3.0]])
@@ -628,10 +751,10 @@ class TestRectangularGrid(TestCase):
         gmsh.clear()
         gmsh.finalize()
 
-    def test_nx_ny_22(self):
+    def test_nx_ny_21(self):
         """Test nx, ny with 2 levels of 1 division."""
-        ref_groups = groups_22
-        ref_centroids = centroids_22
+        ref_groups = groups_21
+        ref_centroids = centroids_21
         mocmg.initialize()
         gmsh.initialize()
         rectangular_grid(bb_44, nx=[2, 2], ny=[2, 2])
@@ -651,6 +774,96 @@ class TestRectangularGrid(TestCase):
             tag = ent[1]
             mass = gmsh.model.occ.getMass(2, tag)
             self.assertAlmostEqual(1.0, mass, places=5, msg="1 width, 1 height, 1 area")
+            x, y, z = gmsh.model.occ.getCenterOfMass(2, tag)
+            centroid = (x, y, z)
+            for i in range(3):
+                self.assertAlmostEqual(centroid[i], ref_centroids[tag][i])
+        gmsh.clear()
+        gmsh.finalize()
+
+    def test_x_y_nonuniform_1(self):
+        """Test x, y with nonuniform grid with 1 level."""
+        ref_groups = groups_nu1
+        ref_centroids = centroids_nu1
+        ref_areas = areas_nu1
+        mocmg.initialize()
+        gmsh.initialize()
+        rectangular_grid(bb_12_4, x=[[2.0, 10.0]], y=[[2.0]])
+        group_nums = gmsh.model.getPhysicalGroups()
+        names = [gmsh.model.getPhysicalName(*grp) for grp in group_nums]
+        ref_names = list(ref_groups.keys())
+        # Check correct names/entities
+        for i, name in enumerate(names):
+            self.assertEqual(name, ref_names[i])
+            index = names.index(name)
+            group_ents = list(gmsh.model.getEntitiesForPhysicalGroup(*group_nums[index]))
+            ref_group_ents = ref_groups[name]
+            self.assertEqual(group_ents, ref_group_ents)
+        # Check correct area/centroid
+        for ent in gmsh.model.getEntities(2):
+            tag = ent[1]
+            mass = gmsh.model.occ.getMass(2, tag)
+            self.assertAlmostEqual(ref_areas[tag], mass, places=5)
+            x, y, z = gmsh.model.occ.getCenterOfMass(2, tag)
+            centroid = (x, y, z)
+            for i in range(3):
+                self.assertAlmostEqual(centroid[i], ref_centroids[tag][i])
+        gmsh.clear()
+        gmsh.finalize()
+
+    def test_x_ny_nonuniform_1(self):
+        """Test x, ny with nonuniform grid with 1 level."""
+        ref_groups = groups_nu1
+        ref_centroids = centroids_nu1
+        ref_areas = areas_nu1
+        mocmg.initialize()
+        gmsh.initialize()
+        rectangular_grid(bb_12_4, x=[[2.0, 10.0]], ny=[2])
+        group_nums = gmsh.model.getPhysicalGroups()
+        names = [gmsh.model.getPhysicalName(*grp) for grp in group_nums]
+        ref_names = list(ref_groups.keys())
+        # Check correct names/entities
+        for i, name in enumerate(names):
+            self.assertEqual(name, ref_names[i])
+            index = names.index(name)
+            group_ents = list(gmsh.model.getEntitiesForPhysicalGroup(*group_nums[index]))
+            ref_group_ents = ref_groups[name]
+            self.assertEqual(group_ents, ref_group_ents)
+        # Check correct area/centroid
+        for ent in gmsh.model.getEntities(2):
+            tag = ent[1]
+            mass = gmsh.model.occ.getMass(2, tag)
+            self.assertAlmostEqual(ref_areas[tag], mass, places=5)
+            x, y, z = gmsh.model.occ.getCenterOfMass(2, tag)
+            centroid = (x, y, z)
+            for i in range(3):
+                self.assertAlmostEqual(centroid[i], ref_centroids[tag][i])
+        gmsh.clear()
+        gmsh.finalize()
+
+    def test_x_y_nonuniform_2(self):
+        """Test x, y with nonuniform grid with 2 level grid."""
+        ref_groups = groups_nu2
+        ref_centroids = centroids_nu2
+        ref_areas = areas_nu2
+        mocmg.initialize()
+        gmsh.initialize()
+        rectangular_grid(bb_12_4, x=[[2.0, 10.0], [2.0, 10.0]], y=[[2.0], [1.0, 3.0]])
+        group_nums = gmsh.model.getPhysicalGroups()
+        names = [gmsh.model.getPhysicalName(*grp) for grp in group_nums]
+        ref_names = list(ref_groups.keys())
+        # Check correct names/entities
+        for i, name in enumerate(names):
+            self.assertEqual(name, ref_names[i])
+            index = names.index(name)
+            group_ents = list(gmsh.model.getEntitiesForPhysicalGroup(*group_nums[index]))
+            ref_group_ents = ref_groups[name]
+            self.assertEqual(group_ents, ref_group_ents)
+        # Check correct area/centroid
+        for ent in gmsh.model.getEntities(2):
+            tag = ent[1]
+            mass = gmsh.model.occ.getMass(2, tag)
+            self.assertAlmostEqual(ref_areas[tag], mass, places=5)
             x, y, z = gmsh.model.occ.getCenterOfMass(2, tag)
             centroid = (x, y, z)
             for i in range(3):
