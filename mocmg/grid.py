@@ -8,17 +8,13 @@ import numpy as np
 module_log = logging.getLogger(__name__)
 
 
-def rectangular_grid(bb, x=None, y=None, nx=None, ny=None):
-    """Fill me in."""
-    module_log.info("Generating rectangular grid")
+def _input_check_rectangular_grid(bb, x, y, nx, ny):
+    """Check the rectangular grid input for correct format/common errors."""
     x_min, y_min, z_min = bb[0:3]
     x_max, y_max, z_max = bb[3:6]
     dx = x_max - x_min
     dy = y_max - y_min
     dz = z_max - z_min
-    zz = z_min
-
-    # Error checking
     # dx, dy, dz should all be positive
     for d in [dx, dy, dz]:
         module_log.require(d >= 0, "Invalid bounding box.")
@@ -71,18 +67,13 @@ def rectangular_grid(bb, x=None, y=None, nx=None, ny=None):
             "y must have iterable elements.",
         )
 
-    # Convert nx, ny notation to x, y format
-    # Include bb limits
-    if x is not None:
-        x[0] = list(x[0])
-        x[0] = sorted(set(x[0] + [x_min, x_max]))
-        for lvl in range(1, nlevels):
-            x[lvl] = sorted(set(x[lvl - 1] + x[lvl]))
-    if y is not None:
-        y[0] = list(y[0])
-        y[0] = sorted(set(y[0] + [y_min, y_max]))
-        for lvl in range(1, nlevels):
-            y[lvl] = sorted(set(y[lvl - 1] + y[lvl]))
+    return nlevels
+
+
+def _nxy_to_xy_rectangular_grid(nlevels, bb, x, y, nx, ny):
+    """Convert the nx, ny arguments to the x, y format."""
+    x_min, y_min, z_min = bb[0:3]
+    x_max, y_max, z_max = bb[3:6]
     if nx is not None:
         # Get first level intervals
         x = []
@@ -112,34 +103,11 @@ def rectangular_grid(bb, x=None, y=None, nx=None, ny=None):
             # Get rid of duplicates
             y[lvl] = sorted(set(np.append(y[lvl][0], y[lvl][1:])))
 
-    # Create smallest rectangles
-    # Ensure elements are in the bb
-    module_log.require(
-        all(x_min <= xx and xx <= x_max for xx in x[-1]),
-        "Divisions must be within the bounding box.",
-    )
-    module_log.require(
-        all(y_min <= yy and yy <= y_max for yy in y[-1]),
-        "Divisions must be within the bounding box.",
-    )
-    grid_tags_coords = []
-    for y_ind, yy in enumerate(y[-1][:-1]):
-        for x_ind, xx in enumerate(x[-1][:-1]):
-            tag = gmsh.model.occ.addRectangle(
-                xx, yy, zz, x[-1][x_ind + 1] - xx, y[-1][y_ind + 1] - yy
-            )
-            grid_tags_coords.append([tag, xx, yy])
-    gmsh.model.occ.synchronize()
+    return x, y, nx, ny
 
-    # Label the rectangles with the appropriate grid level and location
-    # level_#_(i,j) like so:
-    # y
-    # ^
-    # |------------
-    # |(1,2)|(2,2)|
-    # |-----|-----|
-    # |(1,1)|(2,1)|
-    # --------------> x
+
+def _label_rectangular_grid(nlevels, grid_tags_coords, x, y):
+    """Label the rectangles with the appropriate grid level and location."""
     grid_tags_levels = []
     max_grid_digits = max(len(str(len(x[-1]))), len(str(len(y[-1]))))
     for lvl in range(nlevels):
@@ -170,5 +138,59 @@ def rectangular_grid(bb, x=None, y=None, nx=None, ny=None):
             output_tag = gmsh.model.addPhysicalGroup(2, grid_tags_levels[lvl][name])
             phys_grp_tags.append(output_tag)
             gmsh.model.setPhysicalName(2, output_tag, name)
+
+    return grid_tags_coords
+
+
+def _create_model_rectangular_grid(bb, x, y):
+    """Generate the rectangles in gmsh."""
+    x_min, y_min, z_min = bb[0:3]
+    x_max, y_max, z_max = bb[3:6]
+    zz = z_min
+    # Create smallest rectangles
+    # Ensure elements are in the bb
+    module_log.require(
+        all(x_min <= xx and xx <= x_max for xx in x[-1]),
+        "Divisions must be within the bounding box.",
+    )
+    module_log.require(
+        all(y_min <= yy and yy <= y_max for yy in y[-1]),
+        "Divisions must be within the bounding box.",
+    )
+    grid_tags_coords = []
+    for y_ind, yy in enumerate(y[-1][:-1]):
+        for x_ind, xx in enumerate(x[-1][:-1]):
+            tag = gmsh.model.occ.addRectangle(
+                xx, yy, zz, x[-1][x_ind + 1] - xx, y[-1][y_ind + 1] - yy
+            )
+            grid_tags_coords.append([tag, xx, yy])
+    gmsh.model.occ.synchronize()
+
+    return grid_tags_coords
+
+
+def rectangular_grid(bb, x=None, y=None, nx=None, ny=None):
+    """Fill me in."""
+    module_log.info("Generating rectangular grid")
+    x_min, y_min, z_min = bb[0:3]
+    x_max, y_max, z_max = bb[3:6]
+
+    nlevels = _input_check_rectangular_grid(bb, x, y, nx, ny)
+    x, y, nx, ny = _nxy_to_xy_rectangular_grid(nlevels, bb, x, y, nx, ny)
+
+    # Include bb limits
+    if x is not None:
+        x[0] = list(x[0])
+        x[0] = sorted(set(x[0] + [x_min, x_max]))
+        for lvl in range(1, nlevels):
+            x[lvl] = sorted(set(x[lvl - 1] + x[lvl]))
+    if y is not None:
+        y[0] = list(y[0])
+        y[0] = sorted(set(y[0] + [y_min, y_max]))
+        for lvl in range(1, nlevels):
+            y[lvl] = sorted(set(y[lvl - 1] + y[lvl]))
+
+    grid_tags_coords = _create_model_rectangular_grid(bb, x, y)
+    _label_rectangular_grid(nlevels, grid_tags_coords, x, y)
 
     return [tupl[0] for tupl in grid_tags_coords]
