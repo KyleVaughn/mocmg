@@ -1,7 +1,7 @@
-mocmg package
+mocmg API
 =============
 
-mocmg.initialize module
+mocmg base module
 -----------------------
 
 .. autosummary::
@@ -11,10 +11,14 @@ mocmg.initialize module
    mocmg.initialize
 
 
-Module contents
----------------
 
-.. automodule:: mocmg
-   :members:
-   :undoc-members:
-   :show-inheritance:
+mocmg.grid module
+-----------------------
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+
+   mocmg.grid.rectangular_grid
+
+

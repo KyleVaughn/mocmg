@@ -106,6 +106,33 @@ def _nxy_to_xy_rectangular_grid(nlevels, bb, x, y, nx, ny):
     return x, y, nx, ny
 
 
+def _create_model_rectangular_grid(bb, x, y):
+    """Generate the rectangles in gmsh."""
+    x_min, y_min, z_min = bb[0:3]
+    x_max, y_max, z_max = bb[3:6]
+    zz = z_min
+    # Create smallest rectangles
+    # Ensure elements are in the bb
+    module_log.require(
+        all(x_min <= xx and xx <= x_max for xx in x[-1]),
+        "Divisions must be within the bounding box.",
+    )
+    module_log.require(
+        all(y_min <= yy and yy <= y_max for yy in y[-1]),
+        "Divisions must be within the bounding box.",
+    )
+    grid_tags_coords = []
+    for y_ind, yy in enumerate(y[-1][:-1]):
+        for x_ind, xx in enumerate(x[-1][:-1]):
+            tag = gmsh.model.occ.addRectangle(
+                xx, yy, zz, x[-1][x_ind + 1] - xx, y[-1][y_ind + 1] - yy
+            )
+            grid_tags_coords.append([tag, xx, yy])
+    gmsh.model.occ.synchronize()
+
+    return grid_tags_coords
+
+
 def _label_rectangular_grid(nlevels, grid_tags_coords, x, y):
     """Label the rectangles with the appropriate grid level and location."""
     grid_tags_levels = []
@@ -142,35 +169,64 @@ def _label_rectangular_grid(nlevels, grid_tags_coords, x, y):
     return grid_tags_coords
 
 
-def _create_model_rectangular_grid(bb, x, y):
-    """Generate the rectangles in gmsh."""
-    x_min, y_min, z_min = bb[0:3]
-    x_max, y_max, z_max = bb[3:6]
-    zz = z_min
-    # Create smallest rectangles
-    # Ensure elements are in the bb
-    module_log.require(
-        all(x_min <= xx and xx <= x_max for xx in x[-1]),
-        "Divisions must be within the bounding box.",
-    )
-    module_log.require(
-        all(y_min <= yy and yy <= y_max for yy in y[-1]),
-        "Divisions must be within the bounding box.",
-    )
-    grid_tags_coords = []
-    for y_ind, yy in enumerate(y[-1][:-1]):
-        for x_ind, xx in enumerate(x[-1][:-1]):
-            tag = gmsh.model.occ.addRectangle(
-                xx, yy, zz, x[-1][x_ind + 1] - xx, y[-1][y_ind + 1] - yy
-            )
-            grid_tags_coords.append([tag, xx, yy])
-    gmsh.model.occ.synchronize()
-
-    return grid_tags_coords
-
-
 def rectangular_grid(bb, x=None, y=None, nx=None, ny=None):
-    """Fill me in."""
+    """Create a single or multilevel rectangular grid.
+
+    You must provide one of x or nx, and one of y or ny. The following are valid combinations:
+
+    - x and y
+    - nx and ny
+    - x and ny
+    - nx and y
+
+    The grid will generate rectangles with tags labeled first in increasing x, then
+    increasing y, as seen below.
+
+    .. figure:: ../_figures/rectangular_grid.png
+        :scale: 70 %
+
+    The highest level (smallest) rectangles are grouped into lower levels and labeled using
+    gmsh physical groups of the form "Grid_LN_i_j", where:
+
+    - N is the grid level,
+    - i is the x-index of the group,
+    - and j is the y-index of the group.
+
+    Assuming the figure above was generated with nx=[2,2], ny=[2,2], the original
+    bounding box will be split in two in x and y for the first level. The resulting
+    4 entities will then be split in two in x and y again for the second level,
+    producing 16 total entities. A part of the labeled grid can be seen below.
+
+    .. figure:: ../_figures/rectangular_grid_labeled.png
+        :scale: 60 %
+
+    Args:
+        bb (Iterable): The bounding box to be divided into rectangles, of the form:
+            [x_min, y_min, z_min, x_max, y_max, z_max]
+
+        x (list of Iterables): The x-coordinate locations to split the bounding box.
+
+            -   Example: To divide the unit square (bb=[0, 0, 0, 1, 1, 0]) into a two level grid,
+                dividing each element in half in the x-direction: x=[[0.5], [0.25, 0.75]].
+                Note that x may or may not include the divisions from higher levels, as
+                well as the bounding box sides. This x is equivalent to the previous:
+                x=[[0.5],[0.0, 0.25, 0.5, 0.75, 1.0]].
+
+        y (list of Iterables): The y-coordinate locations to split the bounding box.
+
+        nx (Iterable): The number of rectangles to split each entity into at each level.
+
+            -   Example: nx = [1, 2, 3] will not split the bounding box in x on the first level (L1).
+                All L1 entities are then passed to L2, in this case just the bounding box.
+                The bounding box is then split into 2 equal halves. The halves are then passed
+                to L3, where each half is equally divided into thirds, for 6 total, uniform
+                rectangles.
+
+        ny (Iterable): The number of rectangles to split each entity into at each level.
+
+    Returns:
+        A list of tags of the rectangles that make up the grid.
+    """
     module_log.info("Generating rectangular grid")
     x_min, y_min, z_min = bb[0:3]
     x_max, y_max, z_max = bb[3:6]
@@ -179,16 +235,14 @@ def rectangular_grid(bb, x=None, y=None, nx=None, ny=None):
     x, y, nx, ny = _nxy_to_xy_rectangular_grid(nlevels, bb, x, y, nx, ny)
 
     # Include bb limits
-    if x is not None:
-        x[0] = list(x[0])
-        x[0] = sorted(set(x[0] + [x_min, x_max]))
-        for lvl in range(1, nlevels):
-            x[lvl] = sorted(set(x[lvl - 1] + x[lvl]))
-    if y is not None:
-        y[0] = list(y[0])
-        y[0] = sorted(set(y[0] + [y_min, y_max]))
-        for lvl in range(1, nlevels):
-            y[lvl] = sorted(set(y[lvl - 1] + y[lvl]))
+    x[0] = list(x[0])
+    x[0] = sorted(set(x[0] + [x_min, x_max]))
+    for lvl in range(1, nlevels):
+        x[lvl] = sorted(set(x[lvl - 1] + x[lvl]))
+    y[0] = list(y[0])
+    y[0] = sorted(set(y[0] + [y_min, y_max]))
+    for lvl in range(1, nlevels):
+        y[lvl] = sorted(set(y[lvl - 1] + y[lvl]))
 
     grid_tags_coords = _create_model_rectangular_grid(bb, x, y)
     _label_rectangular_grid(nlevels, grid_tags_coords, x, y)
