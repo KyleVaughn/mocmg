@@ -7,7 +7,7 @@ import pytest
 import mocmg
 
 # from mocmg.gmsh_utils import get_entities_for_physical_group_name
-from mocmg.grid import rectangular_grid
+from mocmg.model.rectangular_grid import rectangular_grid
 
 from .testing_utils import captured_output
 
@@ -18,51 +18,57 @@ bb_12_4 = [0.0, 0.0, 0.0, 12.0, 4.0, 0.0]
 
 # Expected output for generating rectangular grid
 reference_out = [
-    "INFO      : mocmg.grid - Generating rectangular grid",
+    "INFO      : mocmg.model.rectangular_grid - Generating rectangular grid",
 ]
 
 # Expected error for a bad bounding box that produces negative dx, dy, dz
 bad_bb = [
-    "ERROR     : mocmg.grid - Invalid bounding box.",
+    "ERROR     : mocmg.model.rectangular_grid - Invalid bounding box.",
 ]
 
 # Expected error for argument of incorrect type
 bad_type = [
-    "ERROR     : mocmg.grid - Arguments should be iterable.",
+    "ERROR     : mocmg.model.rectangular_grid - Arguments should be iterable.",
 ]
 
 # Expected error for mismatch of x and y size
 len_mismatch = [
-    "ERROR     : mocmg.grid - Length of arguments differ (2 and 1). "
+    "ERROR     : mocmg.model.rectangular_grid - Length of arguments differ (2 and 1). "
     + "They should have the same number of levels.",
 ]
 
 # Expected error for too many arguments
 num_args = [
-    "ERROR     : mocmg.grid - Incorrect number of arguments given."
+    "ERROR     : mocmg.model.rectangular_grid - Incorrect number of arguments given."
     + " Provide one of (x or nx) and one of (ny or y).",
 ]
 
 # Expected error for overly thick model
 thick_dz = [
-    "ERROR     : mocmg.grid - Bounding box thickness is greater than 1e-6"
+    "ERROR     : mocmg.model.rectangular_grid - Bounding box thickness is greater than 1e-6"
     + " (10.000000). Bounding box expected in 2D x-y plane.",
 ]
 
 # Expected error for non-int nx elements
-nx_type = ["ERROR     : mocmg.grid - nx must contain positive integer elements only."]
+nx_type = [
+    "ERROR     : mocmg.model.rectangular_grid - nx must contain positive integer elements only."
+]
 
 # Expected error for non-int nx elements
-ny_type = ["ERROR     : mocmg.grid - ny must contain positive integer elements only."]
+ny_type = [
+    "ERROR     : mocmg.model.rectangular_grid - ny must contain positive integer elements only."
+]
 
 # Expected error for non-list x elements
-x_nonlist_type = ["ERROR     : mocmg.grid - x must have iterable elements."]
+x_nonlist_type = ["ERROR     : mocmg.model.rectangular_grid - x must have iterable elements."]
 
 # Expected error for non-list y elements
-y_nonlist_type = ["ERROR     : mocmg.grid - y must have iterable elements."]
+y_nonlist_type = ["ERROR     : mocmg.model.rectangular_grid - y must have iterable elements."]
 
 # Expected error when divisions outside of bb
-out_of_bb = ["ERROR     : mocmg.grid - Divisions must be within the bounding box."]
+out_of_bb = [
+    "ERROR     : mocmg.model.rectangular_grid - Divisions must be within the bounding box."
+]
 
 """
 For single level 1 division in x and y

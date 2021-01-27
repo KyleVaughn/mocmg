@@ -12,13 +12,13 @@ mocmg base module
 
 
 
-mocmg.grid module
+mocmg.model module
 -----------------------
 
 .. autosummary::
    :toctree: generated
    :nosignatures:
 
-   mocmg.grid.rectangular_grid
+   mocmg.model.rectangular_grid
 
 

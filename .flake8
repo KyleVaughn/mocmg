@@ -8,4 +8,5 @@ exclude =
   setup.py, 
   mocmg/__init__.py,
   tests/__init__.py,
+  mocmg/model/__init__.py
   examples, 
