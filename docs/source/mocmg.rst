@@ -19,6 +19,5 @@ mocmg.model module
    :toctree: generated
    :nosignatures:
 
+   mocmg.model.group_preserving_fragment
    mocmg.model.rectangular_grid
-
-

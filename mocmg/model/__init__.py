@@ -1,1 +1,2 @@
+from .group_preserving_fragment import group_preserving_fragment
 from .rectangular_grid import rectangular_grid

@@ -128,6 +128,8 @@ def _create_model_rectangular_grid(bb, x, y):
                 xx, yy, zz, x[-1][x_ind + 1] - xx, y[-1][y_ind + 1] - yy
             )
             grid_tags_coords.append([tag, xx, yy])
+
+    module_log.info("Synchronizing model")
     gmsh.model.occ.synchronize()
 
     return grid_tags_coords

@@ -5,8 +5,6 @@ import gmsh
 import pytest
 
 import mocmg
-
-# from mocmg.gmsh_utils import get_entities_for_physical_group_name
 from mocmg.model.rectangular_grid import rectangular_grid
 
 from .testing_utils import captured_output
@@ -91,7 +89,6 @@ For single level 1 division in x and y
 --------------------------------------
 (0,0)           (2,0)              (4,0)
 """
-ents_11 = [(2, 1), (2, 2), (2, 3), (2, 4)]
 groups_11 = {
     "Grid_L1_1_1": [1],
     "Grid_L1_2_1": [2],
@@ -127,7 +124,6 @@ centroids_11 = {
 --------------------------------------
 (0,0)           (2,0)              (4,0)
 """
-ents_21 = [(2, 1), (2, 2), (2, 3), (2, 4)]
 groups_21 = {
     "Grid_L1_1_1": [1, 2, 5, 6],
     "Grid_L1_2_1": [3, 4, 7, 8],
@@ -183,14 +179,6 @@ For single level non-uniform in x and y
 --------------------------------------
    (2,0)                    (10,0)  (12,0)
 """
-ents_nu1 = [
-    (2, 1),
-    (2, 2),
-    (2, 3),
-    (2, 4),
-    (2, 5),
-    (2, 6),
-]
 groups_nu1 = {
     "Grid_L1_1_1": [1],
     "Grid_L1_2_1": [2],
@@ -229,20 +217,6 @@ For two level non-uniform in x and y
 --------------------------------------
    (2,0)                    (10,0)  (12,0)
 """
-ents_nu2 = [
-    (2, 1),
-    (2, 2),
-    (2, 3),
-    (2, 4),
-    (2, 5),
-    (2, 6),
-    (2, 7),
-    (2, 8),
-    (2, 9),
-    (2, 10),
-    (2, 11),
-    (2, 12),
-]
 groups_nu2 = {
     "Grid_L1_1_1": [1, 4],
     "Grid_L1_2_1": [2, 5],
@@ -294,7 +268,7 @@ areas_nu2 = {
 
 
 class TestRectangularGrid(TestCase):
-    """Test the grid.rectangular_grid function."""
+    """Test the model.rectangular_grid function."""
 
     def test_bad_bounding_box(self):
         """Test a bad bounding box that produces negative dx, dy, dz."""
