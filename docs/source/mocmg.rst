@@ -21,3 +21,12 @@ mocmg.model module
 
    mocmg.model.group_preserving_fragment
    mocmg.model.rectangular_grid
+
+mocmg.mesh module
+-----------------------
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+
+   mocmg.mesh.Mesh
