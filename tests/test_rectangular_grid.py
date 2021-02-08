@@ -710,7 +710,6 @@ class TestRectangularGrid(TestCase):
         rectangular_grid(bb_44, x=[[2.0], [1.0, 3.0]], y=[[2.0], [1.0, 3.0]])
         group_nums = gmsh.model.getPhysicalGroups()
         names = [gmsh.model.getPhysicalName(*grp) for grp in group_nums]
-        print(names)
         ref_names = list(ref_groups.keys())
         # Check correct names/entities
         for i, name in enumerate(names):
@@ -740,7 +739,6 @@ class TestRectangularGrid(TestCase):
         rectangular_grid(bb_44, nx=[2, 2], ny=[2, 2])
         group_nums = gmsh.model.getPhysicalGroups()
         names = [gmsh.model.getPhysicalName(*grp) for grp in group_nums]
-        print(names)
         ref_names = list(ref_groups.keys())
         # Check correct names/entities
         for i, name in enumerate(names):

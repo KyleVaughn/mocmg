@@ -2,8 +2,10 @@
 from unittest import TestCase
 
 import numpy as np
+import pytest
 
 import mocmg
+import mocmg.mesh
 
 # linear triangle data
 linear_triangle_vertices = {
@@ -441,20 +443,38 @@ class TestMesh(TestCase):
         ref_vertices = linear_triangle_vertices
         ref_cells = linear_triangle_cells
         ref_cell_sets = linear_triangle_cell_sets
+        mocmg.initialize()
         mesh = mocmg.mesh.Mesh(ref_vertices, ref_cells, ref_cell_sets)
         self.assertEqual(mesh.vertices, ref_vertices)
         self.assertEqual(mesh.cells, ref_cells)
         self.assertEqual(mesh.cell_sets, ref_cell_sets)
+        # get_cells
+        cell_set = mesh.get_cells("DISK")
+        self.assertTrue(np.array_equal(cell_set, linear_triangle_cell_sets["DISK"]))
+        # get_cells w/ bad name
+        with pytest.raises(SystemExit):
+            cell_set = mesh.get_cells("BAD NAME")
+        # get_cell_area
+
+        with pytest.raises(SystemExit):
+            cell_set = mesh.get_cells("BAD NAME")
 
     def test_quadratic_triangle(self):
         """Test the mesh class functions on a quadratic triangle mesh."""
         ref_vertices = quadratic_triangle_vertices
         ref_cells = quadratic_triangle_cells
         ref_cell_sets = quadratic_triangle_cell_sets
+        mocmg.initialize()
         mesh = mocmg.mesh.Mesh(ref_vertices, ref_cells, ref_cell_sets)
         self.assertEqual(mesh.vertices, ref_vertices)
         self.assertEqual(mesh.cells, ref_cells)
         self.assertEqual(mesh.cell_sets, ref_cell_sets)
+        # get_cells
+        cell_set = mesh.get_cells("DISK")
+        self.assertTrue(np.array_equal(cell_set, linear_triangle_cell_sets["DISK"]))
+        # get_cells w/ bad name
+        with pytest.raises(SystemExit):
+            cell_set = mesh.get_cells("BAD NAME")
 
     def test_linear_quadrilateral(self):
         """Test the mesh class functions on a linear quadrilateral mesh."""
@@ -465,6 +485,12 @@ class TestMesh(TestCase):
         self.assertEqual(mesh.vertices, ref_vertices)
         self.assertEqual(mesh.cells, ref_cells)
         self.assertEqual(mesh.cell_sets, ref_cell_sets)
+        # get_cells
+        cell_set = mesh.get_cells("DISK")
+        self.assertTrue(np.array_equal(cell_set, linear_triangle_cell_sets["DISK"]))
+        # get_cells w/ bad name
+        with pytest.raises(SystemExit):
+            cell_set = mesh.get_cells("BAD NAME")
 
     def test_quadratic_quadrilateral(self):
         """Test the mesh class functions on a quadratic quadrilateral mesh."""
@@ -475,3 +501,9 @@ class TestMesh(TestCase):
         self.assertEqual(mesh.vertices, ref_vertices)
         self.assertEqual(mesh.cells, ref_cells)
         self.assertEqual(mesh.cell_sets, ref_cell_sets)
+        # get_cells
+        cell_set = mesh.get_cells("DISK")
+        self.assertTrue(np.array_equal(cell_set, linear_triangle_cell_sets["DISK"]))
+        # get_cells w/ bad name
+        with pytest.raises(SystemExit):
+            cell_set = mesh.get_cells("BAD NAME")

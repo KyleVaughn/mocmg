@@ -3,7 +3,7 @@ import logging
 
 module_log = logging.getLogger(__name__)
 
-quadratic_edges = {
+_has_quadratic_edges = {
     "quad": False,
     "quad8": True,
     "triangle": False,
@@ -25,7 +25,7 @@ class Mesh:
                     vertices={3: np.array([0.0, 1.0, 2.0])}
 
         cells (dict): The individual cells that compose a mesh.
-            A dictionaries, where each key/value has the form: "cell_type": dict,
+            Dictionaries, where each key/value has the form: "cell_type": dict,
             where the "cell_type" string can be
             "triangle", "quad8", etc. The dictionary value has integer keys and numpy array values.
             This dictionary denotes cell ID and the vertex ID that make up the cell.
@@ -64,3 +64,34 @@ class Mesh:
         self.vertices = vertices
         self.cells = cells
         self.cell_sets = {} if cell_sets is None else cell_sets
+
+    def get_cells(self, cell_set_name):
+        """Get the cell IDs for a given cell set name.
+
+        Args:
+            cell_set_name (str): Name of the cell set for which to retrieve cell IDs.
+
+        Returns:
+            cellIDs (numpy.array)
+        """
+        if cell_set_name in self.cell_sets:
+            return self.cell_sets[cell_set_name]
+        else:
+            module_log.error(f"No cell set named {cell_set_name}")
+
+    def get_cell_area(self, cell):
+        """Get the area of the cell with the given cell ID.
+
+        Args:
+            cell (int): The integer cell ID of the cell whose area will be calculated.
+
+        Returns:
+            area (float)
+        """
+        # Find the cell
+        for cell_type in self.cells.keys():
+            if cell in self.cells[cell_type]:
+                area = 0
+                return area
+            else:
+                module_log.error(f"Cell {cell} does not exist in this mesh")
