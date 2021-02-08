@@ -16,7 +16,7 @@ _has_quadratic_edges = {
 class Mesh:
     """Class to represent a mesh and mesh data.
 
-    Attributes:
+    Parameters:
         vertices (dict): The ID and x,y,z location of vertices. A dictionary with integer keys
             and numpy array values, corresponding to point ID and spatial coordinates, respectively.
 
