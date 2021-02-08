@@ -451,13 +451,17 @@ class TestMesh(TestCase):
         # get_cells
         cell_set = mesh.get_cells("DISK")
         self.assertTrue(np.array_equal(cell_set, linear_triangle_cell_sets["DISK"]))
-        # get_cells w/ bad name
-        with pytest.raises(SystemExit):
-            cell_set = mesh.get_cells("BAD NAME")
         # get_cell_area
-
+        cell_area_ref = 0.210453
+        cell_area = mesh.get_cell_area(1)
+        self.assertAlmostEqual(cell_area, cell_area_ref, 6)
+        # Try w/ name that doesnt exist.
         with pytest.raises(SystemExit):
             cell_set = mesh.get_cells("BAD NAME")
+        # get_set_area
+        set_area_ref = 2.828427
+        set_area = mesh.get_set_area("DISK")
+        self.assertAlmostEqual(set_area, set_area_ref, 6)
 
     def test_quadratic_triangle(self):
         """Test the mesh class functions on a quadratic triangle mesh."""
@@ -471,10 +475,15 @@ class TestMesh(TestCase):
         self.assertEqual(mesh.cell_sets, ref_cell_sets)
         # get_cells
         cell_set = mesh.get_cells("DISK")
-        self.assertTrue(np.array_equal(cell_set, linear_triangle_cell_sets["DISK"]))
-        # get_cells w/ bad name
-        with pytest.raises(SystemExit):
-            cell_set = mesh.get_cells("BAD NAME")
+        self.assertTrue(np.array_equal(cell_set, quadratic_triangle_cell_sets["DISK"]))
+        # get_cell_area
+        cell_area_ref = 0.261949
+        cell_area = mesh.get_cell_area(2)
+        self.assertAlmostEqual(cell_area, cell_area_ref, 6)
+        # get_set_area
+        set_area_ref = 3.1391725
+        set_area = mesh.get_set_area("DISK")
+        self.assertAlmostEqual(set_area, set_area_ref, 6)
 
     def test_linear_quadrilateral(self):
         """Test the mesh class functions on a linear quadrilateral mesh."""
@@ -487,10 +496,15 @@ class TestMesh(TestCase):
         self.assertEqual(mesh.cell_sets, ref_cell_sets)
         # get_cells
         cell_set = mesh.get_cells("DISK")
-        self.assertTrue(np.array_equal(cell_set, linear_triangle_cell_sets["DISK"]))
-        # get_cells w/ bad name
-        with pytest.raises(SystemExit):
-            cell_set = mesh.get_cells("BAD NAME")
+        self.assertTrue(np.array_equal(cell_set, linear_quadrilateral_cell_sets["DISK"]))
+        # get_cell_area
+        cell_area_ref = 0.0874078
+        cell_area = mesh.get_cell_area(1)
+        self.assertAlmostEqual(cell_area, cell_area_ref, 6)
+        # get_set_area
+        set_area_ref = 3.0614675
+        set_area = mesh.get_set_area("DISK")
+        self.assertAlmostEqual(set_area, set_area_ref, 6)
 
     def test_quadratic_quadrilateral(self):
         """Test the mesh class functions on a quadratic quadrilateral mesh."""
@@ -503,7 +517,12 @@ class TestMesh(TestCase):
         self.assertEqual(mesh.cell_sets, ref_cell_sets)
         # get_cells
         cell_set = mesh.get_cells("DISK")
-        self.assertTrue(np.array_equal(cell_set, linear_triangle_cell_sets["DISK"]))
-        # get_cells w/ bad name
-        with pytest.raises(SystemExit):
-            cell_set = mesh.get_cells("BAD NAME")
+        self.assertTrue(np.array_equal(cell_set, quadratic_quadrilateral_cell_sets["DISK"]))
+        # get_cell_area
+        cell_area_ref = 0.7847974
+        cell_area = mesh.get_cell_area(1)
+        self.assertAlmostEqual(cell_area, cell_area_ref, 6)
+        # get_set_area
+        set_area_ref = 3.1391907
+        set_area = mesh.get_set_area("DISK")
+        self.assertAlmostEqual(set_area, set_area_ref, 6)
