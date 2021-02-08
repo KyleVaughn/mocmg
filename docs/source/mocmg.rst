@@ -28,5 +28,6 @@ mocmg.mesh module
 .. autosummary::
    :toctree: generated
    :nosignatures:
+   :template: myclass.rst
 
    mocmg.mesh.Mesh
