@@ -2,7 +2,6 @@
 from unittest import TestCase
 
 import numpy as np
-import pytest
 
 import mocmg
 import mocmg.mesh
@@ -451,13 +450,16 @@ class TestMesh(TestCase):
         # get_cells
         cell_set = mesh.get_cells("DISK")
         self.assertTrue(np.array_equal(cell_set, linear_triangle_cell_sets["DISK"]))
+        # Try w/ name that doesnt exist.
+        with self.assertRaises(SystemExit):
+            cell_set = mesh.get_cells("BAD NAME")
         # get_cell_area
         cell_area_ref = 0.210453
         cell_area = mesh.get_cell_area(1)
         self.assertAlmostEqual(cell_area, cell_area_ref, 6)
-        # Try w/ name that doesnt exist.
-        with pytest.raises(SystemExit):
-            cell_set = mesh.get_cells("BAD NAME")
+        # Try will cell that doesnt exist
+        with self.assertRaises(SystemExit):
+            cell_area = mesh.get_cell_area(-1)
         # get_set_area
         set_area_ref = 2.828427
         set_area = mesh.get_set_area("DISK")
@@ -526,3 +528,25 @@ class TestMesh(TestCase):
         set_area_ref = 3.1391907
         set_area = mesh.get_set_area("DISK")
         self.assertAlmostEqual(set_area, set_area_ref, 6)
+
+    def test_get_cell_area(self):
+        """Test the get_cell_area function."""
+        verts = {
+            1: np.array([0.0, 0.0, 0.0]),
+            2: np.array([1.0, 0.0, 0.0]),
+            3: np.array([1.0, 1.0, 0.0]),
+            4: np.array([0.0, 1.0, 0.0]),
+            5: np.array([0.5, 0.0, 0.0]),
+            6: np.array([1.25, 0.5, 0.0]),
+            7: np.array([0.5, 1.0, 0.0]),
+            8: np.array([0.25, 0.5, 0.0]),
+        }
+        cells = {
+            "quad8": {
+                1: np.array([1, 2, 3, 4, 5, 6, 7, 8]),
+            },
+        }
+        mocmg.initialize()
+        mesh = mocmg.mesh.Mesh(verts, cells)
+        cell_area = mesh.get_cell_area(1)
+        self.assertAlmostEqual(cell_area, 1.0, 6)

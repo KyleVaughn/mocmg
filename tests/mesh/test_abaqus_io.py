@@ -296,3 +296,45 @@ class TestAbaqusIO(TestCase):
         ]
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)
+
+    def test_element_type_error(self):
+        """Test reading a files with an unsupported element type."""
+        out_ref = [
+            "INFO      : mocmg.mesh.abaqus_IO - Reading mesh data from tests/abaqus_files/element_error.inp"
+        ]
+        err_ref = [
+            "ERROR     : mocmg.mesh.abaqus_IO - Unrecognized mesh element type: 'MADEUPTYPE'."
+        ]
+
+        with self.assertRaises(SystemExit):
+            with captured_output() as (out, err):
+                mocmg.initialize()
+                mocmg.mesh.read_abaqus_file("tests/abaqus_files/element_error.inp")
+        out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
+        out, err = [line.split(None, 1)[1] for line in out], [
+            line.split(None, 1)[1] for line in [err[0]]
+        ]
+        self.assertEqual(out, out_ref)
+        self.assertEqual(err, err_ref)
+
+
+#    def test_element_type_error(self):
+#        """Test reading a files with an unsupported element type."""
+#        out_ref = [
+#            "INFO      : mocmg.mesh.abaqus_IO - Reading mesh data from tests/abaqus_files/element_error.inp"
+#        ]
+#        err_ref = ["ERROR     : mocmg.mesh.abaqus_IO - Unrecognized mesh element type: 'MADEUPTYPE'."]
+#
+#        with self.assertRaises(SystemExit) as context:
+#            with captured_output() as (out, err):
+#                mocmg.initialize()
+#                mesh = mocmg.mesh.read_abaqus_file("tests/abaqus_files/element_error.inp")
+#                vertices = mesh.vertices
+#                cells = mesh.cells
+#                cell_sets = mesh.cell_sets
+#        out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
+#        out, err = [line.split(None, 1)[1] for line in out], [
+#            line.split(None, 1)[1] for line in [err[0]]
+#        ]
+#        self.assertEqual(out, out_ref)
+#        self.assertEqual(err, err_ref)
