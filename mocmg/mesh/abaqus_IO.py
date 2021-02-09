@@ -18,6 +18,10 @@ abaqus_to_topo_type = {
     "CPS8": "quad8",
 }
 
+abaqus_1d = {
+    "T3D2": "line",
+}
+
 
 def read_abaqus_file(filepath):
     """Read an Abaqus file into a mesh object."""
@@ -52,22 +56,33 @@ def read_abaqus_file(filepath):
             elif keyword == "ELSET":
                 element_set_name = _get_param(line, "ELSET")
                 elset, line = _read_element_set(f)
-                if element_set_name in element_sets:
-                    element_sets[element_set_name] = np.concatenate(
-                        element_sets[element_set_name], elset
-                    )
-                else:
-                    element_sets[element_set_name] = elset
+                # If an elset is split into multiple sections, uncomment this code.
+                #                if element_set_name in element_sets:
+                #                    element_sets[element_set_name] = np.concatenate(
+                #                        element_sets[element_set_name], elset
+                #                    )
+                #                else:
+                element_sets[element_set_name] = elset
             else:
                 line = f.readline()
+
+    _convert_abaqus_to_topo_type(elements)
+
+    return Mesh(nodes, elements, element_sets)
+
+
+def _convert_abaqus_to_topo_type(elements):
+    # Remove 1D elements, since they are not currently used
+    keys = [k for k in elements.keys()]
+    for key in keys:
+        if key in abaqus_1d:
+            elements.pop(key)
 
     # convert abaqus types to mesh class topological types
     keys = [k for k in elements.keys()]
     for key in keys:
         module_log.require(key in abaqus_to_topo_type, f"Unrecognized mesh element type: '{key}'.")
         elements[abaqus_to_topo_type[key]] = elements.pop(key)
-
-    return Mesh(nodes, elements, element_sets)
 
 
 def _read_nodes(f, nodes):
