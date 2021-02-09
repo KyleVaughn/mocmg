@@ -13,7 +13,7 @@ def get_entities_for_physical_group_name(name):
         name (str): The name of the physical group.
 
     Returns:
-        List of integer IDs of the entities in the physical group.
+        list : List of integer IDs of the entities in the physical group.
 
     """
     groups = gmsh.model.getPhysicalGroups()

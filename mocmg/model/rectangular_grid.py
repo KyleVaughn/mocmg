@@ -227,7 +227,7 @@ def rectangular_grid(bb, x=None, y=None, nx=None, ny=None):
         ny (Iterable): The number of rectangles to split each entity into at each level.
 
     Returns:
-        A list of tags of the rectangles that make up the grid.
+        list: A list of tags of the rectangles that make up the grid.
     """
     module_log.info("Generating rectangular grid")
     x_min, y_min, z_min = bb[0:3]

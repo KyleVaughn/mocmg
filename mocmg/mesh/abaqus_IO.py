@@ -24,7 +24,14 @@ abaqus_1d = {
 
 
 def read_abaqus_file(filepath):
-    """Read an Abaqus file into a mesh object."""
+    """Read an Abaqus file into a mesh object.
+
+    Args:
+        filepath (str): Filepath to the Abaqus file.
+
+    Returns:
+        mocmg.mesh.Mesh : The mesh.
+    """
     module_log.info(f"Reading mesh data from {filepath}")
     # read data in blocks based upon keyword
     nodes = {}

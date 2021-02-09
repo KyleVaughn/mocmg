@@ -22,7 +22,7 @@ def group_preserving_fragment(object_dim_tags, tool_dim_tags):
         tool_dim_tags (list): A list of the dim tags of entities to fragment.
 
     Returns:
-        A list of the resultant dim tags.
+        list : A list of the resultant dim tags.
     """
     # Get all the physical groups
     old_physical_groups = {}

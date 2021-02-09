@@ -59,6 +59,20 @@ class Mesh:
                         "Material Uranium": np.array([1, 2]),
                     }
 
+    Attributes:
+        vertices (dict): The ID and x,y,z location of vertices. A dictionary with integer keys
+            and numpy array values, corresponding to point ID and spatial coordinates, respectively.
+
+        cells (dict): The individual cells that compose a mesh.
+            Dictionaries, where each key/value has the form: "cell_type": dict,
+            where the "cell_type" string can be
+            "triangle", "quad8", etc. The dictionary value has integer keys and numpy array values.
+            This dictionary denotes cell ID and the vertex ID that make up the cell.
+
+        cell_sets (dict): The sets of cells that share the same attributes.
+            A dictionary of the form: "set_name": ID np.array
+            The ID array contains the integer IDs of all cells that share the attribute "set_name".
+
     """
 
     def __init__(self, vertices, cells, cell_sets=None):
@@ -74,7 +88,7 @@ class Mesh:
             cell_set_name (str): Name of the cell set for which to retrieve cell IDs.
 
         Returns:
-            cellIDs (numpy.array)
+            numpy.ndarray: cell IDs of the set.
         """
         if cell_set_name in self.cell_sets:
             return self.cell_sets[cell_set_name]
@@ -88,7 +102,7 @@ class Mesh:
             cell (int): The integer cell ID of the cell whose area will be calculated.
 
         Returns:
-            area (float)
+            float: The area of the cell.
         """
         # Find the cell
         for cell_type in self.cells:
@@ -189,7 +203,7 @@ class Mesh:
             cell_set_name (str): The name of the cell set.
 
         Returns:
-            area (float)
+            float: The area of the set.
         """
         module_log.info(f"Computing '{cell_set_name}' cell set area.")
         cells = self.get_cells(cell_set_name)
