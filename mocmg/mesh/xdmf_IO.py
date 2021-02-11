@@ -69,9 +69,13 @@ def write_xdmf_file(filename, mesh, compression_opts=4):
             cell_sets,
             compression_opts,
         )
+    else:
+        # if there are cell sets, use tree structure
+        module_log.error("Cell sets not currently supported")
 
     tree = ETree.ElementTree(xdmf_file)
     tree.write(filename)
+    h5_file.close()
 
 
 def _add_uniform_grid(
@@ -162,4 +166,44 @@ def _add_topology(grid, h5_filename, h5_group, vertices, cells, compression_opts
 
     # Mixed topology
     else:
-        module_log.error("Mixed topology not supported rn.")
+        total_num_cells = sum(len(cells[cell_type]) for cell_type in cells.keys())
+        topo = ETree.SubElement(
+            grid,
+            "Topology",
+            TopologyType="Mixed",
+            NumberOfElements=str(total_num_cells),
+        )
+
+        vert_map = _map_to_0_index(vertices.keys())
+        topo_data = []
+        total_num_verts = 0
+        for cell_type in cells.keys():
+            first_array = cells[cell_type][list(cells[cell_type].keys())[0]]
+            verts_per_cell = len(first_array)
+            num_cells = len(cells[cell_type].keys())
+            total_num_verts += num_cells * verts_per_cell
+            xdmf_int = topo_type_to_xdmf_int[cell_type]
+            for cell in cells[cell_type].values():
+                new_cell_verts = np.zeros(verts_per_cell + 1, dtype=np.int64)
+                new_cell_verts[0] = xdmf_int
+                for i, vert in enumerate(cell):
+                    new_cell_verts[i + 1] = vert_map[vert]
+                topo_data.append(new_cell_verts)
+
+        dim = str(total_num_cells + total_num_verts)
+        datatype, precision = numpy_to_xdmf_dtype[first_array.dtype.name]
+        topo_data_item = ETree.SubElement(
+            topo,
+            "DataItem",
+            DataType=datatype,
+            Dimensions=dim,
+            Format="HDF",
+            Precision=precision,
+        )
+        h5_group.create_dataset(
+            "CELLS",
+            data=np.concatenate(topo_data),
+            compression="gzip",
+            compression_opts=compression_opts,
+        )
+        topo_data_item.text = os.path.basename(h5_filename) + ":" + h5_group.name + "/CELLS"

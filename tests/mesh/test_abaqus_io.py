@@ -53,7 +53,7 @@ class TestAbaqusIO(TestCase):
         # vertices
         for i in range(1, 9):
             for j in range(3):
-                self.assertAlmostEqual(vertices[i][j], vertices_ref[i][j], places=10)
+                self.assertEqual(vertices[i][j], vertices_ref[i][j])
         # cells
         self.assertEqual(len(cells), 1)
         self.assertEqual(list(cells.keys()), ["triangle"])
@@ -158,7 +158,7 @@ class TestAbaqusIO(TestCase):
         # vertices
         for i in range(1, 50):
             for j in range(3):
-                self.assertAlmostEqual(vertices[i][j], vertices_ref[i][j], places=10)
+                self.assertEqual(vertices[i][j], vertices_ref[i][j])
         # cells
         self.assertEqual(len(cells), 2)
         self.assertEqual(list(cells.keys()), ["triangle6", "quad8"])
@@ -271,7 +271,7 @@ class TestAbaqusIO(TestCase):
         # vertices
         for i in range(1, 50):
             for j in range(3):
-                self.assertAlmostEqual(vertices[i][j], vertices_ref[i][j], places=10)
+                self.assertEqual(vertices[i][j], vertices_ref[i][j])
         # cells
         self.assertEqual(len(cells), 2)
         self.assertEqual(list(cells.keys()), ["triangle6", "quad8"])
@@ -534,7 +534,7 @@ class TestAbaqusIO(TestCase):
         # vertices
         for i in range(1, 75):
             for j in range(3):
-                self.assertAlmostEqual(vertices[i][j], vertices_ref[i][j], places=10)
+                self.assertEqual(vertices[i][j], vertices_ref[i][j])
         # cells
         self.assertEqual(len(cells), 1)
         self.assertEqual(list(cells.keys()), ["triangle"])
