@@ -81,16 +81,92 @@ class TestXDMFIO(TestCase):
                 for k in range(len(cell)):
                     self.assertEqual(cell[k], cells_h5[j][k])
 
-    #        os.remove(filename + ".xdmf")
-    #        os.remove(filename + ".h5")
+        os.remove(filename + ".xdmf")
+        os.remove(filename + ".h5")
 
     def test_mixed_topology_no_cell_sets(self):
         """Test writing xdmf file with mixed topology and no cell sets."""
         filename = "mixed_topology"
-        xml_sha256 = "a506e22c725a1655cee6bb4f00aed3b1d5b948c0191235576d4cef2404109b44"
+        xml_sha256 = "97c2dd7b926ec7856e10855f0dabbe6e4dd48a03c739c91b3497c7a9efdbb5be"
         vertices = {
-            1: np.array([1, 0, 0]),
-            2: np.array([3, 0, 0]),
+            1: np.array([0.0, 0.0, 0.0]),
+            2: np.array([1.0, 1.0, 0.0]),
+            3: np.array([1.0, 0.0, 0.0]),
+            4: np.array([0.0, -1.0, 0.0]),
+            5: np.array([1.0, -1.0, 0.0]),
+            6: np.array([1.0, -2.0, 0.0]),
+            7: np.array([2.0, -2.0, 0.0]),
+            8: np.array([3.0, -2.0, 0.0]),
+            9: np.array([2.5, -0.5, 0.0]),
+        }
+        cells = {
+            "triangle": {
+                1: np.array([1, 3, 2]),
+            },
+            "quad": {
+                2: np.array([4, 5, 3, 1]),
+            },
+            "triangle6": {
+                3: np.array([6, 8, 3, 7, 9, 5]),
+            },
+        }
+        cells_h5_ref = np.concatenate(
+            [
+                np.array([4]),
+                np.array([1, 3, 2]) - 1,
+                np.array([5]),
+                np.array([4, 5, 3, 1]) - 1,
+                np.array([36]),
+                np.array([6, 8, 3, 7, 9, 5]) - 1,
+            ]
+        )
+        out_ref = [
+            "INFO      : mocmg.mesh.xdmf_IO - Writing mesh data to XDMF file '"
+            + filename
+            + ".xdmf'."
+        ]
+        err_ref = []
+        with captured_output() as (out, err):
+            mocmg.initialize()
+            mesh = mocmg.mesh.Mesh(vertices, cells)
+            mocmg.mesh.write_xdmf_file(filename + ".xdmf", mesh)
+
+        # message
+        out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
+
+        # strip times
+        out, err = [line.split(None, 1)[1] for line in out], [
+            line.split(None, 1)[1] for line in err
+        ]
+        self.assertEqual(out, out_ref)
+        self.assertEqual(err, err_ref)
+
+        # Check xml using sha256
+        xml_hash = hashlib.sha256(open(filename + ".xdmf", "rb").read()).hexdigest()
+        self.assertEqual(xml_hash, xml_sha256)
+
+        # Check h5
+        with h5py.File(filename + ".h5", "r") as f:
+            vertices_h5 = np.array(f.get(filename + "/VERTICES"))
+            cells_h5 = np.array(f.get(filename + "/CELLS"))
+        # Vertices
+        for i, coord in enumerate(vertices.values()):
+            for j in range(len(coord)):
+                self.assertEqual(vertices_h5[i][j], coord[j])
+        # Cells
+        for i in range(len(cells_h5_ref)):
+            self.assertEqual(cells_h5[i], cells_h5_ref[i])
+
+        os.remove(filename + ".xdmf")
+        os.remove(filename + ".h5")
+
+    def test_disks_mixed_topology_no_cell_sets(self):
+        """Test writing xdmf file for two disks with mixed topology and no cell sets."""
+        filename = "mixed_topology_disks"
+        xml_sha256 = "d9556a5924ee1142bad35b1d58771898b8be2680c47d8e490e7e669f337afe4f"
+        vertices = {
+            1: np.array([1.0, 0.0, 0.0]),
+            2: np.array([3.0, 0.0, 0.0]),
             3: np.array([0.62348980185873, 0.78183148246803, 0]),
             4: np.array([-0.22252093395631, 0.97492791218182, 0]),
             5: np.array([-0.90096886790242, 0.43388373911756, 0]),
@@ -225,6 +301,5 @@ class TestXDMFIO(TestCase):
         for i in range(len(cells_h5_ref)):
             self.assertEqual(cells_h5[i], cells_h5_ref[i])
 
-
-#        os.remove(filename + ".xdmf")
-#        os.remove(filename + ".h5")
+        os.remove(filename + ".xdmf")
+        os.remove(filename + ".h5")

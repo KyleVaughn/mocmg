@@ -25,11 +25,10 @@ topo_to_xdmf_type = {
 }
 
 xdmf_int_to_topo_type = {
-    0x4: "triangle",
-    0x5: "quad",
-    0x9: "hexahedron",
-    0x24: "triangle6",
-    0x25: "quad8",
+    4: "triangle",
+    5: "quad",
+    36: "triangle6",
+    37: "quad8",
 }
 
 topo_type_to_xdmf_int = {v: k for k, v in xdmf_int_to_topo_type.items()}
