@@ -14,7 +14,7 @@ setuptools.setup(
         "scipy>=1.6",
         "h5py>=3.1",
         "gmsh-dev",
-        "lxml>=lxml 4.6",
+        "lxml>=4.6",
     ],
     include_package_data=True,
     python_requires=">=3.6",
