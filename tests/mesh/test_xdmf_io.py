@@ -1,6 +1,5 @@
 """Test reading and writing of XDMF files."""
 
-import hashlib
 import os
 import sys
 from unittest import TestCase
@@ -21,7 +20,6 @@ class TestXDMFIO(TestCase):
     def test_uniform_grid_triangle_only(self):
         """Test writing file with triangle cells only and no cell sets."""
         filename = "uniform_grid_triangle_only"
-        xml_sha256 = "0c0b9c758820d77f4c03e7e777ff1f7c19d04076cb4cb333a6eec98444f4786b"
         vertices = {
             1: np.array([1.0, 0.0, 0.0]),
             2: np.array([0.62348980185873, 0.78183148246803, 0.0]),
@@ -63,9 +61,16 @@ class TestXDMFIO(TestCase):
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)
 
-        # Check xml using sha256
-        xml_hash = hashlib.sha256(open(filename + ".xdmf", "rb").read()).hexdigest()
-        self.assertEqual(xml_hash, xml_sha256)
+        # Check xdmf
+        ref_file = open("./tests/xdmf_files/" + filename + ".xdmf", "r")
+        test_file = open(filename + ".xdmf", "r")
+        ref_lines = ref_file.readlines()
+        test_lines = test_file.readlines()
+        ref_file.close()
+        test_file.close()
+        self.assertEqual(len(ref_lines), len(test_lines))
+        for i in range(len(ref_lines)):
+            self.assertEqual(ref_lines[i], test_lines[i])
 
         # Check h5
         with h5py.File(filename + ".h5", "r") as f:
@@ -87,7 +92,6 @@ class TestXDMFIO(TestCase):
     def test_mixed_topology_no_cell_sets(self):
         """Test writing xdmf file with mixed topology and no cell sets."""
         filename = "mixed_topology"
-        xml_sha256 = "97c2dd7b926ec7856e10855f0dabbe6e4dd48a03c739c91b3497c7a9efdbb5be"
         vertices = {
             1: np.array([0.0, 0.0, 0.0]),
             2: np.array([1.0, 1.0, 0.0]),
@@ -141,9 +145,16 @@ class TestXDMFIO(TestCase):
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)
 
-        # Check xml using sha256
-        xml_hash = hashlib.sha256(open(filename + ".xdmf", "rb").read()).hexdigest()
-        self.assertEqual(xml_hash, xml_sha256)
+        # Check xdmf
+        ref_file = open("./tests/xdmf_files/" + filename + ".xdmf", "r")
+        test_file = open(filename + ".xdmf", "r")
+        ref_lines = ref_file.readlines()
+        test_lines = test_file.readlines()
+        ref_file.close()
+        test_file.close()
+        self.assertEqual(len(ref_lines), len(test_lines))
+        for i in range(len(ref_lines)):
+            self.assertEqual(ref_lines[i], test_lines[i])
 
         # Check h5
         with h5py.File(filename + ".h5", "r") as f:
@@ -163,7 +174,6 @@ class TestXDMFIO(TestCase):
     def test_disks_mixed_topology_no_cell_sets(self):
         """Test writing xdmf file for two disks with mixed topology and no cell sets."""
         filename = "mixed_topology_disks"
-        xml_sha256 = "d9556a5924ee1142bad35b1d58771898b8be2680c47d8e490e7e669f337afe4f"
         vertices = {
             1: np.array([1.0, 0.0, 0.0]),
             2: np.array([3.0, 0.0, 0.0]),
@@ -285,9 +295,16 @@ class TestXDMFIO(TestCase):
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)
 
-        # Check xml using sha256
-        xml_hash = hashlib.sha256(open(filename + ".xdmf", "rb").read()).hexdigest()
-        self.assertEqual(xml_hash, xml_sha256)
+        # Check xdmf
+        ref_file = open("./tests/xdmf_files/" + filename + ".xdmf", "r")
+        test_file = open(filename + ".xdmf", "r")
+        ref_lines = ref_file.readlines()
+        test_lines = test_file.readlines()
+        ref_file.close()
+        test_file.close()
+        self.assertEqual(len(ref_lines), len(test_lines))
+        for i in range(len(ref_lines)):
+            self.assertEqual(ref_lines[i], test_lines[i])
 
         # Check h5
         with h5py.File(filename + ".h5", "r") as f:

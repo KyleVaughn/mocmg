@@ -1,9 +1,9 @@
 """Functions for reading and writing XDMF files."""
 import logging
 import os
-import xml.etree.ElementTree as ETree
 
 import h5py
+import lxml.etree as etree
 import numpy as np
 
 module_log = logging.getLogger(__name__)
@@ -53,8 +53,8 @@ def write_xdmf_file(filename, mesh, compression_opts=4):
     h5_filename = os.path.splitext(filename)[0] + ".h5"
     h5_file = h5py.File(h5_filename, "w")
 
-    xdmf_file = ETree.Element("Xdmf", Version="3.0")
-    domain = ETree.SubElement(xdmf_file, "Domain")
+    xdmf_file = etree.Element("Xdmf", Version="3.0")
+    domain = etree.SubElement(xdmf_file, "Domain")
 
     # If no cell sets, just write one uniform grid.
     if cell_sets == {}:
@@ -72,8 +72,8 @@ def write_xdmf_file(filename, mesh, compression_opts=4):
         # if there are cell sets, use tree structure
         module_log.error("Cell sets not currently supported")
 
-    tree = ETree.ElementTree(xdmf_file)
-    tree.write(filename)
+    tree = etree.ElementTree(xdmf_file)
+    tree.write(filename, pretty_print=True)
     h5_file.close()
 
 
@@ -82,7 +82,7 @@ def _add_uniform_grid(
 ):
     """Add a uniform grid to the xml element and write the h5 data."""
     # Name is basically group list
-    grid = ETree.SubElement(xml_element, "Grid", Name=name[-1], GridType="Uniform")
+    grid = etree.SubElement(xml_element, "Grid", Name=name[-1], GridType="Uniform")
     # Create group for name
     this_h5_group = h5_group.create_group(name[-1])
     _add_geometry(grid, h5_filename, this_h5_group, vertices, compression_opts)
@@ -91,11 +91,11 @@ def _add_uniform_grid(
 
 def _add_geometry(grid, h5_filename, h5_group, vertices, compression_opts):
     """Add XYZ vertex locations in the geometry block."""
-    geom = ETree.SubElement(grid, "Geometry", GeometryType="XYZ")
+    geom = etree.SubElement(grid, "Geometry", GeometryType="XYZ")
     vert_ids = list(vertices.keys())
     datatype, precision = numpy_to_xdmf_dtype[vertices[vert_ids[0]].dtype.name]
     dim = "{} {}".format(len(vert_ids), 3)
-    vertices_data_item = ETree.SubElement(
+    vertices_data_item = etree.SubElement(
         geom,
         "DataItem",
         DataType=datatype,
@@ -138,7 +138,7 @@ def _add_topology(grid, h5_filename, h5_group, vertices, cells, compression_opts
 
         num_cells = len(cell_arrays)
         verts_per_cell = len(cell_arrays[0])
-        topo = ETree.SubElement(
+        topo = etree.SubElement(
             grid,
             "Topology",
             TopologyType=xdmf_type,
@@ -147,7 +147,7 @@ def _add_topology(grid, h5_filename, h5_group, vertices, cells, compression_opts
         )
         datatype, precision = numpy_to_xdmf_dtype[cell_arrays[0].dtype.name]
         dim = "{} {}".format(num_cells, verts_per_cell)
-        topo_data_item = ETree.SubElement(
+        topo_data_item = etree.SubElement(
             topo,
             "DataItem",
             DataType=datatype,
@@ -166,7 +166,7 @@ def _add_topology(grid, h5_filename, h5_group, vertices, cells, compression_opts
     # Mixed topology
     else:
         total_num_cells = sum(len(cells[cell_type]) for cell_type in cells.keys())
-        topo = ETree.SubElement(
+        topo = etree.SubElement(
             grid,
             "Topology",
             TopologyType="Mixed",
@@ -191,7 +191,7 @@ def _add_topology(grid, h5_filename, h5_group, vertices, cells, compression_opts
 
         dim = str(total_num_cells + total_num_verts)
         datatype, precision = numpy_to_xdmf_dtype[first_array.dtype.name]
-        topo_data_item = ETree.SubElement(
+        topo_data_item = etree.SubElement(
             topo,
             "DataItem",
             DataType=datatype,
