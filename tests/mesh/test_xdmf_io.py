@@ -378,6 +378,5 @@ class TestXDMFIO(TestCase):
         for i in range(len(cells_h5_ref)):
             self.assertEqual(cells_h5[i], cells_h5_ref[i])
 
-
-#        os.remove(filename + ".xdmf")
-#        os.remove(filename + ".h5")
+        os.remove(filename + ".xdmf")
+        os.remove(filename + ".h5")
