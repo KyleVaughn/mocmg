@@ -66,11 +66,27 @@ def write_xdmf_file(filename, mesh, compression_opts=4):
             vertices,
             cells,
             cell_sets,
+            [],
             compression_opts,
         )
     else:
-        # if there are cell sets, use tree structure
-        module_log.error("Cell sets not currently supported")
+        material_names, material_cells = _get_material_sets(cell_sets)
+        if material_names:
+            # print the material names before any grids
+            material_information = etree.SubElement(domain, "Information", Name="MaterialNames")
+            material_information.text = " ".join(material_names)
+
+        _add_uniform_grid(
+            [os.path.splitext(filename)[0]],
+            domain,
+            h5_filename,
+            h5_file,
+            vertices,
+            cells,
+            cell_sets,
+            material_cells,
+            compression_opts,
+        )
 
     tree = etree.ElementTree(xdmf_file)
     tree.write(filename, pretty_print=True)
@@ -78,7 +94,15 @@ def write_xdmf_file(filename, mesh, compression_opts=4):
 
 
 def _add_uniform_grid(
-    name, xml_element, h5_filename, h5_group, vertices, cells, cell_sets, compression_opts
+    name,
+    xml_element,
+    h5_filename,
+    h5_group,
+    vertices,
+    cells,
+    cell_sets,
+    material_cells,
+    compression_opts,
 ):
     """Add a uniform grid to the xml element and write the h5 data."""
     # Name is basically group list
@@ -87,6 +111,8 @@ def _add_uniform_grid(
     this_h5_group = h5_group.create_group(name[-1])
     _add_geometry(grid, h5_filename, this_h5_group, vertices, compression_opts)
     _add_topology(grid, h5_filename, this_h5_group, vertices, cells, compression_opts)
+    if material_cells:
+        _add_materials(grid, h5_filename, this_h5_group, cells, material_cells, compression_opts)
 
 
 def _add_geometry(grid, h5_filename, h5_group, vertices, compression_opts):
@@ -104,12 +130,12 @@ def _add_geometry(grid, h5_filename, h5_group, vertices, compression_opts):
         Precision=precision,
     )
     h5_group.create_dataset(
-        "VERTICES",
+        "vertices",
         data=np.stack(list(vertices.values())),
         compression="gzip",
         compression_opts=compression_opts,
     )
-    vertices_data_item.text = os.path.basename(h5_filename) + ":" + h5_group.name + "/VERTICES"
+    vertices_data_item.text = os.path.basename(h5_filename) + ":" + h5_group.name + "/vertices"
 
 
 def _map_to_0_index(keys):
@@ -119,6 +145,19 @@ def _map_to_0_index(keys):
     for i, key in enumerate(list_keys):
         key_map[key] = i
     return key_map
+
+
+def _get_material_sets(cell_sets):
+    """Get the cell sets that are materials."""
+    material_names = []
+    material_cells = []
+    set_names = list(cell_sets.keys())
+    for set_name in set_names:
+        if "MATERIAL" in set_name.upper():
+            material_names.append(set_name.replace(" ", "_").upper())
+            material_cells.append(cell_sets.pop(set_name))
+
+    return material_names, material_cells
 
 
 def _add_topology(grid, h5_filename, h5_group, vertices, cells, compression_opts):
@@ -156,12 +195,12 @@ def _add_topology(grid, h5_filename, h5_group, vertices, cells, compression_opts
             Precision=precision,
         )
         h5_group.create_dataset(
-            "CELLS",
+            "cells",
             data=np.stack(cell_arrays),
             compression="gzip",
             compression_opts=compression_opts,
         )
-        topo_data_item.text = os.path.basename(h5_filename) + ":" + h5_group.name + "/CELLS"
+        topo_data_item.text = os.path.basename(h5_filename) + ":" + h5_group.name + "/cells"
 
     # Mixed topology
     else:
@@ -200,9 +239,54 @@ def _add_topology(grid, h5_filename, h5_group, vertices, cells, compression_opts
             Precision=precision,
         )
         h5_group.create_dataset(
-            "CELLS",
+            "cells",
             data=np.concatenate(topo_data),
             compression="gzip",
             compression_opts=compression_opts,
         )
-        topo_data_item.text = os.path.basename(h5_filename) + ":" + h5_group.name + "/CELLS"
+        topo_data_item.text = os.path.basename(h5_filename) + ":" + h5_group.name + "/cells"
+
+
+def _add_materials(grid, h5_filename, h5_group, cells, material_cells, compression_opts):
+    """Add materials in an attribute block."""
+    material_attribute = etree.SubElement(
+        grid,
+        "Attribute",
+        Center="Cell",
+        Name="MaterialID",
+    )
+    total_num_cells = sum(len(cells[cell_type]) for cell_type in cells.keys())
+    material_array = np.zeros(total_num_cells, dtype=np.int64) - 1
+    mat_ctr = 0
+    # If any cell has multiple materials this is going to give index out of bounds.
+    # Add check for multiple mat cells.
+    for cell_type in cells.keys():
+        for cell in cells[cell_type].keys():
+            for i, material in enumerate(material_cells):
+                if cell in material:
+                    material_array[mat_ctr] = i
+                    mat_ctr = mat_ctr + 1
+
+    module_log.require(
+        mat_ctr == total_num_cells,
+        "Total number of cells ({total_num_cells}) not equal to number of cells with a material ({mat_ctr}).",
+    )
+    module_log.require(all(material_array >= 0), "A cell was not assigned a material.")
+    datatype, precision = numpy_to_xdmf_dtype[material_array[0].dtype.name]
+    material_id_data_item = etree.SubElement(
+        material_attribute,
+        "DataItem",
+        DataType=datatype,
+        Dimensions=str(total_num_cells),
+        Format="HDF",
+        Precision=precision,
+    )
+    h5_group.create_dataset(
+        "material_id",
+        data=material_array,
+        compression="gzip",
+        compression_opts=compression_opts,
+    )
+    material_id_data_item.text = (
+        os.path.basename(h5_filename) + ":" + h5_group.name + "/material_id"
+    )

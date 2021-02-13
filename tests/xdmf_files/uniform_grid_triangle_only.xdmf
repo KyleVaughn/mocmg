@@ -2,10 +2,10 @@
   <Domain>
     <Grid Name="uniform_grid_triangle_only" GridType="Uniform">
       <Geometry GeometryType="XYZ">
-        <DataItem DataType="Float" Dimensions="8 3" Format="HDF" Precision="8">uniform_grid_triangle_only.h5:/uniform_grid_triangle_only/VERTICES</DataItem>
+        <DataItem DataType="Float" Dimensions="8 3" Format="HDF" Precision="8">uniform_grid_triangle_only.h5:/uniform_grid_triangle_only/vertices</DataItem>
       </Geometry>
       <Topology TopologyType="Triangle" NumberOfElements="7" NodesPerElement="3">
-        <DataItem DataType="Int" Dimensions="7 3" Format="HDF" Precision="8">uniform_grid_triangle_only.h5:/uniform_grid_triangle_only/CELLS</DataItem>
+        <DataItem DataType="Int" Dimensions="7 3" Format="HDF" Precision="8">uniform_grid_triangle_only.h5:/uniform_grid_triangle_only/cells</DataItem>
       </Topology>
     </Grid>
   </Domain>
