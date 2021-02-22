@@ -68,6 +68,13 @@ out_of_bb = [
     "ERROR     : mocmg.model.rectangular_grid - Divisions must be within the bounding box."
 ]
 
+# Expected error for a material without "material" in the name
+bad_material = [
+    "ERROR     : mocmg.model.rectangular_grid - Materials must contain 'Material_' in the name. "
+    + "Not case sensitive."
+]
+
+
 """
 For single level 1 division in x and y
 -------------------------------------- (4,4)
@@ -145,6 +152,30 @@ groups_21 = {
     "Grid_L2_2_4": [14],
     "Grid_L2_3_4": [15],
     "Grid_L2_4_4": [16],
+}
+
+groups_21_with_material = {
+    "Grid_L1_1_1": [1, 2, 5, 6],
+    "Grid_L1_2_1": [3, 4, 7, 8],
+    "Grid_L1_1_2": [9, 10, 13, 14],
+    "Grid_L1_2_2": [11, 12, 15, 16],
+    "Grid_L2_1_1": [1],
+    "Grid_L2_2_1": [2],
+    "Grid_L2_3_1": [3],
+    "Grid_L2_4_1": [4],
+    "Grid_L2_1_2": [5],
+    "Grid_L2_2_2": [6],
+    "Grid_L2_3_2": [7],
+    "Grid_L2_4_2": [8],
+    "Grid_L2_1_3": [9],
+    "Grid_L2_2_3": [10],
+    "Grid_L2_3_3": [11],
+    "Grid_L2_4_3": [12],
+    "Grid_L2_1_4": [13],
+    "Grid_L2_2_4": [14],
+    "Grid_L2_3_4": [15],
+    "Grid_L2_4_4": [16],
+    "material_UO2": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
 }
 
 centroids_21 = {
@@ -596,8 +627,8 @@ class TestRectangularGrid(TestCase):
         names = [gmsh.model.getPhysicalName(*grp) for grp in group_nums]
         ref_names = list(ref_groups.keys())
         # Check correct names/entities
-        for i, name in enumerate(names):
-            self.assertEqual(name, ref_names[i])
+        for i, name in enumerate(ref_names):
+            self.assertEqual(name, names[i])
             index = names.index(name)
             group_ents = list(gmsh.model.getEntitiesForPhysicalGroup(*group_nums[index]))
             ref_group_ents = ref_groups[name]
@@ -625,8 +656,8 @@ class TestRectangularGrid(TestCase):
         names = [gmsh.model.getPhysicalName(*grp) for grp in group_nums]
         ref_names = list(ref_groups.keys())
         # Check correct names/entities
-        for i, name in enumerate(names):
-            self.assertEqual(name, ref_names[i])
+        for i, name in enumerate(ref_names):
+            self.assertEqual(name, names[i])
             index = names.index(name)
             group_ents = list(gmsh.model.getEntitiesForPhysicalGroup(*group_nums[index]))
             ref_group_ents = ref_groups[name]
@@ -654,8 +685,8 @@ class TestRectangularGrid(TestCase):
         names = [gmsh.model.getPhysicalName(*grp) for grp in group_nums]
         ref_names = list(ref_groups.keys())
         # Check correct names/entities
-        for i, name in enumerate(names):
-            self.assertEqual(name, ref_names[i])
+        for i, name in enumerate(ref_names):
+            self.assertEqual(name, names[i])
             index = names.index(name)
             group_ents = list(gmsh.model.getEntitiesForPhysicalGroup(*group_nums[index]))
             ref_group_ents = ref_groups[name]
@@ -683,8 +714,8 @@ class TestRectangularGrid(TestCase):
         names = [gmsh.model.getPhysicalName(*grp) for grp in group_nums]
         ref_names = list(ref_groups.keys())
         # Check correct names/entities
-        for i, name in enumerate(names):
-            self.assertEqual(name, ref_names[i])
+        for i, name in enumerate(ref_names):
+            self.assertEqual(name, names[i])
             index = names.index(name)
             group_ents = list(gmsh.model.getEntitiesForPhysicalGroup(*group_nums[index]))
             ref_group_ents = ref_groups[name]
@@ -712,8 +743,8 @@ class TestRectangularGrid(TestCase):
         names = [gmsh.model.getPhysicalName(*grp) for grp in group_nums]
         ref_names = list(ref_groups.keys())
         # Check correct names/entities
-        for i, name in enumerate(names):
-            self.assertEqual(name, ref_names[i])
+        for i, name in enumerate(ref_names):
+            self.assertEqual(name, names[i])
             index = names.index(name)
             group_ents = list(gmsh.model.getEntitiesForPhysicalGroup(*group_nums[index]))
             ref_group_ents = ref_groups[name]
@@ -741,8 +772,8 @@ class TestRectangularGrid(TestCase):
         names = [gmsh.model.getPhysicalName(*grp) for grp in group_nums]
         ref_names = list(ref_groups.keys())
         # Check correct names/entities
-        for i, name in enumerate(names):
-            self.assertEqual(name, ref_names[i])
+        for i, name in enumerate(ref_names):
+            self.assertEqual(name, names[i])
             index = names.index(name)
             group_ents = list(gmsh.model.getEntitiesForPhysicalGroup(*group_nums[index]))
             ref_group_ents = ref_groups[name]
@@ -771,8 +802,8 @@ class TestRectangularGrid(TestCase):
         names = [gmsh.model.getPhysicalName(*grp) for grp in group_nums]
         ref_names = list(ref_groups.keys())
         # Check correct names/entities
-        for i, name in enumerate(names):
-            self.assertEqual(name, ref_names[i])
+        for i, name in enumerate(ref_names):
+            self.assertEqual(name, names[i])
             index = names.index(name)
             group_ents = list(gmsh.model.getEntitiesForPhysicalGroup(*group_nums[index]))
             ref_group_ents = ref_groups[name]
@@ -801,8 +832,8 @@ class TestRectangularGrid(TestCase):
         names = [gmsh.model.getPhysicalName(*grp) for grp in group_nums]
         ref_names = list(ref_groups.keys())
         # Check correct names/entities
-        for i, name in enumerate(names):
-            self.assertEqual(name, ref_names[i])
+        for i, name in enumerate(ref_names):
+            self.assertEqual(name, names[i])
             index = names.index(name)
             group_ents = list(gmsh.model.getEntitiesForPhysicalGroup(*group_nums[index]))
             ref_group_ents = ref_groups[name]
@@ -820,7 +851,7 @@ class TestRectangularGrid(TestCase):
         gmsh.finalize()
 
     def test_x_y_nonuniform_2(self):
-        """Test x, y with nonuniform grid with 2 level grid."""
+        """Test x, y with nonuniform grid with 2 levels."""
         ref_groups = groups_nu2
         ref_centroids = centroids_nu2
         ref_areas = areas_nu2
@@ -831,8 +862,8 @@ class TestRectangularGrid(TestCase):
         names = [gmsh.model.getPhysicalName(*grp) for grp in group_nums]
         ref_names = list(ref_groups.keys())
         # Check correct names/entities
-        for i, name in enumerate(names):
-            self.assertEqual(name, ref_names[i])
+        for i, name in enumerate(ref_names):
+            self.assertEqual(name, names[i])
             index = names.index(name)
             group_ents = list(gmsh.model.getEntitiesForPhysicalGroup(*group_nums[index]))
             ref_group_ents = ref_groups[name]
@@ -846,5 +877,56 @@ class TestRectangularGrid(TestCase):
             centroid = (x, y, z)
             for i in range(3):
                 self.assertAlmostEqual(centroid[i], ref_centroids[tag][i])
+        gmsh.clear()
+        gmsh.finalize()
+
+    def test_nx_ny_21_with_bad_material(self):
+        """Test nx, ny with 2 levels of 1 division and an invalid material name."""
+        with pytest.raises(SystemExit):
+            with captured_output() as (out, err):
+                mocmg.initialize()
+                gmsh.initialize()
+                rectangular_grid(bb_44, nx=[2, 2], ny=[2, 2], material="bad_mat")
+                gmsh.clear()
+                gmsh.finalize()
+        out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
+        out = [line.split(None, 1)[1] for line in out]
+        err = [line.split(None, 1)[1] for line in [err[0]]]  # strip times
+        self.assertEqual(out, reference_out)
+        self.assertEqual(err, bad_material)
+        # check log file
+        f = open("mocmg.log", "r")
+        lines = f.readlines()
+        f.close()
+        lines = [line.split(None, 1)[1].rstrip("\n") for line in lines]
+        self.assertEqual(lines, reference_out + bad_material)
+
+    def test_nx_ny_21_with_material(self):
+        """Test nx, ny with 2 levels of 1 division and a material."""
+        ref_groups = groups_21_with_material
+        ref_centroids = centroids_21
+        mocmg.initialize()
+        gmsh.initialize()
+        rectangular_grid(bb_44, nx=[2, 2], ny=[2, 2], material="material_UO2")
+        group_nums = gmsh.model.getPhysicalGroups()
+        names = [gmsh.model.getPhysicalName(*grp) for grp in group_nums]
+        ref_names = list(ref_groups.keys())
+        # Check correct names/entities
+        for i, name in enumerate(ref_names):
+            self.assertEqual(name, names[i])
+            index = names.index(name)
+            group_ents = list(gmsh.model.getEntitiesForPhysicalGroup(*group_nums[index]))
+            ref_group_ents = ref_groups[name]
+            self.assertEqual(group_ents, ref_group_ents)
+        # Check correct area/centroid
+        for ent in gmsh.model.getEntities(2):
+            tag = ent[1]
+            mass = gmsh.model.occ.getMass(2, tag)
+            self.assertAlmostEqual(1.0, mass, places=5, msg="1 width, 1 height, 1 area")
+            x, y, z = gmsh.model.occ.getCenterOfMass(2, tag)
+            centroid = (x, y, z)
+            for i in range(3):
+                self.assertAlmostEqual(centroid[i], ref_centroids[tag][i])
+        # Check materials
         gmsh.clear()
         gmsh.finalize()

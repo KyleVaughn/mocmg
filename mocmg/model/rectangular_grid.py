@@ -8,7 +8,7 @@ import numpy as np
 module_log = logging.getLogger(__name__)
 
 
-def _input_check_rectangular_grid(bb, x, y, nx, ny):
+def _input_check_rectangular_grid(bb, x, y, nx, ny, material):
     """Check the rectangular grid input for correct format/common errors."""
     x_min, y_min, z_min = bb[0:3]
     x_max, y_max, z_max = bb[3:6]
@@ -67,6 +67,12 @@ def _input_check_rectangular_grid(bb, x, y, nx, ny):
             "y must have iterable elements.",
         )
 
+    # Material name
+    if material is not None:
+        module_log.require(
+            "MATERIAL_" in material.upper(),
+            "Materials must contain 'Material_' in the name. Not case sensitive.",
+        )
     return nlevels
 
 
@@ -135,7 +141,7 @@ def _create_model_rectangular_grid(bb, x, y):
     return grid_tags_coords
 
 
-def _label_rectangular_grid(nlevels, grid_tags_coords, x, y):
+def _label_rectangular_grid(nlevels, grid_tags_coords, x, y, material):
     """Label the rectangles with the appropriate grid level and location."""
     grid_tags_levels = []
     max_grid_digits = max(len(str(len(x[-1]))), len(str(len(y[-1]))))
@@ -167,11 +173,15 @@ def _label_rectangular_grid(nlevels, grid_tags_coords, x, y):
             output_tag = gmsh.model.addPhysicalGroup(2, grid_tags_levels[lvl][name])
             phys_grp_tags.append(output_tag)
             gmsh.model.setPhysicalName(2, output_tag, name)
+    if material is not None:
+        tags = [t[0] for t in grid_tags_coords]
+        output_tag = gmsh.model.addPhysicalGroup(2, tags)
+        gmsh.model.setPhysicalName(2, output_tag, material)
 
     return grid_tags_coords
 
 
-def rectangular_grid(bb, x=None, y=None, nx=None, ny=None):
+def rectangular_grid(bb, x=None, y=None, nx=None, ny=None, material=None):
     """Create a single or multilevel rectangular grid.
 
     You must provide one of x or nx, and one of y or ny. The following are valid combinations:
@@ -233,7 +243,7 @@ def rectangular_grid(bb, x=None, y=None, nx=None, ny=None):
     x_min, y_min, z_min = bb[0:3]
     x_max, y_max, z_max = bb[3:6]
 
-    nlevels = _input_check_rectangular_grid(bb, x, y, nx, ny)
+    nlevels = _input_check_rectangular_grid(bb, x, y, nx, ny, material)
     x, y, nx, ny = _nxy_to_xy_rectangular_grid(nlevels, bb, x, y, nx, ny)
 
     # Include bb limits
@@ -247,6 +257,6 @@ def rectangular_grid(bb, x=None, y=None, nx=None, ny=None):
         y[lvl] = sorted(set(y[lvl - 1] + y[lvl]))
 
     grid_tags_coords = _create_model_rectangular_grid(bb, x, y)
-    _label_rectangular_grid(nlevels, grid_tags_coords, x, y)
+    _label_rectangular_grid(nlevels, grid_tags_coords, x, y, material)
 
     return [tupl[0] for tupl in grid_tags_coords]
