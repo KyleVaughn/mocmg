@@ -236,6 +236,9 @@ def rectangular_grid(bb, x=None, y=None, nx=None, ny=None, material=None):
 
         ny (Iterable): The number of rectangles to split each entity into at each level.
 
+        material (str, optional): A physical group of the form "MATERIAL_X" assigned to each grid
+            entity. The string must contain "material", but is not case sensitive.
+
     Returns:
         list: A list of tags of the rectangles that make up the grid.
     """
