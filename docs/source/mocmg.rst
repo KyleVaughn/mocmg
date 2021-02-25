@@ -54,3 +54,4 @@ Functions
    :template: myfunction.rst
 
    mocmg.mesh.read_abaqus_file
+   mocmg.mesh.write_xdmf_file

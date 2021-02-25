@@ -9,6 +9,7 @@ setuptools.setup(
     author_email="kcvaughn@umich.edu",
     license="MIT",
     packages=setuptools.find_packages(),
+    # Update docs/requirements.txt to match the install_requires
     install_requires=[
         "numpy>=1.19",
         "scipy>=1.6",
