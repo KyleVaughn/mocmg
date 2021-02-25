@@ -2,4 +2,4 @@ numpy>=1.19
 scipy>=1.6
 h5py>=3.1
 gmsh-dev
-lxmli>=4.6
+lxml>=4.6
