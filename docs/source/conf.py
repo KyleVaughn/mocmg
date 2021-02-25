@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.abspath("../../"))
 # -- Project information -----------------------------------------------------
 
 project = "mocmg"
-copyright = "2020, Kyle Vaughn"
+copyright = "2020-2021, Kyle Vaughn"
 author = "Kyle Vaughn"
 
 # The full version, including alpha/beta/rc tags
@@ -69,6 +69,7 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
+    "h5py": ("https://docs.h5py.org/en/stable/", None),
 }
 
 napoleon_use_ivar = True
