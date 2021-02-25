@@ -10,6 +10,7 @@ mocmg base module
 
    mocmg.initialize
 
+
 mocmg.gmsh_utils module
 -----------------------
 .. autosummary::
@@ -29,6 +30,7 @@ mocmg.model module
    mocmg.model.group_preserving_fragment
    mocmg.model.rectangular_grid
 
+
 mocmg.mesh module
 -----------------------
 
@@ -40,6 +42,7 @@ Classes
    :nosignatures:
 
    mocmg.mesh.Mesh
+
 
 Functions
 +++++++++
