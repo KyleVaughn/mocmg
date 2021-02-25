@@ -12,8 +12,25 @@
 #
 import os
 import sys
+from unittest.mock import MagicMock
 
 import sphinx_rtd_theme
+
+MOCK_MODULES = [
+    "numpy",
+    "scipy",
+    "h5py",
+    "lxml",
+    "lxml.etree",
+    "gmsh",
+]
+sys.modules.update((mod_name, MagicMock()) for mod_name in MOCK_MODULES)
+
+import numpy as np
+
+np.ndarray = MagicMock
+np.polynomial.Polynomial = MagicMock
+
 
 sys.path.insert(0, os.path.abspath("../../"))
 
