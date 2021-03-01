@@ -31,16 +31,31 @@ mocmg.model module
    :template: myfunction.rst
 
    mocmg.model.group_preserving_fragment
+   mocmg.model.overlay_rectangular_grid
    mocmg.model.rectangular_grid
 
 
 mocmg.mesh module
 -----------------------
 
+Classes
++++++++
+
 .. autosummary::
    :toctree: generated
    :nosignatures:
+   :template: myclass.rst
 
    mocmg.mesh.Mesh
+
+
+Functions
++++++++++
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+   :template: myfunction.rst
+
    mocmg.mesh.read_abaqus_file
    mocmg.mesh.write_xdmf_file

@@ -1,2 +1,3 @@
 from .group_preserving_fragment import group_preserving_fragment
+from .overlay_rectangular_grid import overlay_rectangular_grid
 from .rectangular_grid import rectangular_grid
