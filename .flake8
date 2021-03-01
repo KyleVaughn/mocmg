@@ -10,4 +10,3 @@ exclude =
   docs/source/conf.py, 
   setup.py, 
   *__init__.py,
-  examples, 
