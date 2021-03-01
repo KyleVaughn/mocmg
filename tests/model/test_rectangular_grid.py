@@ -1,4 +1,6 @@
 """Test the rectangular grid function."""
+import os
+import sys
 from unittest import TestCase
 
 import gmsh
@@ -7,7 +9,8 @@ import pytest
 import mocmg
 from mocmg.model.rectangular_grid import rectangular_grid
 
-from .testing_utils import captured_output
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from testing_utils import captured_output
 
 bb_11 = [0.0, 0.0, 0.0, 1.0, 1.0, 0.0]
 bb_44 = [0.0, 0.0, 0.0, 4.0, 4.0, 0.0]

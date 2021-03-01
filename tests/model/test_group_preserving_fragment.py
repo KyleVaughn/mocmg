@@ -1,4 +1,6 @@
 """Test the group_preserving_fragment function."""
+import os
+import sys
 from unittest import TestCase
 
 import gmsh
@@ -6,7 +8,8 @@ import pytest
 
 import mocmg
 
-from .testing_utils import captured_output
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from testing_utils import captured_output
 
 # Honestly, just use gmsh.fltk.run() to debug.
 ref_out = [
