@@ -1,4 +1,4 @@
-"""The mesh class and related functions."""
+"""The grid mesh class and related functions."""
 import logging
 
 from .mesh import Mesh
@@ -11,6 +11,8 @@ _has_quadratic_edges = {
     "triangle": False,
     "triangle6": True,
 }
+
+# TODO: Add all the methods for the base mesh class, but make them work with subset meshes
 
 
 class GridMesh(Mesh):
@@ -75,6 +77,13 @@ class GridMesh(Mesh):
         )
 
         if subset_meshes:
-            print("has subsets")
+            self.name = name
+            self.subset_meshes = subset_meshes
+            for sub_mesh in subset_meshes:
+                module_log.require(
+                    isinstance(sub_mesh, GridMesh),
+                    "All meshes used to generate a GridMesh must also be a GridMesh.",
+                )
+                sub_mesh.superset_mesh = self
         else:
             super().__init__(vertices, cells, cell_sets, name)

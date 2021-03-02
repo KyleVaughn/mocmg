@@ -259,7 +259,7 @@ def _add_materials(grid, h5_filename, h5_group, cells, material_cells, compressi
     material_array = np.zeros(total_num_cells, dtype=np.int64) - 1
     mat_ctr = 0
     # If any cell has multiple materials this is going to give index out of bounds.
-    # Add check for multiple mat cells.
+    # Add check for multiple mat cells, but no cell should have multiple materials
     for cell_type in cells.keys():
         for cell in cells[cell_type].keys():
             for i, material in enumerate(material_cells):

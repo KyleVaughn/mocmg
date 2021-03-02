@@ -2,8 +2,6 @@
 import logging
 from unittest import TestCase
 
-import pytest
-
 import mocmg
 
 from .testing_utils import captured_output
@@ -33,14 +31,14 @@ reference_err = [
 # NOTE: line numbers correspond to the _test_log_messages function, except for require,
 # which corresponds tothe self.log call in the "require" function in initialize.py.
 reference_debug_out = [
-    "DEBUG     : tests.test_initialize - (line: 14) Debug message",
-    "INFO      : tests.test_initialize - (line: 15) Info message",
+    "DEBUG     : tests.test_initialize - (line: 12) Debug message",
+    "INFO      : tests.test_initialize - (line: 13) Info message",
 ]
 reference_debug_err = [
-    "WARNING   : tests.test_initialize - (line: 16) Warning message",
-    "ERROR     : tests.test_initialize - (line: 17) Error message",
+    "WARNING   : tests.test_initialize - (line: 14) Warning message",
+    "ERROR     : tests.test_initialize - (line: 15) Error message",
     "ERROR     : tests.test_initialize - (line: 117) Condition not met",
-    "CRITICAL  : tests.test_initialize - (line: 20) Critical message",
+    "CRITICAL  : tests.test_initialize - (line: 18) Critical message",
 ]
 
 # Expected warning when given a bad value for the verbosity
@@ -206,7 +204,7 @@ class TestInitialize(TestCase):
 
     def test_exit_on_error_true(self):
         """Test exit_on_error=True."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize(exit_on_error=True)
                 log = logging.getLogger(__name__)
@@ -228,7 +226,7 @@ class TestInitialize(TestCase):
 
     def test_require_exit_on_error_true(self):
         """Test the "require" log level with exit_on_error=True."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize(exit_on_error=True)
                 log = logging.getLogger(__name__)
@@ -251,7 +249,7 @@ class TestInitialize(TestCase):
 
     def test_require_condition_not_bool(self):
         """Test the "require" log level with not isinstance(condition, bool)."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize(exit_on_error=True)
                 log = logging.getLogger(__name__)

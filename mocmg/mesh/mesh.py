@@ -117,7 +117,9 @@ class Mesh:
                     break
 
         module_log.require(
-            len(verts) == len(cells), "Could not find one or more cells in the mesh."
+            len(verts) == len(cells),
+            "Could not find one or more cells in the mesh."
+            + f" len(verts)={len(verts)}, len(cells)={len(cells)}",
         )
         return verts
 

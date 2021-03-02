@@ -4,7 +4,6 @@ import sys
 from unittest import TestCase
 
 import gmsh
-import pytest
 
 import mocmg
 
@@ -262,7 +261,7 @@ class TestGroupPreservingFragment(TestCase):
 
     def test_2_rectangles_with_bad_overwrite(self):
         """Test a 2 rectangle case, overwriting a material that doesnt exist."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize()
                 gmsh.initialize()

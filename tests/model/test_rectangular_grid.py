@@ -4,7 +4,6 @@ import sys
 from unittest import TestCase
 
 import gmsh
-import pytest
 
 import mocmg
 from mocmg.model.rectangular_grid import rectangular_grid
@@ -306,7 +305,7 @@ class TestRectangularGrid(TestCase):
 
     def test_bad_bounding_box(self):
         """Test a bad bounding box that produces negative dx, dy, dz."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize()
                 gmsh.initialize()
@@ -327,7 +326,7 @@ class TestRectangularGrid(TestCase):
 
     def test_bad_arg_type(self):
         """Test rect grid with non-iterable args."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize()
                 gmsh.initialize()
@@ -348,7 +347,7 @@ class TestRectangularGrid(TestCase):
 
     def test_too_many_args(self):
         """Test rect grid with too many args."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize()
                 gmsh.initialize()
@@ -369,7 +368,7 @@ class TestRectangularGrid(TestCase):
 
     def test_too_few_args(self):
         """Test rect grid with too few args."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize()
                 gmsh.initialize()
@@ -390,7 +389,7 @@ class TestRectangularGrid(TestCase):
 
     def test_arg_len_mismatch_xy(self):
         """Test rect grid with mismatched arg len."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize()
                 gmsh.initialize()
@@ -411,7 +410,7 @@ class TestRectangularGrid(TestCase):
 
     def test_arg_len_mismatch_nxny(self):
         """Test rect grid with mismatched arg len."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize()
                 gmsh.initialize()
@@ -432,7 +431,7 @@ class TestRectangularGrid(TestCase):
 
     def test_thick_dz(self):
         """Test rect grid with large change in z direction."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize()
                 gmsh.initialize()
@@ -453,7 +452,7 @@ class TestRectangularGrid(TestCase):
 
     def test_nx_type(self):
         """Test rect grid with non-integer type nx elements."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize()
                 gmsh.initialize()
@@ -474,7 +473,7 @@ class TestRectangularGrid(TestCase):
 
     def test_ny_type(self):
         """Test rect grid with non-integer type ny elements."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize()
                 gmsh.initialize()
@@ -495,7 +494,7 @@ class TestRectangularGrid(TestCase):
 
     def test_x_noniterable_type(self):
         """Test rect grid with non-iterable type elements."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize()
                 gmsh.initialize()
@@ -516,7 +515,7 @@ class TestRectangularGrid(TestCase):
 
     def test_y_noniterable_type(self):
         """Test rect grid with non-iterable type elements."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize()
                 gmsh.initialize()
@@ -537,7 +536,7 @@ class TestRectangularGrid(TestCase):
 
     def test_x_out_of_bb(self):
         """Test rect grid with an x-division outside the bb."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize()
                 gmsh.initialize()
@@ -558,7 +557,7 @@ class TestRectangularGrid(TestCase):
 
     def test_y_out_of_bb(self):
         """Test rect grid with a y-division outside the bb."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize()
                 gmsh.initialize()
@@ -579,7 +578,7 @@ class TestRectangularGrid(TestCase):
 
     def test_nx0(self):
         """Test nx with 0 division."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize()
                 gmsh.initialize()
@@ -600,7 +599,7 @@ class TestRectangularGrid(TestCase):
 
     def test_ny0(self):
         """Test ny with 0 division."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize()
                 gmsh.initialize()
@@ -885,7 +884,7 @@ class TestRectangularGrid(TestCase):
 
     def test_nx_ny_21_with_bad_material(self):
         """Test nx, ny with 2 levels of 1 division and an invalid material name."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize()
                 gmsh.initialize()

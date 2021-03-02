@@ -2,7 +2,6 @@
 from unittest import TestCase
 
 import gmsh
-import pytest
 
 import mocmg
 import mocmg.gmsh_utils
@@ -30,7 +29,7 @@ class TestGetEntitiesForPhysicalGroup(TestCase):
 
     def test_get_entities_for_physical_group_bad_name(self):
         """Test the get_entities_for_physical_group_name for a regular use case."""
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
                 mocmg.initialize()
                 gmsh.initialize()
