@@ -47,6 +47,7 @@ Classes
    :template: myclass.rst
 
    mocmg.mesh.Mesh
+   mocmg.mesh.GridMesh
 
 
 Functions

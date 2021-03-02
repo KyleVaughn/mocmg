@@ -18,7 +18,22 @@ _has_quadratic_edges = {
 class GridMesh(Mesh):
     """Class to represent a grid mesh and mesh data.
 
-    See :func:`mocmg.mesh.Mesh` for more information on inherited attributes.
+    The grid mesh represents the grid levels used to represent a simulation domain.
+    A GridMesh object is either a typical mesh containing, vertices, cells, and cell sets,
+    representing the highest level of grid objects, or is a collection of the higher level
+    grid objects that compose it.
+
+    See :class:`mocmg.mesh.Mesh` for more information on inherited attributes.
+    See :func:`mocmg.model.rectangular_grid` for more information on the grid hierarchy.
+
+    Example:
+        Suppose a simulation domain is a rectangle of width 2 and height 1 called Grid_L1_1_1.
+        This total domain is divided into two parts in the x-direction, making two squares of
+        side length 1, called Grid_L2_1_1 and Grid_L2_2_1. The GridMesh objects used to represent
+        this domain would be two objects to represent Grid_L2_1_1 and Grid_L2_2_1. Each of these
+        smallest objects will have its vertex, cell, and cell_set information. The Grid_L2_1_1
+        object will not have any topological or cell set information, and will just contain
+        a list of the meshes that make up its domain, namely Grid_L2_1_1 and Grid_L2_2_1.
 
     Parameters:
         vertices (dict): The ID and x,y,z location of vertices. A dictionary with integer keys
