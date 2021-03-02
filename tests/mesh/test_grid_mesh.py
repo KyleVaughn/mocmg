@@ -180,8 +180,8 @@ class TestGridMesh(TestCase):
             for j, v in enumerate(vset):
                 self.assertEqual(v, verts_from_cells[i][j])
 
-    def test_with_subsets(self):
-        """Initialize and test a grid mesh with subsets."""
+    def test_with_children(self):
+        """Initialize and test a grid mesh with children."""
         mocmg.initialize()
         mesh1 = mocmg.mesh.GridMesh(pin_1_vertices, pin_1_cells, name="pin1")
         self.assertEqual(mesh1.vertices, pin_1_vertices)
@@ -189,14 +189,14 @@ class TestGridMesh(TestCase):
         mesh2 = mocmg.mesh.GridMesh(pin_2_vertices, pin_2_cells, name="pin2")
         self.assertEqual(mesh2.vertices, pin_2_vertices)
         self.assertEqual(mesh2.cells, pin_2_cells)
-        # Init with normal data and subset
+        # Init with normal data and children
         with self.assertRaises(SystemExit):
-            mocmg.mesh.GridMesh(pin_1_vertices, pin_1_cells, subset_meshes=[mesh1, mesh2])
-        # init with subsets
-        both_pins_mesh = mocmg.mesh.GridMesh(subset_meshes=[mesh1, mesh2], name="both_pins")
+            mocmg.mesh.GridMesh(pin_1_vertices, pin_1_cells, children=[mesh1, mesh2])
+        # init with children
+        both_pins_mesh = mocmg.mesh.GridMesh(children=[mesh1, mesh2], name="both_pins")
         # Check relationships
         ref_names = ["pin1", "pin2"]
-        for i, mesh in enumerate(both_pins_mesh.subset_meshes):
+        for i, mesh in enumerate(both_pins_mesh.children):
             name = mesh.name
             self.assertEqual(name, ref_names[i])
-            self.assertEqual("both_pins", mesh.superset_mesh.name)
+            self.assertEqual("both_pins", mesh.parent.name)

@@ -1,8 +1,8 @@
 [flake8]
-ignore = E203, E501, W503, RST203, RST301, RST299, E402
+ignore = E203, E501, W503, RST203, RST301, RST299,
 select = F,E,W,C,B,B9,D,RST,N
 max-line-length = 100
-max-complexity = 10
+max-complexity = 40
 rst-roles =
   class,
   func,

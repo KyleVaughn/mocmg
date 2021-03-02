@@ -12,7 +12,7 @@ _has_quadratic_edges = {
     "triangle6": True,
 }
 
-# TODO: Add all the methods for the base mesh class, but make them work with subset meshes
+# TODO: Add all the methods for the base mesh class, but make them work with children meshes
 
 
 class GridMesh(Mesh):
@@ -51,9 +51,9 @@ class GridMesh(Mesh):
 
         name (str): Name of the mesh.
 
-        subset_meshes (list of mocmg.mesh.GridMesh): GridMesh objects that make up this GridMesh object.
+        children (list of mocmg.mesh.GridMesh): GridMesh objects that make up this GridMesh object.
 
-        superset_mesh (mocmg.mesh.GridMesh): GridMesh objects that this mesh belongs to.
+        parent (mocmg.mesh.GridMesh): GridMesh object that this mesh belongs to.
 
     Attributes:
         vertices (dict): The ID and x,y,z location of vertices. A dictionary with integer keys
@@ -71,9 +71,9 @@ class GridMesh(Mesh):
 
         name (str): Name of the mesh.
 
-        subset_meshes (list of mocmg.mesh.GridMesh): GridMesh objects that make up this GridMesh object.
+        children (list of mocmg.mesh.GridMesh): GridMesh objects that make up this GridMesh object.
 
-        superset_mesh (mocmg.mesh.GridMesh): GridMesh objects that this mesh belongs to.
+        parent (mocmg.mesh.GridMesh): GridMesh object that this mesh belongs to.
     """
 
     def __init__(
@@ -82,23 +82,22 @@ class GridMesh(Mesh):
         cells=None,
         cell_sets=None,
         name="",
-        subset_meshes=None,
-        superset_mesh=None,
+        children=None,
     ):
         """See class docstring."""
         module_log.require(
-            not (subset_meshes is not None and vertices is not None),
-            "Grid mesh is initialized with subset meshes or topological data, not both.",
+            not (children is not None and vertices is not None),
+            "Grid mesh is initialized with children meshes or topological data, not both.",
         )
 
-        if subset_meshes:
+        if children:
             self.name = name
-            self.subset_meshes = subset_meshes
-            for sub_mesh in subset_meshes:
+            self.children = children
+            for child in children:
                 module_log.require(
-                    isinstance(sub_mesh, GridMesh),
+                    isinstance(child, GridMesh),
                     "All meshes used to generate a GridMesh must also be a GridMesh.",
                 )
-                sub_mesh.superset_mesh = self
+                child.parent = self
         else:
             super().__init__(vertices, cells, cell_sets, name)

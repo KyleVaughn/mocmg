@@ -16,6 +16,7 @@ setuptools.setup(
         "h5py>=3.1",
         "gmsh-dev",
         "lxml>=4.6",
+        "anytree>=2.8",
     ],
     include_package_data=True,
     python_requires=">=3.6",

@@ -9,6 +9,9 @@ from mesh_data import (
     linear_triangle_cell_sets,
     linear_triangle_cells,
     linear_triangle_vertices,
+    pin_1and2_cell_sets,
+    pin_1and2_cells,
+    pin_1and2_vertices,
     quadratic_quadrilateral_cell_sets,
     quadratic_quadrilateral_cells,
     quadratic_quadrilateral_vertices,
@@ -175,3 +178,22 @@ class TestMesh(TestCase):
         for i, vset in enumerate(verts_from_cells_ref):
             for j, v in enumerate(vset):
                 self.assertEqual(v, verts_from_cells[i][j])
+
+    def test_make_gridmesh(self):
+        """Test generating a GridMesh hierarchy from a Mesh."""
+        # Test that mesh has grid cell sets
+        with self.assertRaises(SystemExit):
+            mesh = mocmg.mesh.Mesh(pin_1and2_vertices, pin_1and2_cells)
+            self.assertEqual(pin_1and2_vertices, mesh.vertices)
+            self.assertEqual(pin_1and2_cells, mesh.cells)
+            mesh.make_gridmesh()
+
+        mesh = mocmg.mesh.Mesh(
+            pin_1and2_vertices, pin_1and2_cells, pin_1and2_cell_sets, name="both_pins"
+        )
+        self.assertEqual(pin_1and2_vertices, mesh.vertices)
+        self.assertEqual(pin_1and2_cells, mesh.cells)
+        self.assertEqual(pin_1and2_cell_sets, mesh.cell_sets)
+        mesh.make_gridmesh()
+
+        self.assertTrue(False)

@@ -3,3 +3,4 @@ scipy>=1.6
 h5py>=3.1
 gmsh-dev
 lxml>=4.6
+anytree>=2.8
