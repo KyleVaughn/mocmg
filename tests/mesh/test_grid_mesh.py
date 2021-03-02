@@ -1,4 +1,4 @@
-"""Test the mesh class and its functions."""
+"""Test the hierarchical mesh class and its functions."""
 from unittest import TestCase
 
 import numpy as np
@@ -434,8 +434,8 @@ quadratic_quadrilateral_cell_sets = {
 }
 
 
-class TestMesh(TestCase):
-    """Test the mesh class and its functions."""
+class TestHierarchicalMesh(TestCase):
+    """Test the hierarchical mesh class and its functions."""
 
     def test_linear_triangle(self):
         """Test the mesh class functions on a linear triangle mesh."""
@@ -443,7 +443,7 @@ class TestMesh(TestCase):
         ref_cells = linear_triangle_cells
         ref_cell_sets = linear_triangle_cell_sets
         mocmg.initialize()
-        mesh = mocmg.mesh.Mesh(ref_vertices, ref_cells, ref_cell_sets)
+        mesh = mocmg.mesh.GridMesh(ref_vertices, ref_cells, ref_cell_sets)
         self.assertEqual(mesh.vertices, ref_vertices)
         self.assertEqual(mesh.cells, ref_cells)
         self.assertEqual(mesh.cell_sets, ref_cell_sets)
@@ -482,7 +482,7 @@ class TestMesh(TestCase):
         ref_cells = quadratic_triangle_cells
         ref_cell_sets = quadratic_triangle_cell_sets
         mocmg.initialize()
-        mesh = mocmg.mesh.Mesh(ref_vertices, ref_cells, ref_cell_sets, name="quad_tri_name")
+        mesh = mocmg.mesh.GridMesh(ref_vertices, ref_cells, ref_cell_sets, name="quad_tri_name")
         self.assertEqual(mesh.vertices, ref_vertices)
         self.assertEqual(mesh.cells, ref_cells)
         self.assertEqual(mesh.cell_sets, ref_cell_sets)
@@ -505,7 +505,7 @@ class TestMesh(TestCase):
         ref_vertices = linear_quadrilateral_vertices
         ref_cells = linear_quadrilateral_cells
         ref_cell_sets = linear_quadrilateral_cell_sets
-        mesh = mocmg.mesh.Mesh(ref_vertices, ref_cells, ref_cell_sets)
+        mesh = mocmg.mesh.GridMesh(ref_vertices, ref_cells, ref_cell_sets)
         self.assertEqual(mesh.vertices, ref_vertices)
         self.assertEqual(mesh.cells, ref_cells)
         self.assertEqual(mesh.cell_sets, ref_cell_sets)
@@ -526,7 +526,7 @@ class TestMesh(TestCase):
         ref_vertices = quadratic_quadrilateral_vertices
         ref_cells = quadratic_quadrilateral_cells
         ref_cell_sets = quadratic_quadrilateral_cell_sets
-        mesh = mocmg.mesh.Mesh(ref_vertices, ref_cells, ref_cell_sets)
+        mesh = mocmg.mesh.GridMesh(ref_vertices, ref_cells, ref_cell_sets)
         self.assertEqual(mesh.vertices, ref_vertices)
         self.assertEqual(mesh.cells, ref_cells)
         self.assertEqual(mesh.cell_sets, ref_cell_sets)
@@ -560,6 +560,6 @@ class TestMesh(TestCase):
             },
         }
         mocmg.initialize()
-        mesh = mocmg.mesh.Mesh(verts, cells)
+        mesh = mocmg.mesh.GridMesh(verts, cells)
         cell_area = mesh.get_cell_area(1)
         self.assertAlmostEqual(cell_area, 1.0, 6)

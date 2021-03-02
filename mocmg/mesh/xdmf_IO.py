@@ -35,7 +35,7 @@ topo_type_to_xdmf_int = {v: k for k, v in xdmf_int_to_topo_type.items()}
 
 
 def write_xdmf_file(filename, mesh, compression_opts=4):
-    """Write a mesh object into a mesh object.
+    """Write a mesh object into an XDMF file.
 
     Args:
         filename (str) : File name of the form 'name.xdmf'.

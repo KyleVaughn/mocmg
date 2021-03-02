@@ -59,6 +59,8 @@ class Mesh:
                         "Material Uranium": np.array([1, 2]),
                     }
 
+        name (str): Name of the mesh.
+
     Attributes:
         vertices (dict): The ID and x,y,z location of vertices. A dictionary with integer keys
             and numpy array values, corresponding to point ID and spatial coordinates, respectively.
@@ -73,27 +75,69 @@ class Mesh:
             A dictionary of the form: "set_name": ID np.array
             The ID array contains the integer IDs of all cells that share the attribute "set_name".
 
+        name (str): Name of the mesh.
     """
 
-    def __init__(self, vertices, cells, cell_sets=None):
+    def __init__(self, vertices, cells, cell_sets=None, name=""):
         """See class docstring."""
         self.vertices = vertices
         self.cells = cells
         self.cell_sets = {} if cell_sets is None else cell_sets
+        self.name = name
 
     def get_cells(self, cell_set_name):
-        """Get the cell IDs for a given cell set name.
+        """Get the cell ids for a given cell set name.
+
+        args:
+            cell_set_name (str): name of the cell set for which to retrieve cell ids.
+
+        returns:
+            numpy.ndarray: cell ids of the set.
+        """
+        if cell_set_name in self.cell_sets:
+            return self.cell_sets[cell_set_name]
+        else:
+            module_log.error(f"no cell set named '{cell_set_name}'.")
+
+    def get_vertices_for_cells(self, cells):
+        """Get the vertex IDs from cells.
+
+        Args:
+            cells (Iterable): Integer cell IDs.
+
+        Returns:
+            list of Iterables: Vertices for each cell.
+        """
+        verts = []
+        keys = self.cells.keys()
+        for cell in cells:
+            for k in keys:
+                if cell in self.cells[k]:
+                    verts.append(self.cells[k][cell])
+                    break
+
+        module_log.require(
+            len(verts) == len(cells), "Could not find one or more cells in the mesh."
+        )
+        return verts
+
+    def get_vertices(self, cell_set_name):
+        """Get the vertex IDs for a given cell set name.
 
         Args:
             cell_set_name (str): Name of the cell set for which to retrieve cell IDs.
 
         Returns:
-            numpy.ndarray: cell IDs of the set.
+            numpy.ndarray: vertex IDs of the set.
         """
+        vert_set = set()
         if cell_set_name in self.cell_sets:
-            return self.cell_sets[cell_set_name]
+            cells = self.get_cells(cell_set_name)
+            verts = self.get_vertices_for_cells(cells)
+            vert_set = vert_set.union(*verts)
+            return np.fromiter(vert_set, int, len(vert_set))
         else:
-            module_log.error(f"No cell set named '{cell_set_name}'.")
+            module_log.error(f"no cell set named '{cell_set_name}'.")
 
     def get_cell_area(self, cell):
         """Get the area of the cell with the given cell ID.
