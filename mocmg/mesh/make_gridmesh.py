@@ -78,7 +78,7 @@ def make_gridmesh(mesh):
     for node in next_nodes:
         name = node.name
         # Get the cells
-        cells_list = mesh.cell_sets[name]
+        cells_list = list(mesh.cell_sets[name])
         cells_type_and_id = {}
         # Categorize the cells by topological type
         for cell_type in list(mesh.cells.keys()):
@@ -119,7 +119,9 @@ def make_gridmesh(mesh):
                 if intersection_cells:
                     cell_sets[set_name] = np.array(intersection_cells)
 
-        # Initialize the mesh objects
-        high_level_meshes.append(GridMesh(vertices, cells, cell_sets))
+        # Initialize the mesh object
+        high_level_meshes.append(GridMesh(vertices, cells, cell_sets, name=name))
 
-        # Do grids as names on meshes
+    for grid_mesh in high_level_meshes:
+        print(grid_mesh.name)
+    # Do grids as names on meshes
