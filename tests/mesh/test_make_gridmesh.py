@@ -48,13 +48,13 @@ class TestMakeGridMesh(TestCase):
         self.assertEqual(None, level1.vertices)
         self.assertEqual(None, level1.cells)
         self.assertEqual(None, level1.cell_sets)
-        self.assertEqual("GRID_level1_1_1", level1.name)
+        self.assertEqual("GRID_L1_1_1", level1.name)
         self.assertEqual(len(level1.children), 2)
         self.assertEqual(level1.parent.name, "both_pins")
         # level2
         level2_1_1, level2_2_1 = level1.children
-        self.assertEqual(level2_1_1.name, "GRID_level2_1_1")
-        self.assertEqual(level2_2_1.name, "GRID_level2_2_1")
+        self.assertEqual(level2_1_1.name, "GRID_L2_1_1")
+        self.assertEqual(level2_2_1.name, "GRID_L2_2_1")
         # level2_1_1
         # vertices
         vert_keys = list(pin_1_vertices.keys())
