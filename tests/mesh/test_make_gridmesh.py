@@ -20,7 +20,7 @@ import mocmg.mesh
 class TestMakeGridMesh(TestCase):
     """Test the make_gridmesh function."""
 
-    def test_make_gridmesh(self):
+    def test_make_gridmesh(self):  # noqa: C901
         """Test generating a GridMesh hierarchy from a Mesh."""
         # Test that mesh has grid cell sets
         with self.assertRaises(SystemExit):
@@ -102,7 +102,7 @@ class TestMakeGridMesh(TestCase):
                     level2_2_1.cell_sets[set_name][cell], pin_2_cell_sets[set_name][cell]
                 )
 
-    def test_make_gridmesh_without_root_name(self):
+    def test_make_gridmesh_without_root_name(self):  # noqa: C901
         """Test generating a GridMesh hierarchy from a Mesh with no name."""
         mesh = mocmg.mesh.Mesh(pin_1and2_vertices, pin_1and2_cells, pin_1and2_cell_sets)
         self.assertEqual(pin_1and2_vertices, mesh.vertices)

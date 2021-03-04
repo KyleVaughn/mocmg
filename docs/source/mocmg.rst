@@ -58,5 +58,7 @@ Functions
    :nosignatures:
    :template: myfunction.rst
 
+
+   mocmg.mesh.make_gridmesh
    mocmg.mesh.read_abaqus_file
    mocmg.mesh.write_xdmf_file
