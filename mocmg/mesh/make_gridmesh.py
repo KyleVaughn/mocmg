@@ -117,11 +117,39 @@ def make_gridmesh(mesh):
                 cells_set = set(mesh.cell_sets[set_name])
                 intersection_cells = grid_cells_set.intersection(cells_set)
                 if intersection_cells:
-                    cell_sets[set_name] = np.array(intersection_cells)
+                    cell_sets[set_name] = np.array(list(intersection_cells))
 
         # Initialize the mesh object
         high_level_meshes.append(GridMesh(vertices, cells, cell_sets, name=name))
 
-    for grid_mesh in high_level_meshes:
-        print(grid_mesh.name)
-    # Do grids as names on meshes
+    # Construct the mesh hierarchy
+    child_nodes = next_nodes
+    child_meshes = high_level_meshes
+    parent_nodes = []
+    parent_meshes = []
+    for _level in range(max_level - 1, 0, -1):
+        # Gather all parents
+        for node in child_nodes:
+            parent_node = node.parent
+            if parent_node not in parent_nodes:
+                parent_nodes.append(parent_node)
+        # Create meshes for parent meshes
+        for node in parent_nodes:
+            node_children_names = [node_child.name for node_child in node.children]
+            mesh_children = []
+            for mesh in child_meshes:
+                if mesh.name in node_children_names:
+                    mesh_children.append(mesh)
+
+            #            print(node.name, [child.name for child in mesh_children])
+            parent_meshes.append(GridMesh(children=mesh_children, name=node.name))
+
+        child_nodes = copy.deepcopy(parent_nodes)
+        child_meshes = copy.deepcopy(parent_meshes)
+        parent_nodes = []
+        parent_meshes = []
+
+    # Add L1 to root
+    root_mesh = GridMesh(children=child_meshes, name=root.name)
+
+    return root_mesh

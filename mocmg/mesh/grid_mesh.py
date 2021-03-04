@@ -92,6 +92,9 @@ class GridMesh(Mesh):
 
         if children:
             self.name = name
+            self.vertices = None
+            self.cells = None
+            self.cell_sets = None
             self.children = children
             for child in children:
                 module_log.require(
