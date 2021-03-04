@@ -66,8 +66,8 @@ def make_gridmesh(mesh):
                     node_cells = set(mesh.cell_sets[node.name])
                     if grid_cells.issubset(node_cells):
                         next_nodes.append(Node(grid_name, parent=node))
+                        grid_names.remove(grid_name)
                         break
-                grid_names.remove(grid_name)
 
     # Render the tree
     # for pre, fill, node in RenderTree(root):
@@ -141,7 +141,6 @@ def make_gridmesh(mesh):
                 if mesh.name in node_children_names:
                     mesh_children.append(mesh)
 
-            #            print(node.name, [child.name for child in mesh_children])
             parent_meshes.append(GridMesh(children=mesh_children, name=node.name))
 
         child_nodes = copy.deepcopy(parent_nodes)
