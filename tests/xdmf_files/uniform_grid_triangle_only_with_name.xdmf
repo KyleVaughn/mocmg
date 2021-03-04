@@ -1,0 +1,12 @@
+<Xdmf Version="3.0">
+  <Domain>
+    <Grid Name="named_mesh" GridType="Uniform">
+      <Geometry GeometryType="XYZ">
+        <DataItem DataType="Float" Dimensions="8 3" Format="HDF" Precision="8">uniform_grid_triangle_only_with_name.h5:/named_mesh/vertices</DataItem>
+      </Geometry>
+      <Topology TopologyType="Triangle" NumberOfElements="7" NodesPerElement="3">
+        <DataItem DataType="Int" Dimensions="7 3" Format="HDF" Precision="8">uniform_grid_triangle_only_with_name.h5:/named_mesh/cells</DataItem>
+      </Topology>
+    </Grid>
+  </Domain>
+</Xdmf>

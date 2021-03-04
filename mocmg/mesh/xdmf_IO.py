@@ -6,6 +6,8 @@ import h5py
 import lxml.etree as etree
 import numpy as np
 
+from mocmg.mesh import GridMesh, Mesh
+
 module_log = logging.getLogger(__name__)
 
 numpy_to_xdmf_dtype = {
@@ -37,6 +39,12 @@ topo_type_to_xdmf_int = {v: k for k, v in xdmf_int_to_topo_type.items()}
 def write_xdmf_file(filename, mesh, compression_opts=4):
     """Write a mesh object into an XDMF file.
 
+    Note that if a mesh has any materials, it is assumed that every cell has a material.
+    A :class:`mocmg.mesh.Mesh` is written as one uniform grid without a mesh hierarchy.
+    A :class:`mocmg.mesh.GridMesh` is assumed to be partitioned by cell sets of the 'GRID' form.
+    The GridMesh is written in the XDMF as a tree of the child meshes.
+    See the GridMesh docstring for more info.
+
     Args:
         filename (str) : File name of the form 'name.xdmf'.
 
@@ -46,38 +54,30 @@ def write_xdmf_file(filename, mesh, compression_opts=4):
 
     """
     module_log.info(f"Writing mesh data to XDMF file '{filename}'.")
-    vertices = mesh.vertices
-    cells = mesh.cells
-    cell_sets = mesh.cell_sets
+    if isinstance(mesh, Mesh):
+        vertices = mesh.vertices
+        cells = mesh.cells
+        cell_sets = mesh.cell_sets
 
-    h5_filename = os.path.splitext(filename)[0] + ".h5"
-    h5_file = h5py.File(h5_filename, "w")
+        h5_filename = os.path.splitext(filename)[0] + ".h5"
+        h5_file = h5py.File(h5_filename, "w")
 
-    xdmf_file = etree.Element("Xdmf", Version="3.0")
-    domain = etree.SubElement(xdmf_file, "Domain")
+        xdmf_file = etree.Element("Xdmf", Version="3.0")
+        domain = etree.SubElement(xdmf_file, "Domain")
 
-    # If no cell sets, just write one uniform grid.
-    if cell_sets == {}:
-        _add_uniform_grid(
-            [os.path.splitext(filename)[0]],
-            domain,
-            h5_filename,
-            h5_file,
-            vertices,
-            cells,
-            cell_sets,
-            [],
-            compression_opts,
-        )
-    else:
         material_names, material_cells = _get_material_sets(cell_sets)
         if material_names:
             # print the material names before any grids
             material_information = etree.SubElement(domain, "Information", Name="MaterialNames")
             material_information.text = " ".join(material_names)
 
+        if mesh.name != "":
+            name = mesh.name
+        else:
+            name = [os.path.splitext(filename)[0]][-1]
+
         _add_uniform_grid(
-            [os.path.splitext(filename)[0]],
+            name,
             domain,
             h5_filename,
             h5_file,
@@ -88,9 +88,14 @@ def write_xdmf_file(filename, mesh, compression_opts=4):
             compression_opts,
         )
 
-    tree = etree.ElementTree(xdmf_file)
-    tree.write(filename, pretty_print=True)
-    h5_file.close()
+        tree = etree.ElementTree(xdmf_file)
+        tree.write(filename, pretty_print=True)
+        h5_file.close()
+
+    elif isinstance(mesh, GridMesh):
+        print("gridmesh")
+    else:
+        module_log.error("Invalid type given as input.")
 
 
 def _add_uniform_grid(
@@ -106,9 +111,9 @@ def _add_uniform_grid(
 ):
     """Add a uniform grid to the xml element and write the h5 data."""
     # Name is basically group list
-    grid = etree.SubElement(xml_element, "Grid", Name=name[-1], GridType="Uniform")
+    grid = etree.SubElement(xml_element, "Grid", Name=name, GridType="Uniform")
     # Create group for name
-    this_h5_group = h5_group.create_group(name[-1])
+    this_h5_group = h5_group.create_group(name)
     _add_geometry(grid, h5_filename, this_h5_group, vertices, compression_opts)
     _add_topology(grid, h5_filename, this_h5_group, vertices, cells, compression_opts)
     if material_cells:
@@ -151,11 +156,12 @@ def _get_material_sets(cell_sets):
     """Get the cell sets that are materials."""
     material_names = []
     material_cells = []
-    set_names = list(cell_sets.keys())
-    for set_name in set_names:
-        if "MATERIAL" in set_name.upper():
-            material_names.append(set_name.replace(" ", "_").upper())
-            material_cells.append(cell_sets.pop(set_name))
+    if cell_sets:
+        set_names = list(cell_sets.keys())
+        for set_name in set_names:
+            if "MATERIAL" in set_name.upper():
+                material_names.append(set_name.replace(" ", "_").upper())
+                material_cells.append(cell_sets.pop(set_name))
 
     return material_names, material_cells
 
@@ -259,7 +265,7 @@ def _add_materials(grid, h5_filename, h5_group, cells, material_cells, compressi
     material_array = np.zeros(total_num_cells, dtype=np.int64) - 1
     mat_ctr = 0
     # If any cell has multiple materials this is going to give index out of bounds.
-    # Add check for multiple mat cells, but no cell should have multiple materials
+    # TODO: Add check for multiple mat cells, but no cell should have multiple materials
     for cell_type in cells.keys():
         for cell in cells[cell_type].keys():
             for i, material in enumerate(material_cells):
@@ -269,7 +275,8 @@ def _add_materials(grid, h5_filename, h5_group, cells, material_cells, compressi
 
     module_log.require(
         mat_ctr == total_num_cells,
-        "Total number of cells ({total_num_cells}) not equal to number of cells with a material ({mat_ctr}).",
+        f"Total number of cells ({total_num_cells}) not equal to "
+        + f"number of cells with a material ({mat_ctr}).",
     )
     module_log.require(all(material_array >= 0), "A cell was not assigned a material.")
     datatype, precision = numpy_to_xdmf_dtype[material_array[0].dtype.name]
