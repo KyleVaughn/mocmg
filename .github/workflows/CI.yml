@@ -32,7 +32,8 @@ jobs:
           pip install --upgrade scipy
           pip install --upgrade h5py
           pip install --upgrade gmsh-dev
-          pip install --upgrade lxml
+          pip install --upgrade lxml          
+          pip install --upgrade anytree
           pip install --upgrade isort
           pip install --upgrade black
           pip install --upgrade flake8
