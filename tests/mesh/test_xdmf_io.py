@@ -94,7 +94,7 @@ class TestXDMFIO(TestCase):
         self.assertEqual(err, err_ref)
 
         # Check xdmf
-        ref_file = open("./tests/xdmf_files/" + filename + ".xdmf", "r")
+        ref_file = open("./tests/mesh/xdmf_files/" + filename + ".xdmf", "r")
         test_file = open(filename + ".xdmf", "r")
         ref_lines = ref_file.readlines()
         test_lines = test_file.readlines()
@@ -166,7 +166,7 @@ class TestXDMFIO(TestCase):
         self.assertEqual(err, err_ref)
 
         # Check xdmf
-        ref_file = open("./tests/xdmf_files/" + filename + ".xdmf", "r")
+        ref_file = open("./tests/mesh/xdmf_files/" + filename + ".xdmf", "r")
         test_file = open(filename + ".xdmf", "r")
         ref_lines = ref_file.readlines()
         test_lines = test_file.readlines()
@@ -250,7 +250,7 @@ class TestXDMFIO(TestCase):
         self.assertEqual(err, err_ref)
 
         # Check xdmf
-        ref_file = open("./tests/xdmf_files/" + filename + ".xdmf", "r")
+        ref_file = open("./tests/mesh/xdmf_files/" + filename + ".xdmf", "r")
         test_file = open(filename + ".xdmf", "r")
         ref_lines = ref_file.readlines()
         test_lines = test_file.readlines()
@@ -303,7 +303,7 @@ class TestXDMFIO(TestCase):
         self.assertEqual(err, err_ref)
 
         # Check xdmf
-        ref_file = open("./tests/xdmf_files/" + filename + ".xdmf", "r")
+        ref_file = open("./tests/mesh/xdmf_files/" + filename + ".xdmf", "r")
         test_file = open(filename + ".xdmf", "r")
         ref_lines = ref_file.readlines()
         test_lines = test_file.readlines()
@@ -359,7 +359,7 @@ class TestXDMFIO(TestCase):
         self.assertEqual(err, err_ref)
 
         # Check xdmf
-        ref_file = open("./tests/xdmf_files/" + filename + ".xdmf", "r")
+        ref_file = open("./tests/mesh/xdmf_files/" + filename + ".xdmf", "r")
         test_file = open(filename + ".xdmf", "r")
         ref_lines = ref_file.readlines()
         test_lines = test_file.readlines()

@@ -119,7 +119,9 @@ def _create_gridmesh_tree(mesh, grid_names, name, max_level):
             if grid_level == level:
                 # find the parent for this grid
                 grid_cells = set(mesh.cell_sets[grid_name])
-                for node in current_nodes:
+                # This next for loop will always hit the break.
+                # It is therefore excluded from coverage.
+                for node in current_nodes:  # pragma: no cover
                     node_cells = set(mesh.cell_sets[node.name])
                     if grid_cells.issubset(node_cells):
                         next_nodes.append(Node(grid_name, parent=node))
