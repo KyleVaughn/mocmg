@@ -6,7 +6,13 @@ from unittest import TestCase
 
 import h5py
 import numpy as np
-from mesh_data import two_disks_tri6_quad8_cells, two_disks_tri6_quad8_vertices
+from mesh_data import (
+    three_level_grid_cell_sets,
+    three_level_grid_cells,
+    three_level_grid_vertices,
+    two_disks_tri6_quad8_cells,
+    two_disks_tri6_quad8_vertices,
+)
 
 import mocmg
 import mocmg.mesh
@@ -441,4 +447,44 @@ class TestXDMFIO(TestCase):
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)
 
+        os.remove(filename + ".h5")
+
+    def test_three_level_grid(self):
+        """Test writing a mesh with three grid levels and no materials."""
+        name = "three_lvl_grid"
+        filename = "three_level_grid"
+        ref_vertices = three_level_grid_vertices
+        ref_cells = three_level_grid_cells
+        ref_cell_sets = three_level_grid_cell_sets
+        mesh = mocmg.mesh.Mesh(ref_vertices, ref_cells, ref_cell_sets, name=name)
+        mocmg.mesh.write_xdmf_file(filename + ".xdmf", mesh)
+
+        # Check xdmf
+        ref_file = open("./tests/mesh/xdmf_files/" + filename + ".xdmf", "r")
+        test_file = open(filename + ".xdmf", "r")
+        ref_lines = ref_file.readlines()
+        test_lines = test_file.readlines()
+        ref_file.close()
+        test_file.close()
+        self.assertEqual(len(ref_lines), len(test_lines))
+        for i in range(len(ref_lines)):
+            self.assertEqual(ref_lines[i], test_lines[i])
+
+        # Check h5
+        # Reference file
+        with h5py.File("./tests/mesh/xdmf_files/" + filename + ".h5", "r") as f:
+            cells_h5_ref = np.array(f.get(name + "/cells"))
+        # Test file
+        with h5py.File(filename + ".h5", "r") as f:
+            vertices_h5 = np.array(f.get(name + "/vertices"))
+            cells_h5 = np.array(f.get(name + "/cells"))
+        # Vertices
+        for i, coord in enumerate(ref_vertices.values()):
+            for j in range(len(coord)):
+                self.assertEqual(vertices_h5[i][j], coord[j])
+        # Cells
+        for i in range(len(cells_h5_ref)):
+            self.assertEqual(cells_h5[i], cells_h5_ref[i])
+
+        os.remove(filename + ".xdmf")
         os.remove(filename + ".h5")

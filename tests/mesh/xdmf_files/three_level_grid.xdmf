@@ -1,0 +1,12 @@
+<Xdmf Version="3.0">
+  <Domain>
+    <Grid Name="three_lvl_grid" GridType="Uniform">
+      <Geometry GeometryType="XYZ">
+        <DataItem DataType="Float" Dimensions="42 3" Format="HDF" Precision="8">three_level_grid.h5:/three_lvl_grid/vertices</DataItem>
+      </Geometry>
+      <Topology TopologyType="Mixed" NumberOfElements="46">
+        <DataItem DataType="Int" Dimensions="200" Format="HDF" Precision="8">three_level_grid.h5:/three_lvl_grid/cells</DataItem>
+      </Topology>
+    </Grid>
+  </Domain>
+</Xdmf>
