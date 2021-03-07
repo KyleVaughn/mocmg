@@ -379,6 +379,7 @@ class TestXDMFIO(TestCase):
         with h5py.File(filename + ".h5", "r") as f:
             vertices_h5 = np.array(f.get(filename + "/vertices"))
             cells_h5 = np.array(f.get(filename + "/cells"))
+            materials_h5 = np.array(f.get(filename + "/material_id"))
         # Vertices
         for i, coord in enumerate(vertices.values()):
             for j in range(len(coord)):
@@ -386,6 +387,12 @@ class TestXDMFIO(TestCase):
         # Cells
         for i in range(len(cells_h5_ref)):
             self.assertEqual(cells_h5[i], cells_h5_ref[i])
+
+        # Material
+        for i in range(7):
+            self.assertEqual(materials_h5[i], 0)
+        for i in range(7, 13):
+            self.assertEqual(materials_h5[i], 1)
 
         os.remove(filename + ".xdmf")
         os.remove(filename + ".h5")
