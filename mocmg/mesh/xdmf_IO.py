@@ -54,16 +54,16 @@ def write_xdmf_file(filename, mesh, compression_opts=4):
 
     """
     module_log.info(f"Writing mesh data to XDMF file '{filename}'.")
-    if isinstance(mesh, Mesh):
-        vertices = mesh.vertices
-        cells = mesh.cells
-        cell_sets = mesh.cell_sets
-
+    if isinstance(mesh, Mesh) and not isinstance(mesh, GridMesh):
         h5_filename = os.path.splitext(filename)[0] + ".h5"
         h5_file = h5py.File(h5_filename, "w")
 
         xdmf_file = etree.Element("Xdmf", Version="3.0")
         domain = etree.SubElement(xdmf_file, "Domain")
+
+        vertices = mesh.vertices
+        cells = mesh.cells
+        cell_sets = mesh.cell_sets
 
         material_names, material_cells = _get_material_sets(cell_sets)
         if material_names:
@@ -93,7 +93,35 @@ def write_xdmf_file(filename, mesh, compression_opts=4):
         h5_file.close()
 
     elif isinstance(mesh, GridMesh):
-        print("gridmesh")
+        h5_filename = os.path.splitext(filename)[0] + ".h5"
+        h5_file = h5py.File(h5_filename, "w")
+
+        xdmf_file = etree.Element("Xdmf", Version="3.0")
+        domain = etree.SubElement(xdmf_file, "Domain")
+
+        #        material_names, material_cells = _get_material_sets(cell_sets)
+        #        if material_names:
+        #            # print the material names before any grids
+        #            material_information = etree.SubElement(domain, "Information", Name="MaterialNames")
+        #            material_information.text = " ".join(material_names)
+
+        if mesh.name != "":
+            name = mesh.name
+        else:
+            name = [os.path.splitext(filename)[0]][-1]
+
+        # Add top level
+        root = etree.SubElement(domain, "Grid", Name=name, GridType="Tree")
+
+        # Add all other levels
+        _add_gridmesh_levels(
+            [(root, h5_file, mesh)], h5_filename, compression_opts=compression_opts
+        )
+
+        tree = etree.ElementTree(xdmf_file)
+        tree.write(filename, pretty_print=True)
+        h5_file.close()
+
     else:
         module_log.error("Invalid type given as input.")
 
@@ -336,3 +364,32 @@ def _add_cell_sets(grid, h5_filename, h5_group, cells, cell_sets, compression_op
             compression_opts=compression_opts,
         )
         set_data_item.text = os.path.basename(h5_filename) + ":" + h5_group.name + "/" + set_name
+
+
+def _add_gridmesh_levels(xml_h5_mesh_list, h5_filename, compression_opts=4):
+    child_list = []
+    for xml_tree, h5_file, mesh in xml_h5_mesh_list:
+        print(mesh.name)
+        if mesh.children is not None:
+            # If there are children, create a tree for them and add to child list
+            for child_mesh in mesh.children:
+                child_xml_tree = etree.SubElement(
+                    xml_tree, "Grid", Name=child_mesh.name, GridType="Tree"
+                )
+                child_list.append((child_xml_tree, h5_file, child_mesh))
+        else:
+            # If there are not children, this must be the bottom level. Write the data
+            _add_uniform_grid(
+                mesh.name,
+                xml_tree,
+                h5_filename,
+                h5_file,
+                mesh.vertices,
+                mesh.cells,
+                mesh.cell_sets,
+                [],
+                compression_opts,
+            )
+
+    if child_list:
+        _add_gridmesh_levels(child_list, h5_filename, compression_opts)

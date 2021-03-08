@@ -509,3 +509,59 @@ class TestXDMFIO(TestCase):
 
         os.remove(filename + ".xdmf")
         os.remove(filename + ".h5")
+
+    def test_gridmesh_three_level_grid(self):
+        """Test writing a GridMesh with three grid levels and no materials."""
+        name = "three_lvl_grid"
+        filename = "gridmesh_three_level_grid"
+        ref_vertices = three_level_grid_vertices
+        ref_cells = three_level_grid_cells
+        ref_cell_sets = three_level_grid_cell_sets
+        mesh = mocmg.mesh.Mesh(ref_vertices, ref_cells, ref_cell_sets, name=name)
+        gridmesh = mocmg.mesh.make_gridmesh(mesh)
+        mocmg.mesh.write_xdmf_file(filename + ".xdmf", gridmesh)
+
+        # Check xdmf
+        ref_file = open("./tests/mesh/xdmf_files/" + filename + ".xdmf", "r")
+        test_file = open(filename + ".xdmf", "r")
+        ref_lines = ref_file.readlines()
+        test_lines = test_file.readlines()
+        ref_file.close()
+        test_file.close()
+        self.assertEqual(len(ref_lines), len(test_lines))
+        for i in range(len(ref_lines)):
+            self.assertEqual(ref_lines[i], test_lines[i])
+
+        # Check h5
+        # Reference file
+        with h5py.File("./tests/mesh/xdmf_files/" + filename + ".h5", "r") as f:
+            cells_h5_ref = np.array(f.get(name + "/cells"))
+        # Test file
+        with h5py.File(filename + ".h5", "r") as f:
+            vertices_h5 = np.array(f.get(name + "/vertices"))
+            cells_h5 = np.array(f.get(name + "/cells"))
+        # Vertices
+        for i, coord in enumerate(ref_vertices.values()):
+            for j in range(len(coord)):
+                self.assertEqual(vertices_h5[i][j], coord[j])
+        # Cells
+        for i in range(len(cells_h5_ref)):
+            self.assertEqual(cells_h5[i], cells_h5_ref[i])
+
+        # Cell sets
+        cell_id_map = {}
+        cell_ctr = 0
+        for cell_type in ref_cells.keys():
+            for cell_id in ref_cells[cell_type].keys():
+                cell_id_map[cell_id] = cell_ctr
+                cell_ctr = cell_ctr + 1
+
+        with h5py.File(filename + ".h5", "r") as f:
+            for set_name in ref_cell_sets.keys():
+                set_cells_h5 = np.array(f.get(name + "/" + set_name))
+                for i, cell_id in enumerate(ref_cell_sets[set_name]):
+                    self.assertEqual(cell_id_map[cell_id], set_cells_h5[i])
+
+
+#        os.remove(filename + ".xdmf")
+#        os.remove(filename + ".h5")

@@ -104,3 +104,4 @@ class GridMesh(Mesh):
                 child.parent = self
         else:
             super().__init__(vertices, cells, cell_sets, name)
+            self.children = None
