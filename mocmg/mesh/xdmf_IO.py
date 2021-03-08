@@ -226,13 +226,17 @@ def _make_global_material_id_map(mesh):
                     material_name_map[set_name.replace(" ", "_").upper()] = material_ctr
                     material_ctr = material_ctr + 1
 
-    #    if material_ctr > 0:
-    #        module_log.info("Material Name        : Material ID")
-    #        module_log.info("==================================")
-    #        for mat_name in list(material_name_map.keys()):
-    #            module_log.info(f"{mat_name.ljust(20)} : {material_name_map[mat_name]}")
+    _print_material_names_and_ids(material_ctr, material_name_map)
 
     return material_name_map, material_ctr
+
+
+def _print_material_names_and_ids(material_ctr, material_name_map):
+    if material_ctr > 0:
+        module_log.info("Material Name        : Material ID")
+        module_log.info("==================================")
+        for mat_name in list(material_name_map.keys()):
+            module_log.info(f"{mat_name.ljust(20)} : {material_name_map[mat_name]}")
 
 
 def _get_material_sets(cell_sets):
