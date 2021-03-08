@@ -1,0 +1,16 @@
+<Xdmf Version="3.0">
+  <Domain>
+    <Information Name="MaterialNames">MATERIAL_DISK1 MATERIAL_DISK2</Information>
+    <Grid Name="mixed_topology_disks_with_materials" GridType="Uniform">
+      <Geometry GeometryType="XYZ">
+        <DataItem DataType="Float" Dimensions="49 3" Format="HDF" Precision="8">mixed_topology_disks_with_materials.h5:/mixed_topology_disks_with_materials/vertices</DataItem>
+      </Geometry>
+      <Topology TopologyType="Mixed" NumberOfElements="13">
+        <DataItem DataType="Int" Dimensions="103" Format="HDF" Precision="8">mixed_topology_disks_with_materials.h5:/mixed_topology_disks_with_materials/cells</DataItem>
+      </Topology>
+      <Attribute Center="Cell" Name="MaterialID">
+        <DataItem DataType="Int" Dimensions="13" Format="HDF" Precision="8">mixed_topology_disks_with_materials.h5:/mixed_topology_disks_with_materials/material_id</DataItem>
+      </Attribute>
+    </Grid>
+  </Domain>
+</Xdmf>

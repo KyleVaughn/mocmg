@@ -65,7 +65,7 @@ def write_xdmf_file(filename, mesh, compression_opts=4):
         cells = mesh.cells
         cell_sets = mesh.cell_sets
 
-        material_name_map, material_ctr = _make_global_material_id_map(cell_sets)
+        material_name_map, material_ctr = _make_global_material_id_map(mesh)
 
         if material_ctr > 0:
             # print the material names before any grids
@@ -86,6 +86,7 @@ def write_xdmf_file(filename, mesh, compression_opts=4):
             vertices,
             cells,
             cell_sets,
+            material_name_map,
             compression_opts,
         )
 
@@ -100,23 +101,25 @@ def write_xdmf_file(filename, mesh, compression_opts=4):
         xdmf_file = etree.Element("Xdmf", Version="3.0")
         domain = etree.SubElement(xdmf_file, "Domain")
 
-        #        material_names, material_cells = _get_material_sets(cell_sets)
-        #        if material_names:
-        #            # print the material names before any grids
-        #            material_information = etree.SubElement(domain, "Information", Name="MaterialNames")
-        #            material_information.text = " ".join(material_names)
+        material_name_map, material_ctr = _make_global_material_id_map(mesh)
 
-        if mesh.name != "":
-            name = mesh.name
-        else:
-            name = [os.path.splitext(filename)[0]][-1]
+        if material_ctr > 0:
+            # print the material names before any grids
+            material_names = list(material_name_map.keys())
+            material_information = etree.SubElement(domain, "Information", Name="MaterialNames")
+            material_information.text = " ".join(material_names)
+
+        name = mesh.name
 
         # Add top level
         root = etree.SubElement(domain, "Grid", Name=name, GridType="Tree")
 
         # Add all other levels
         _add_gridmesh_levels(
-            [(root, h5_file, mesh)], h5_filename, compression_opts=compression_opts
+            [(root, h5_file, mesh)],
+            h5_filename,
+            material_name_map,
+            compression_opts=compression_opts,
         )
 
         tree = etree.ElementTree(xdmf_file)
@@ -135,6 +138,7 @@ def _add_uniform_grid(
     vertices,
     cells,
     cell_sets,
+    material_name_map,
     compression_opts,
 ):
     """Add a uniform grid to the xml element and write the h5 data."""
@@ -148,7 +152,16 @@ def _add_uniform_grid(
     if cell_sets:
         _add_cell_sets(grid, h5_filename, this_h5_group, cells, cell_sets, compression_opts)
     if material_cells:
-        _add_materials(grid, h5_filename, this_h5_group, cells, material_cells, compression_opts)
+        _add_materials(
+            grid,
+            h5_filename,
+            this_h5_group,
+            cells,
+            material_name_map,
+            material_names,
+            material_cells,
+            compression_opts,
+        )
 
 
 def _add_geometry(grid, h5_filename, h5_group, vertices, compression_opts):
@@ -183,16 +196,41 @@ def _map_to_0_index(keys):
     return key_map
 
 
-def _make_global_material_id_map(cell_sets):
+def _make_global_material_id_map(mesh):
     """Generate a map from material name to integer ID."""
     material_name_map = {}
     material_ctr = 0
-    if cell_sets:
-        set_names = list(cell_sets.keys())
-        for set_name in set_names:
-            if "MATERIAL" in set_name.upper():
-                material_name_map[set_name.replace(" ", "_").upper()] = material_ctr
-                material_ctr = material_ctr + 1
+    if isinstance(mesh, GridMesh):
+        # Get the leaves
+        mesh_children = [mesh]
+        next_mesh_children = []
+        leaves_reached = False
+        while not leaves_reached:
+            for child_mesh in mesh_children:
+                if child_mesh.children is not None:
+                    next_mesh_children.extend(child_mesh.children)
+                else:
+                    leaves_reached = True
+            if not leaves_reached:
+                mesh_children = next_mesh_children
+                next_mesh_children = []
+    else:
+        mesh_children = [mesh]
+
+    for child_mesh in mesh_children:
+        cell_sets = child_mesh.cell_sets
+        if cell_sets:
+            set_names = list(cell_sets.keys())
+            for set_name in set_names:
+                if ("MATERIAL" in set_name.upper()) and (set_name.upper() not in material_name_map):
+                    material_name_map[set_name.replace(" ", "_").upper()] = material_ctr
+                    material_ctr = material_ctr + 1
+
+    #    if material_ctr > 0:
+    #        module_log.info("Material Name        : Material ID")
+    #        module_log.info("==================================")
+    #        for mat_name in list(material_name_map.keys()):
+    #            module_log.info(f"{mat_name.ljust(20)} : {material_name_map[mat_name]}")
 
     return material_name_map, material_ctr
 
@@ -298,7 +336,16 @@ def _add_topology(grid, h5_filename, h5_group, vertices, cells, compression_opts
         topo_data_item.text = os.path.basename(h5_filename) + ":" + h5_group.name + "/cells"
 
 
-def _add_materials(grid, h5_filename, h5_group, cells, material_cells, compression_opts):
+def _add_materials(
+    grid,
+    h5_filename,
+    h5_group,
+    cells,
+    material_name_map,
+    material_names,
+    material_cells,
+    compression_opts,
+):
     """Add materials in an attribute block."""
     material_attribute = etree.SubElement(
         grid,
@@ -313,9 +360,9 @@ def _add_materials(grid, h5_filename, h5_group, cells, material_cells, compressi
     # TODO: Add check for multiple mat cells, but no cell should have multiple materials
     for cell_type in cells.keys():
         for cell in cells[cell_type].keys():
-            for i, material in enumerate(material_cells):
-                if cell in material:
-                    material_array[mat_ctr] = i
+            for i, material in enumerate(material_names):
+                if cell in material_cells[i]:
+                    material_array[mat_ctr] = material_name_map[material]
                     mat_ctr = mat_ctr + 1
 
     module_log.require(
@@ -381,7 +428,7 @@ def _add_cell_sets(grid, h5_filename, h5_group, cells, cell_sets, compression_op
         set_data_item.text = os.path.basename(h5_filename) + ":" + h5_group.name + "/" + set_name
 
 
-def _add_gridmesh_levels(xml_h5_mesh_list, h5_filename, compression_opts=4):
+def _add_gridmesh_levels(xml_h5_mesh_list, h5_filename, material_name_map, compression_opts=4):
     child_list = []
     for xml_tree, h5_file, mesh in xml_h5_mesh_list:
         if mesh.children is not None:
@@ -401,8 +448,9 @@ def _add_gridmesh_levels(xml_h5_mesh_list, h5_filename, compression_opts=4):
                 mesh.vertices,
                 mesh.cells,
                 mesh.cell_sets,
+                material_name_map,
                 compression_opts,
             )
 
     if child_list:
-        _add_gridmesh_levels(child_list, h5_filename, compression_opts)
+        _add_gridmesh_levels(child_list, h5_filename, material_name_map, compression_opts)

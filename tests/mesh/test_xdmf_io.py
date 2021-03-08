@@ -2,11 +2,15 @@
 
 import os
 import sys
+from copy import deepcopy
 from unittest import TestCase
 
 import h5py
 import numpy as np
 from mesh_data import (
+    pin_1and2_cell_sets,
+    pin_1and2_cells,
+    pin_1and2_vertices,
     three_level_grid_cell_sets,
     three_level_grid_cells,
     three_level_grid_vertices,
@@ -347,7 +351,11 @@ class TestXDMFIO(TestCase):
         out_ref = [
             "INFO      : mocmg.mesh.xdmf_IO - Writing mesh data to XDMF file '"
             + filename
-            + ".xdmf'."
+            + ".xdmf'.",
+            "INFO      : mocmg.mesh.xdmf_IO - Material Name        : Material ID",
+            "INFO      : mocmg.mesh.xdmf_IO - ==================================",
+            "INFO      : mocmg.mesh.xdmf_IO - MATERIAL_DISK1       : 0",
+            "INFO      : mocmg.mesh.xdmf_IO - MATERIAL_DISK2       : 1",
         ]
         err_ref = []
         with captured_output() as (out, err):
@@ -433,7 +441,11 @@ class TestXDMFIO(TestCase):
         out_ref = [
             "INFO      : mocmg.mesh.xdmf_IO - Writing mesh data to XDMF file '"
             + filename
-            + ".xdmf'."
+            + ".xdmf'.",
+            "INFO      : mocmg.mesh.xdmf_IO - Material Name        : Material ID",
+            "INFO      : mocmg.mesh.xdmf_IO - ==================================",
+            "INFO      : mocmg.mesh.xdmf_IO - MATERIAL_DISK1       : 0",
+            "INFO      : mocmg.mesh.xdmf_IO - MATERIAL_DISK2       : 1",
         ]
         err_ref = [
             "ERROR     : mocmg.mesh.xdmf_IO - Total number of cells (13) not "
@@ -542,6 +554,53 @@ class TestXDMFIO(TestCase):
         with h5py.File(filename + ".h5", "r") as f:
             vertices_h5 = np.array(f.get("/GRID_L3_3_3/vertices"))
             cells_h5 = np.array(f.get("/GRID_L3_3_3/cells"))
+        # Vertices
+        for i, coord in enumerate(vertices_h5_ref):
+            for j in range(len(coord)):
+                self.assertEqual(vertices_h5[i][j], coord[j])
+        # Cells
+        for i in range(len(cells_h5_ref)):
+            for j in range(len(cells_h5_ref[i])):
+                self.assertEqual(cells_h5[i][j], cells_h5_ref[i][j])
+
+        os.remove(filename + ".xdmf")
+        os.remove(filename + ".h5")
+
+    def test_gridmesh_two_pins(self):
+        """Test writing a GridMesh for two pins with materials."""
+        pin_1and2_cell_sets_1_level = deepcopy(pin_1and2_cell_sets)
+        pin_1and2_cell_sets_1_level.pop("GRID_L1_1_1")
+        pin_1and2_cell_sets_1_level["GRID_L1_1_1"] = pin_1and2_cell_sets_1_level.pop("GRID_L2_1_1")
+        pin_1and2_cell_sets_1_level["GRID_L1_2_1"] = pin_1and2_cell_sets_1_level.pop("GRID_L2_2_1")
+        filename = "gridmesh_two_pins"
+        ref_vertices = pin_1and2_vertices
+        ref_cells = pin_1and2_cells
+        ref_cell_sets = pin_1and2_cell_sets_1_level
+        mesh = mocmg.mesh.Mesh(ref_vertices, ref_cells, ref_cell_sets)
+        gridmesh = mocmg.mesh.make_gridmesh(mesh)
+        mocmg.mesh.write_xdmf_file(filename + ".xdmf", gridmesh)
+
+        # Check xdmf
+        ref_file = open("./tests/mesh/xdmf_files/" + filename + ".xdmf", "r")
+        test_file = open(filename + ".xdmf", "r")
+        ref_lines = ref_file.readlines()
+        test_lines = test_file.readlines()
+        ref_file.close()
+        test_file.close()
+        self.assertEqual(len(ref_lines), len(test_lines))
+        for i in range(len(ref_lines)):
+            self.assertEqual(ref_lines[i], test_lines[i])
+
+        # Check h5
+        # Just spot check since this become tedious
+        # Reference file
+        with h5py.File("./tests/mesh/xdmf_files/" + filename + ".h5", "r") as f:
+            vertices_h5_ref = np.array(f.get("/GRID_L1_1_1/vertices"))
+            cells_h5_ref = np.array(f.get("/GRID_L1_1_1/cells"))
+        # Test file
+        with h5py.File(filename + ".h5", "r") as f:
+            vertices_h5 = np.array(f.get("/GRID_L1_1_1/vertices"))
+            cells_h5 = np.array(f.get("/GRID_L1_1_1/cells"))
         # Vertices
         for i, coord in enumerate(vertices_h5_ref):
             for j in range(len(coord)):
