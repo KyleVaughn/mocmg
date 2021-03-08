@@ -65,9 +65,11 @@ def write_xdmf_file(filename, mesh, compression_opts=4):
         cells = mesh.cells
         cell_sets = mesh.cell_sets
 
-        material_names, material_cells = _get_material_sets(cell_sets)
-        if material_names:
+        material_name_map, material_ctr = _make_global_material_id_map(cell_sets)
+
+        if material_ctr > 0:
             # print the material names before any grids
+            material_names = list(material_name_map.keys())
             material_information = etree.SubElement(domain, "Information", Name="MaterialNames")
             material_information.text = " ".join(material_names)
 
@@ -84,7 +86,6 @@ def write_xdmf_file(filename, mesh, compression_opts=4):
             vertices,
             cells,
             cell_sets,
-            material_cells,
             compression_opts,
         )
 
@@ -134,13 +135,13 @@ def _add_uniform_grid(
     vertices,
     cells,
     cell_sets,
-    material_cells,
     compression_opts,
 ):
     """Add a uniform grid to the xml element and write the h5 data."""
     # Name is basically group list
     grid = etree.SubElement(xml_element, "Grid", Name=name, GridType="Uniform")
     # Create group for name
+    material_names, material_cells = _get_material_sets(cell_sets)
     this_h5_group = h5_group.create_group(name)
     _add_geometry(grid, h5_filename, this_h5_group, vertices, compression_opts)
     _add_topology(grid, h5_filename, this_h5_group, vertices, cells, compression_opts)
@@ -180,6 +181,20 @@ def _map_to_0_index(keys):
     for i, key in enumerate(list_keys):
         key_map[key] = i
     return key_map
+
+
+def _make_global_material_id_map(cell_sets):
+    """Generate a map from material name to integer ID."""
+    material_name_map = {}
+    material_ctr = 0
+    if cell_sets:
+        set_names = list(cell_sets.keys())
+        for set_name in set_names:
+            if "MATERIAL" in set_name.upper():
+                material_name_map[set_name.replace(" ", "_").upper()] = material_ctr
+                material_ctr = material_ctr + 1
+
+    return material_name_map, material_ctr
 
 
 def _get_material_sets(cell_sets):
@@ -369,7 +384,6 @@ def _add_cell_sets(grid, h5_filename, h5_group, cells, cell_sets, compression_op
 def _add_gridmesh_levels(xml_h5_mesh_list, h5_filename, compression_opts=4):
     child_list = []
     for xml_tree, h5_file, mesh in xml_h5_mesh_list:
-        print(mesh.name)
         if mesh.children is not None:
             # If there are children, create a tree for them and add to child list
             for child_mesh in mesh.children:
@@ -387,7 +401,6 @@ def _add_gridmesh_levels(xml_h5_mesh_list, h5_filename, compression_opts=4):
                 mesh.vertices,
                 mesh.cells,
                 mesh.cell_sets,
-                [],
                 compression_opts,
             )
 
