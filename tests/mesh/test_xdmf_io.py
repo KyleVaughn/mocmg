@@ -493,5 +493,19 @@ class TestXDMFIO(TestCase):
         for i in range(len(cells_h5_ref)):
             self.assertEqual(cells_h5[i], cells_h5_ref[i])
 
+        # Cell sets
+        cell_id_map = {}
+        cell_ctr = 0
+        for cell_type in ref_cells.keys():
+            for cell_id in ref_cells[cell_type].keys():
+                cell_id_map[cell_id] = cell_ctr
+                cell_ctr = cell_ctr + 1
+
+        with h5py.File(filename + ".h5", "r") as f:
+            for set_name in ref_cell_sets.keys():
+                set_cells_h5 = np.array(f.get(name + "/" + set_name))
+                for i, cell_id in enumerate(ref_cell_sets[set_name]):
+                    self.assertEqual(cell_id_map[cell_id], set_cells_h5[i])
+
         os.remove(filename + ".xdmf")
         os.remove(filename + ".h5")

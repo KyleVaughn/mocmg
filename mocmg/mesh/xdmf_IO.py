@@ -116,6 +116,8 @@ def _add_uniform_grid(
     this_h5_group = h5_group.create_group(name)
     _add_geometry(grid, h5_filename, this_h5_group, vertices, compression_opts)
     _add_topology(grid, h5_filename, this_h5_group, vertices, cells, compression_opts)
+    if cell_sets:
+        _add_cell_sets(grid, h5_filename, this_h5_group, cells, cell_sets, compression_opts)
     if material_cells:
         _add_materials(grid, h5_filename, this_h5_group, cells, material_cells, compression_opts)
 
@@ -297,3 +299,40 @@ def _add_materials(grid, h5_filename, h5_group, cells, material_cells, compressi
     material_id_data_item.text = (
         os.path.basename(h5_filename) + ":" + h5_group.name + "/material_id"
     )
+
+
+def _add_cell_sets(grid, h5_filename, h5_group, cells, cell_sets, compression_opts):
+    """Add cells_sets in set blocks."""
+    set_names = list(cell_sets.keys())
+    # Need to map the cell ids in cell sets to how the data appears in the h5 by mapping to
+    # a 0 index array.
+    cell_id_map = {}
+    cell_ctr = 0
+    for cell_type in cells.keys():
+        for cell_id in cells[cell_type].keys():
+            cell_id_map[cell_id] = cell_ctr
+            cell_ctr = cell_ctr + 1
+
+    for set_name in set_names:
+        set_block = etree.SubElement(grid, "Set", Name=set_name, SetType="Cell")
+        set_cells = cell_sets[set_name]
+        set_cells_post_map = np.zeros(len(set_cells), dtype=np.int64)
+        for i, cell_id in enumerate(set_cells):
+            set_cells_post_map[i] = cell_id_map[cell_id]
+        datatype, precision = numpy_to_xdmf_dtype[set_cells_post_map[0].dtype.name]
+        dim = str(len(set_cells_post_map))
+        set_data_item = etree.SubElement(
+            set_block,
+            "DataItem",
+            DataType=datatype,
+            Dimensions=dim,
+            Format="HDF",
+            Precision=precision,
+        )
+        h5_group.create_dataset(
+            set_name,
+            data=set_cells_post_map,
+            compression="gzip",
+            compression_opts=compression_opts,
+        )
+        set_data_item.text = os.path.basename(h5_filename) + ":" + h5_group.name + "/" + set_name
