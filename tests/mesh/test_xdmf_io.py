@@ -533,34 +533,23 @@ class TestXDMFIO(TestCase):
             self.assertEqual(ref_lines[i], test_lines[i])
 
         # Check h5
+        # Just spot check since this become tedious
         # Reference file
         with h5py.File("./tests/mesh/xdmf_files/" + filename + ".h5", "r") as f:
-            cells_h5_ref = np.array(f.get(name + "/cells"))
+            vertices_h5_ref = np.array(f.get("/GRID_L3_3_3/vertices"))
+            cells_h5_ref = np.array(f.get("/GRID_L3_3_3/cells"))
         # Test file
         with h5py.File(filename + ".h5", "r") as f:
-            vertices_h5 = np.array(f.get(name + "/vertices"))
-            cells_h5 = np.array(f.get(name + "/cells"))
+            vertices_h5 = np.array(f.get("/GRID_L3_3_3/vertices"))
+            cells_h5 = np.array(f.get("/GRID_L3_3_3/cells"))
         # Vertices
-        for i, coord in enumerate(ref_vertices.values()):
+        for i, coord in enumerate(vertices_h5_ref):
             for j in range(len(coord)):
                 self.assertEqual(vertices_h5[i][j], coord[j])
         # Cells
         for i in range(len(cells_h5_ref)):
-            self.assertEqual(cells_h5[i], cells_h5_ref[i])
-
-        # Cell sets
-        cell_id_map = {}
-        cell_ctr = 0
-        for cell_type in ref_cells.keys():
-            for cell_id in ref_cells[cell_type].keys():
-                cell_id_map[cell_id] = cell_ctr
-                cell_ctr = cell_ctr + 1
-
-        with h5py.File(filename + ".h5", "r") as f:
-            for set_name in ref_cell_sets.keys():
-                set_cells_h5 = np.array(f.get(name + "/" + set_name))
-                for i, cell_id in enumerate(ref_cell_sets[set_name]):
-                    self.assertEqual(cell_id_map[cell_id], set_cells_h5[i])
+            for j in range(len(cells_h5_ref[i])):
+                self.assertEqual(cells_h5[i][j], cells_h5_ref[i][j])
 
         os.remove(filename + ".xdmf")
         os.remove(filename + ".h5")
