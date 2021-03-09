@@ -112,12 +112,13 @@ def write_xdmf_file(filename, mesh, compression_opts=4):
         name = mesh.name
 
         # Add top level
-        root = etree.SubElement(domain, "Grid", Name=name, GridType="Tree")
+        # root = etree.SubElement(domain, "Grid", Name=name, GridType="Tree")
 
         # Add all other levels
         _add_gridmesh_levels(
-            [(root, h5_file, mesh)],
+            [(domain, mesh)],
             h5_filename,
+            h5_file,
             material_name_map,
             compression_opts=compression_opts,
         )
@@ -432,23 +433,25 @@ def _add_cell_sets(grid, h5_filename, h5_group, cells, cell_sets, compression_op
         set_data_item.text = os.path.basename(h5_filename) + ":" + h5_group.name + "/" + set_name
 
 
-def _add_gridmesh_levels(xml_h5_mesh_list, h5_filename, material_name_map, compression_opts=4):
+def _add_gridmesh_levels(
+    xml_mesh_list, h5_filename, h5_group, material_name_map, compression_opts=4
+):
     child_list = []
-    for xml_tree, h5_file, mesh in xml_h5_mesh_list:
+    for parent_xml_tree, mesh in xml_mesh_list:
+        # If it has children, write the tree and add children to child list
         if mesh.children is not None:
-            # If there are children, create a tree for them and add to child list
+            mesh_xml_tree = etree.SubElement(
+                parent_xml_tree, "Grid", Name=mesh.name, GridType="Tree"
+            )
             for child_mesh in mesh.children:
-                child_xml_tree = etree.SubElement(
-                    xml_tree, "Grid", Name=child_mesh.name, GridType="Tree"
-                )
-                child_list.append((child_xml_tree, h5_file, child_mesh))
+                child_list.append((mesh_xml_tree, child_mesh))
         else:
             # If there are not children, this must be the bottom level. Write the data
             _add_uniform_grid(
                 mesh.name,
-                xml_tree,
+                parent_xml_tree,
                 h5_filename,
-                h5_file,
+                h5_group,
                 mesh.vertices,
                 mesh.cells,
                 mesh.cell_sets,
@@ -457,4 +460,4 @@ def _add_gridmesh_levels(xml_h5_mesh_list, h5_filename, material_name_map, compr
             )
 
     if child_list:
-        _add_gridmesh_levels(child_list, h5_filename, material_name_map, compression_opts)
+        _add_gridmesh_levels(child_list, h5_filename, h5_group, material_name_map, compression_opts)
