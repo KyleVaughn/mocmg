@@ -2,13 +2,12 @@
 
 import os
 import sys
-from copy import deepcopy
 from unittest import TestCase
 
 import h5py
 import numpy as np
 from mesh_data import (
-    pin_1and2_cell_sets,
+    pin_1and2_cell_sets_1_level,
     pin_1and2_cells,
     pin_1and2_vertices,
     three_level_grid_cell_sets,
@@ -126,7 +125,7 @@ class TestXDMFIO(TestCase):
         for cell_type in cells.values():
             for j, cell in enumerate(cell_type.values()):
                 for k in range(len(cell)):
-                    self.assertEqual(cell[k], cells_h5[j][k])
+                    self.assertEqual(cell[k] - 1, cells_h5[j][k])
 
         os.remove(filename + ".xdmf")
         os.remove(filename + ".h5")
@@ -198,7 +197,7 @@ class TestXDMFIO(TestCase):
         for cell_type in cells.values():
             for j, cell in enumerate(cell_type.values()):
                 for k in range(len(cell)):
-                    self.assertEqual(cell[k], cells_h5[j][k])
+                    self.assertEqual(cell[k] - 1, cells_h5[j][k])
 
         os.remove(filename + ".xdmf")
         os.remove(filename + ".h5")
@@ -568,10 +567,6 @@ class TestXDMFIO(TestCase):
 
     def test_gridmesh_two_pins(self):
         """Test writing a GridMesh for two pins with materials."""
-        pin_1and2_cell_sets_1_level = deepcopy(pin_1and2_cell_sets)
-        pin_1and2_cell_sets_1_level.pop("GRID_L1_1_1")
-        pin_1and2_cell_sets_1_level["GRID_L1_1_1"] = pin_1and2_cell_sets_1_level.pop("GRID_L2_1_1")
-        pin_1and2_cell_sets_1_level["GRID_L1_2_1"] = pin_1and2_cell_sets_1_level.pop("GRID_L2_2_1")
         filename = "gridmesh_two_pins"
         ref_vertices = pin_1and2_vertices
         ref_cells = pin_1and2_cells
@@ -612,3 +607,14 @@ class TestXDMFIO(TestCase):
 
         os.remove(filename + ".xdmf")
         os.remove(filename + ".h5")
+
+    def test_gridmesh_two_pins_split_level_negative(self):
+        """Test writing a GridMesh for two pins but the split level is negative."""
+        filename = "gridmesh_two_pins"
+        ref_vertices = pin_1and2_vertices
+        ref_cells = pin_1and2_cells
+        ref_cell_sets = pin_1and2_cell_sets_1_level
+        mesh = mocmg.mesh.Mesh(ref_vertices, ref_cells, ref_cell_sets)
+        gridmesh = mocmg.mesh.make_gridmesh(mesh)
+        with self.assertRaises(SystemExit):
+            mocmg.mesh.write_xdmf_file(filename + ".xdmf", gridmesh, split_level=-1)

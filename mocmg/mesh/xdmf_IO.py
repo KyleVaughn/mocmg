@@ -1,6 +1,7 @@
 """Functions for reading and writing XDMF files."""
 import logging
 import os
+from copy import deepcopy
 
 import h5py
 import lxml.etree as etree
@@ -36,7 +37,7 @@ xdmf_int_to_topo_type = {
 topo_type_to_xdmf_int = {v: k for k, v in xdmf_int_to_topo_type.items()}
 
 
-def write_xdmf_file(filename, mesh, compression_opts=4):
+def write_xdmf_file(filename, mesh, split_level=None, compression_opts=4):
     """Write a mesh object into an XDMF file.
 
     Note that if a mesh has any materials, it is assumed that every cell has a material.
@@ -50,9 +51,14 @@ def write_xdmf_file(filename, mesh, compression_opts=4):
 
         mesh (mocmg.mesh.Mesh) : The mesh object to save as an XDMF file.
 
+        split_level (int, optional) : Split the mesh into different files based on grid level provided.
+
         compression_opts (int, optional) : Compression level. May be an integer from 0 to 9, default is 4.
 
     """
+    if split_level is not None:
+        # Check that the level is appropriate
+        module_log.require(split_level > 0, "split_level must be greater that 0.")
     module_log.info(f"Writing mesh data to XDMF file '{filename}'.")
     if isinstance(mesh, Mesh) and not isinstance(mesh, GridMesh):
         h5_filename = os.path.splitext(filename)[0] + ".h5"
@@ -109,12 +115,7 @@ def write_xdmf_file(filename, mesh, compression_opts=4):
             material_information = etree.SubElement(domain, "Information", Name="MaterialNames")
             material_information.text = " ".join(material_names)
 
-        name = mesh.name
-
-        # Add top level
-        # root = etree.SubElement(domain, "Grid", Name=name, GridType="Tree")
-
-        # Add all other levels
+        # Add all grid levels
         _add_gridmesh_levels(
             [(domain, mesh)],
             h5_filename,
@@ -150,6 +151,7 @@ def _add_uniform_grid(
     this_h5_group = h5_group.create_group(name)
     _add_geometry(grid, h5_filename, this_h5_group, vertices, compression_opts)
     _add_topology(grid, h5_filename, this_h5_group, vertices, cells, compression_opts)
+
     if cell_sets:
         _add_cell_sets(grid, h5_filename, this_h5_group, cells, cell_sets, compression_opts)
     if material_cells:
@@ -263,7 +265,7 @@ def _add_topology(grid, h5_filename, h5_group, vertices, cells, compression_opts
     if len(cells) == 1:
         topo_type = list(cells.keys())[0]
         xdmf_type = topo_to_xdmf_type[topo_type][0]
-        cell_arrays = list(cells[topo_type].values())
+        cell_arrays = list(deepcopy(cells[topo_type]).values())
         # convert vertices to hdf5 local 0 index
         for i in range(len(cell_arrays)):
             for j in range(len(cell_arrays[i])):
