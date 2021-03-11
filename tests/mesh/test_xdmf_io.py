@@ -348,13 +348,14 @@ class TestXDMFIO(TestCase):
             "Material DISK2": np.array([8, 9, 10, 11, 12, 13]),
         }
         out_ref = [
-            "INFO      : mocmg.mesh.xdmf_IO - Writing mesh data to XDMF file '"
-            + filename
-            + ".xdmf'.",
+            "INFO      : mocmg.mesh.xdmf_IO - Generating global material ID map.",
             "INFO      : mocmg.mesh.xdmf_IO - Material Name        : Material ID",
             "INFO      : mocmg.mesh.xdmf_IO - ==================================",
             "INFO      : mocmg.mesh.xdmf_IO - MATERIAL_DISK1       : 0",
             "INFO      : mocmg.mesh.xdmf_IO - MATERIAL_DISK2       : 1",
+            "INFO      : mocmg.mesh.xdmf_IO - Writing mesh data to XDMF file '"
+            + filename
+            + ".xdmf'.",
         ]
         err_ref = []
         with captured_output() as (out, err):
@@ -365,9 +366,8 @@ class TestXDMFIO(TestCase):
         # message
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
         # strip times
-        out, err = [line.split(None, 1)[1] for line in out], [
-            line.split(None, 1)[1] for line in err
-        ]
+        out = [line.split(None, 1)[1] for line in out]
+        err = [line.split(None, 1)[1] for line in err]
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)
 
@@ -407,11 +407,7 @@ class TestXDMFIO(TestCase):
     def test_with_bad_type(self):
         """Test writing a non-mesh."""
         filename = "bad_type"
-        out_ref = [
-            "INFO      : mocmg.mesh.xdmf_IO - Writing mesh data to XDMF file '"
-            + filename
-            + ".xdmf'."
-        ]
+        out_ref = []
         err_ref = ["ERROR     : mocmg.mesh.xdmf_IO - Invalid type given as input."]
         with self.assertRaises(SystemExit):
             with captured_output() as (out, err):
@@ -438,13 +434,14 @@ class TestXDMFIO(TestCase):
             "Material DISK2": np.array([8, 9, 10, 11]),
         }
         out_ref = [
-            "INFO      : mocmg.mesh.xdmf_IO - Writing mesh data to XDMF file '"
-            + filename
-            + ".xdmf'.",
+            "INFO      : mocmg.mesh.xdmf_IO - Generating global material ID map.",
             "INFO      : mocmg.mesh.xdmf_IO - Material Name        : Material ID",
             "INFO      : mocmg.mesh.xdmf_IO - ==================================",
             "INFO      : mocmg.mesh.xdmf_IO - MATERIAL_DISK1       : 0",
             "INFO      : mocmg.mesh.xdmf_IO - MATERIAL_DISK2       : 1",
+            "INFO      : mocmg.mesh.xdmf_IO - Writing mesh data to XDMF file '"
+            + filename
+            + ".xdmf'.",
         ]
         err_ref = [
             "ERROR     : mocmg.mesh.xdmf_IO - Total number of cells (13) not "
@@ -459,9 +456,9 @@ class TestXDMFIO(TestCase):
         # message
         out, err = out.getvalue().splitlines(), err.getvalue().splitlines()
         # strip times
-        out, err = [line.split(None, 1)[1] for line in out], [
-            line.split(None, 1)[1] for line in [err[0]]
-        ]
+
+        out = [line.split(None, 1)[1] for line in out]
+        err = [line.split(None, 1)[1] for line in [err[0]]]
         self.assertEqual(out, out_ref)
         self.assertEqual(err, err_ref)
 
@@ -544,7 +541,7 @@ class TestXDMFIO(TestCase):
             self.assertEqual(ref_lines[i], test_lines[i])
 
         # Check h5
-        # Just spot check since this become tedious
+        # Just spot check since this can become tedious
         # Reference file
         with h5py.File("./tests/mesh/xdmf_files/" + filename + ".h5", "r") as f:
             vertices_h5_ref = np.array(f.get("/GRID_L3_3_3/vertices"))
@@ -587,11 +584,12 @@ class TestXDMFIO(TestCase):
             self.assertEqual(ref_lines[i], test_lines[i])
 
         # Check h5
-        # Just spot check since this become tedious
+        # Just spot check since this can become tedious
         # Reference file
         with h5py.File("./tests/mesh/xdmf_files/" + filename + ".h5", "r") as f:
             vertices_h5_ref = np.array(f.get("/GRID_L1_1_1/vertices"))
             cells_h5_ref = np.array(f.get("/GRID_L1_1_1/cells"))
+            materials_h5 = np.array(f.get("/GRID_L1_1_1/material_id"))
         # Test file
         with h5py.File(filename + ".h5", "r") as f:
             vertices_h5 = np.array(f.get("/GRID_L1_1_1/vertices"))
@@ -604,6 +602,13 @@ class TestXDMFIO(TestCase):
         for i in range(len(cells_h5_ref)):
             for j in range(len(cells_h5_ref[i])):
                 self.assertEqual(cells_h5[i][j], cells_h5_ref[i][j])
+
+        # Material
+        self.assertEqual(len(materials_h5), 46)
+        for i in range(7):
+            self.assertEqual(materials_h5[i], 0)
+        for i in range(7, 46):
+            self.assertEqual(materials_h5[i], 1)
 
         os.remove(filename + ".xdmf")
         os.remove(filename + ".h5")
@@ -618,3 +623,68 @@ class TestXDMFIO(TestCase):
         gridmesh = mocmg.mesh.make_gridmesh(mesh)
         with self.assertRaises(SystemExit):
             mocmg.mesh.write_xdmf_file(filename + ".xdmf", gridmesh, split_level=-1)
+
+    def test_gridmesh_two_pins_split_level_too_many(self):
+        """Test writing a GridMesh for two pins but the split level is too high."""
+        filename = "gridmesh_two_pins"
+        ref_vertices = pin_1and2_vertices
+        ref_cells = pin_1and2_cells
+        ref_cell_sets = pin_1and2_cell_sets_1_level
+        mesh = mocmg.mesh.Mesh(ref_vertices, ref_cells, ref_cell_sets)
+        gridmesh = mocmg.mesh.make_gridmesh(mesh)
+        with self.assertRaises(SystemExit):
+            mocmg.mesh.write_xdmf_file(filename + ".xdmf", gridmesh, split_level=5)
+
+    def test_gridmesh_two_pins_split_level(self):
+        """Test writing a GridMesh for two pins with materials, split at level 1."""
+        filename = "gridmesh_two_pins"
+        ref_vertices = pin_1and2_vertices
+        ref_cells = pin_1and2_cells
+        ref_cell_sets = pin_1and2_cell_sets_1_level
+        mesh = mocmg.mesh.Mesh(ref_vertices, ref_cells, ref_cell_sets)
+        gridmesh = mocmg.mesh.make_gridmesh(mesh)
+        mocmg.mesh.write_xdmf_file(filename + ".xdmf", gridmesh, split_level=1)
+
+        # Just check first pin
+        # Check xdmf
+        ref_file = open("./tests/mesh/xdmf_files/gridmesh_two_pins_GRID_L1_1_1.xdmf", "r")
+        test_file = open(filename + "_GRID_L1_1_1.xdmf", "r")
+        ref_lines = ref_file.readlines()
+        test_lines = test_file.readlines()
+        ref_file.close()
+        test_file.close()
+        self.assertEqual(len(ref_lines), len(test_lines))
+        for i in range(len(ref_lines)):
+            self.assertEqual(ref_lines[i], test_lines[i])
+
+        # Check h5
+        # Just spot check since this can become tedious
+        # Reference file
+        with h5py.File("./tests/mesh/xdmf_files/gridmesh_two_pins_GRID_L1_1_1.h5", "r") as f:
+            vertices_h5_ref = np.array(f.get("/GRID_L1_1_1/vertices"))
+            cells_h5_ref = np.array(f.get("/GRID_L1_1_1/cells"))
+            materials_h5 = np.array(f.get("/GRID_L1_1_1/material_id"))
+        # Test file
+        with h5py.File("gridmesh_two_pins_GRID_L1_1_1.h5", "r") as f:
+            vertices_h5 = np.array(f.get("/GRID_L1_1_1/vertices"))
+            cells_h5 = np.array(f.get("/GRID_L1_1_1/cells"))
+        # Vertices
+        for i, coord in enumerate(vertices_h5_ref):
+            for j in range(len(coord)):
+                self.assertEqual(vertices_h5[i][j], coord[j])
+        # Cells
+        for i in range(len(cells_h5_ref)):
+            for j in range(len(cells_h5_ref[i])):
+                self.assertEqual(cells_h5[i][j], cells_h5_ref[i][j])
+
+        # Material
+        self.assertEqual(len(materials_h5), 46)
+        for i in range(7):
+            self.assertEqual(materials_h5[i], 0)
+        for i in range(7, 46):
+            self.assertEqual(materials_h5[i], 1)
+
+        os.remove(filename + "_GRID_L1_1_1.xdmf")
+        os.remove(filename + "_GRID_L1_1_1.h5")
+        os.remove(filename + "_GRID_L1_2_1.xdmf")
+        os.remove(filename + "_GRID_L1_2_1.h5")

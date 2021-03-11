@@ -19,6 +19,7 @@ def make_gridmesh(mesh):
     Returns:
         mocmg.mesh.GridMesh: The root GridMesh object.
     """
+    module_log.info("Converting Mesh to GridMesh")
     # Process input
     set_names, grid_names, name, max_level = _process_make_gridmesh_input(mesh)
 

@@ -37,7 +37,7 @@ xdmf_int_to_topo_type = {
 topo_type_to_xdmf_int = {v: k for k, v in xdmf_int_to_topo_type.items()}
 
 
-def write_xdmf_file(filename, mesh, split_level=None, compression_opts=4):
+def write_xdmf_file(filename, mesh, split_level=None, material_name_map=None, compression_opts=4):
     """Write a mesh object into an XDMF file.
 
     Note that if a mesh has any materials, it is assumed that every cell has a material.
@@ -56,9 +56,16 @@ def write_xdmf_file(filename, mesh, split_level=None, compression_opts=4):
         compression_opts (int, optional) : Compression level. May be an integer from 0 to 9, default is 4.
 
     """
+    module_log.require(isinstance(mesh, Mesh), "Invalid type given as input.")
+
+    if material_name_map is None and (isinstance(mesh, GridMesh) or mesh.cell_sets):
+        module_log.info("Generating global material ID map.")
+        material_name_map, material_ctr = _make_global_material_id_map(mesh)
+
     if split_level is not None:
-        # Check that the level is appropriate
-        module_log.require(split_level > 0, "split_level must be greater that 0.")
+        _handle_split_level(filename, mesh, split_level, material_name_map, compression_opts)
+        return
+
     module_log.info(f"Writing mesh data to XDMF file '{filename}'.")
     if isinstance(mesh, Mesh) and not isinstance(mesh, GridMesh):
         h5_filename = os.path.splitext(filename)[0] + ".h5"
@@ -71,9 +78,7 @@ def write_xdmf_file(filename, mesh, split_level=None, compression_opts=4):
         cells = mesh.cells
         cell_sets = mesh.cell_sets
 
-        material_name_map, material_ctr = _make_global_material_id_map(mesh)
-
-        if material_ctr > 0:
+        if material_name_map:
             # print the material names before any grids
             material_names = list(material_name_map.keys())
             material_information = etree.SubElement(domain, "Information", Name="MaterialNames")
@@ -107,9 +112,7 @@ def write_xdmf_file(filename, mesh, split_level=None, compression_opts=4):
         xdmf_file = etree.Element("Xdmf", Version="3.0")
         domain = etree.SubElement(xdmf_file, "Domain")
 
-        material_name_map, material_ctr = _make_global_material_id_map(mesh)
-
-        if material_ctr > 0:
+        if material_name_map:
             # print the material names before any grids
             material_names = list(material_name_map.keys())
             material_information = etree.SubElement(domain, "Information", Name="MaterialNames")
@@ -127,9 +130,6 @@ def write_xdmf_file(filename, mesh, split_level=None, compression_opts=4):
         tree = etree.ElementTree(xdmf_file)
         tree.write(filename, pretty_print=True)
         h5_file.close()
-
-    else:
-        module_log.error("Invalid type given as input.")
 
 
 def _add_uniform_grid(
@@ -463,3 +463,36 @@ def _add_gridmesh_levels(
 
     if child_list:
         _add_gridmesh_levels(child_list, h5_filename, h5_group, material_name_map, compression_opts)
+
+
+def _handle_split_level(filename, mesh, split_level, material_name_map, compression_opts):
+    # Check that the level is appropriate
+    module_log.require(split_level >= 0, "split_level must be greater than or equal to 0.")
+    # If level is 0, write
+    if split_level == 0:
+        write_xdmf_file(
+            filename,
+            mesh,
+            split_level=None,
+            material_name_map=material_name_map,
+            compression_opts=compression_opts,
+        )
+
+    # Otherwise call next level
+    else:
+        next_mesh = mesh
+        for _i in range(split_level):
+            module_log.require(
+                next_mesh.children is not None,
+                "split_level is too high. Not enough grid levels in mesh.",
+            )
+            next_mesh = next_mesh.children[0]
+        for child in mesh.children:
+            new_filename = os.path.splitext(filename)[0] + "_" + child.name + ".xdmf"
+            write_xdmf_file(
+                new_filename,
+                child,
+                split_level=split_level - 1,
+                material_name_map=material_name_map,
+                compression_opts=compression_opts,
+            )
