@@ -9,6 +9,9 @@
         <Topology TopologyType="Triangle_6" NumberOfElements="46" NodesPerElement="6">
           <DataItem DataType="Int" Dimensions="46 6" Format="HDF" Precision="8">gridmesh_two_pins.h5:/GRID_L1_1_1/cells</DataItem>
         </Topology>
+        <Set Name="Pin_1" SetType="Cell">
+          <DataItem DataType="Int" Dimensions="46" Format="HDF" Precision="8">gridmesh_two_pins.h5:/GRID_L1_1_1/Pin_1</DataItem>
+        </Set>
         <Attribute Center="Cell" Name="MaterialID">
           <DataItem DataType="Int" Dimensions="46" Format="HDF" Precision="8">gridmesh_two_pins.h5:/GRID_L1_1_1/material_id</DataItem>
         </Attribute>
@@ -20,6 +23,9 @@
         <Topology TopologyType="Triangle_6" NumberOfElements="46" NodesPerElement="6">
           <DataItem DataType="Int" Dimensions="46 6" Format="HDF" Precision="8">gridmesh_two_pins.h5:/GRID_L1_2_1/cells</DataItem>
         </Topology>
+        <Set Name="Pin_2" SetType="Cell">
+          <DataItem DataType="Int" Dimensions="46" Format="HDF" Precision="8">gridmesh_two_pins.h5:/GRID_L1_2_1/Pin_2</DataItem>
+        </Set>
         <Attribute Center="Cell" Name="MaterialID">
           <DataItem DataType="Int" Dimensions="46" Format="HDF" Precision="8">gridmesh_two_pins.h5:/GRID_L1_2_1/material_id</DataItem>
         </Attribute>

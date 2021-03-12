@@ -589,11 +589,13 @@ class TestXDMFIO(TestCase):
         with h5py.File("./tests/mesh/xdmf_files/" + filename + ".h5", "r") as f:
             vertices_h5_ref = np.array(f.get("/GRID_L1_1_1/vertices"))
             cells_h5_ref = np.array(f.get("/GRID_L1_1_1/cells"))
-            materials_h5 = np.array(f.get("/GRID_L1_1_1/material_id"))
+            cell_set_h5_ref = np.array(f.get("/GRID_L1_1_1/Pin_1"))
         # Test file
         with h5py.File(filename + ".h5", "r") as f:
             vertices_h5 = np.array(f.get("/GRID_L1_1_1/vertices"))
             cells_h5 = np.array(f.get("/GRID_L1_1_1/cells"))
+            materials_h5 = np.array(f.get("/GRID_L1_1_1/material_id"))
+            cell_set_h5 = np.array(f.get("/GRID_L1_1_1/Pin_1"))
         # Vertices
         for i, coord in enumerate(vertices_h5_ref):
             for j in range(len(coord)):
@@ -609,6 +611,10 @@ class TestXDMFIO(TestCase):
             self.assertEqual(materials_h5[i], 0)
         for i in range(7, 46):
             self.assertEqual(materials_h5[i], 1)
+
+        # Cell sets
+        for i in range(len(cell_set_h5)):
+            self.assertEqual(cell_set_h5[i], cell_set_h5_ref[i])
 
         os.remove(filename + ".xdmf")
         os.remove(filename + ".h5")
@@ -663,11 +669,11 @@ class TestXDMFIO(TestCase):
         with h5py.File("./tests/mesh/xdmf_files/gridmesh_two_pins_GRID_L1_1_1.h5", "r") as f:
             vertices_h5_ref = np.array(f.get("/GRID_L1_1_1/vertices"))
             cells_h5_ref = np.array(f.get("/GRID_L1_1_1/cells"))
-            materials_h5 = np.array(f.get("/GRID_L1_1_1/material_id"))
         # Test file
         with h5py.File("gridmesh_two_pins_GRID_L1_1_1.h5", "r") as f:
             vertices_h5 = np.array(f.get("/GRID_L1_1_1/vertices"))
             cells_h5 = np.array(f.get("/GRID_L1_1_1/cells"))
+            materials_h5 = np.array(f.get("/GRID_L1_1_1/material_id"))
         # Vertices
         for i, coord in enumerate(vertices_h5_ref):
             for j in range(len(coord)):
