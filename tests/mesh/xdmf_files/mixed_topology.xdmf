@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='ASCII'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <Xdmf Version="3.0">
   <Domain>
     <Grid Name="mixed_topology" GridType="Uniform">

@@ -102,7 +102,7 @@ def write_xdmf_file(filename, mesh, split_level=None, material_name_map=None, co
         )
 
         tree = etree.ElementTree(xdmf_file)
-        tree.write(filename, pretty_print=True, xml_declaration=True)
+        tree.write(filename, pretty_print=True, encoding="utf-8", xml_declaration=True)
         h5_file.close()
 
     elif isinstance(mesh, GridMesh):
@@ -128,7 +128,7 @@ def write_xdmf_file(filename, mesh, split_level=None, material_name_map=None, co
         )
 
         tree = etree.ElementTree(xdmf_file)
-        tree.write(filename, pretty_print=True, xml_declaration=True)
+        tree.write(filename, pretty_print=True, encoding="utf-8", xml_declaration=True)
         h5_file.close()
 
 
