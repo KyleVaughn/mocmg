@@ -251,12 +251,8 @@ For two level non-uniform in x and y
    (2,0)                    (10,0)  (12,0)
 """
 groups_nu2 = {
-    "Grid_L1_1_1": [1, 4],
-    "Grid_L1_2_1": [2, 5],
-    "Grid_L1_3_1": [3, 6],
-    "Grid_L1_1_2": [7, 10],
-    "Grid_L1_2_2": [8, 11],
-    "Grid_L1_3_2": [9, 12],
+    "Grid_L1_1_1": [1, 2, 3, 4, 5, 6],
+    "Grid_L1_1_2": [7, 8, 9, 10, 11, 12],
     "Grid_L2_1_1": [1],
     "Grid_L2_2_1": [2],
     "Grid_L2_3_1": [3],
@@ -859,7 +855,7 @@ class TestRectangularGrid(TestCase):
         ref_areas = areas_nu2
         mocmg.initialize()
         gmsh.initialize()
-        rectangular_grid(bb_12_4, x=[[2.0, 10.0], [2.0, 10.0]], y=[[2.0], [1.0, 3.0]])
+        rectangular_grid(bb_12_4, x=[[0.0, 12.0], [2.0, 10.0]], y=[[2.0], [1.0, 3.0]])
         group_nums = gmsh.model.getPhysicalGroups()
         names = [gmsh.model.getPhysicalName(*grp) for grp in group_nums]
         ref_names = list(ref_groups.keys())

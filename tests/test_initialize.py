@@ -37,7 +37,7 @@ reference_debug_out = [
 reference_debug_err = [
     "WARNING   : tests.test_initialize - (line: 14) Warning message",
     "ERROR     : tests.test_initialize - (line: 15) Error message",
-    "ERROR     : tests.test_initialize - (line: 117) Condition not met",
+    "ERROR     : tests.test_initialize - (line: 119) Condition not met",
     "CRITICAL  : tests.test_initialize - (line: 18) Critical message",
 ]
 

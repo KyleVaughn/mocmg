@@ -113,7 +113,7 @@ def _add_require_log_level():
     """
     # Add 'requre' logger level
     def require(self, condition, message, *args, **kws):
-        if isinstance(condition, bool) or (isinstance, np.bool):
+        if isinstance(condition, bool) or isinstance(condition, np.bool_):
             if not condition:
                 # Yes, logger takes its '*args' as 'args'.
                 self.log(logging.ERROR, message, *args, **kws)

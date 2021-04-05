@@ -267,13 +267,13 @@ def rectangular_grid(bb, x=None, y=None, nx=None, ny=None, material=None):
             module_log.require(
                 abs(x[nlevels - 2][i + 1] - xval - x_diff) < 1.0e-14,
                 f"Grid level {nlevels - 1} must have equal x-divisions"
-                + " so that all modular geometry has the same size.",
+                + " so that all modular geometry have the same size.",
             )
         for i, yval in enumerate(y[nlevels - 2][:-1]):
             module_log.require(
                 abs(y[nlevels - 2][i + 1] - yval - y_diff) < 1.0e-14,
                 f"Grid level {nlevels - 1} must have equal y-divisions"
-                + " so that all modular geometry has the same size.",
+                + " so that all modular geometry have the same size.",
             )
     grid_tags_coords = _create_model_rectangular_grid(bb, x, y)
     _label_rectangular_grid(nlevels, grid_tags_coords, x, y, material)
