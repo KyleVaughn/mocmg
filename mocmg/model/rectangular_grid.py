@@ -259,6 +259,22 @@ def rectangular_grid(bb, x=None, y=None, nx=None, ny=None, material=None):
     for lvl in range(1, nlevels):
         y[lvl] = sorted(set(y[lvl - 1] + y[lvl]))
 
+    # Check that all modular geometry sizes are the same (nlevel - 1)
+    if nlevels > 1:
+        x_diff = x[nlevels - 2][1] - x[nlevels - 2][0]
+        y_diff = y[nlevels - 2][1] - y[nlevels - 2][0]
+        for i, xval in enumerate(x[nlevels - 2][:-1]):
+            module_log.require(
+                abs(x[nlevels - 2][i + 1] - xval - x_diff) < 1.0e-14,
+                f"Grid level {nlevels - 1} must have equal x-divisions"
+                + " so that all modular geometry has the same size.",
+            )
+        for i, yval in enumerate(y[nlevels - 2][:-1]):
+            module_log.require(
+                abs(y[nlevels - 2][i + 1] - yval - y_diff) < 1.0e-14,
+                f"Grid level {nlevels - 1} must have equal y-divisions"
+                + " so that all modular geometry has the same size.",
+            )
     grid_tags_coords = _create_model_rectangular_grid(bb, x, y)
     _label_rectangular_grid(nlevels, grid_tags_coords, x, y, material)
 

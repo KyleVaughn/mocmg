@@ -5,6 +5,8 @@ import logging
 import sys
 import traceback
 
+import numpy as np
+
 module_log = logging.getLogger(__name__)
 
 
@@ -111,7 +113,7 @@ def _add_require_log_level():
     """
     # Add 'requre' logger level
     def require(self, condition, message, *args, **kws):
-        if isinstance(condition, bool):
+        if isinstance(condition, bool) or (isinstance, np.bool):
             if not condition:
                 # Yes, logger takes its '*args' as 'args'.
                 self.log(logging.ERROR, message, *args, **kws)
