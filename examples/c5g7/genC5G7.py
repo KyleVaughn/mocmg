@@ -255,7 +255,22 @@ if gen_model:  # noqa: C901
 
     gmsh.write("c5g7.inp")
 mesh = mocmg.mesh.read_abaqus_file("c5g7.inp")
-gridmesh = mocmg.mesh.make_gridmesh(mesh)
-mocmg.mesh.write_xdmf_file("c5g7.xdmf", gridmesh)
+# gridmesh = mocmg.mesh.make_gridmesh(mesh)
+# mocmg.mesh.write_xdmf_file("c5g7.xdmf", mesh)
+ncells = mesh.n_cells()
+print("Number of cells: ", ncells)
+total_area = 0.0
+for i in range(1, 4):
+    for j in range(1, 4):
+        total_area = total_area + mesh.get_set_area(f"GRID_L1_0{i}_0{j}")
+uo2 = mesh.get_set_area("MATERIAL_UO2-3.3")
+mox70 = mesh.get_set_area("MATERIAL_MOX-7.0")
+mox43 = mesh.get_set_area("MATERIAL_MOX-4.3")
+mox87 = mesh.get_set_area("MATERIAL_MOX-8.7")
+fis = uo2 + mox70 + mox43 + mox87
+print(f"Total mesh area: {total_area}")
+print("Total mesh area error: ", total_area - 64.26 ** 2)
+print(f"Fissile mesh area: {fis}")
+print("Fissile mesh area error: ", fis - pi * 0.54 ** 2 * (17 ** 2 - 25) * 4, "\n")
 
 gmsh.finalize()

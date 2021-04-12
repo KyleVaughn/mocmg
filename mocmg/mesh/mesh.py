@@ -85,6 +85,17 @@ class Mesh:
         self.cell_sets = {} if cell_sets is None else cell_sets
         self.name = name
 
+    def n_cells(self):
+        """Get the number of cells in the mesh.
+
+        returns:
+            int: number of cells.
+        """
+        n_cells = 0
+        for cell_type in self.cells:
+            n_cells = n_cells + len(self.cells[cell_type])
+        return n_cells
+
     def get_cells(self, cell_set_name):
         """Get the cell ids for a given cell set name.
 
