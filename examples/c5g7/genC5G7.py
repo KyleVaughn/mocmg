@@ -9,7 +9,7 @@ pi = 3.141592653589793
 
 lc = 0.40
 lcmin = 0.04
-gen_model = False
+gen_model = True
 
 # Geometry
 # Module 1 - UO2-3.3 pin
@@ -99,6 +99,7 @@ def coord_2_id(x, y):
 
 
 gmsh.initialize()
+gmsh.option.setNumber("General.NumThreads", 4)
 mocmg.initialize()
 if gen_model:  # noqa: C901
     radius = 0.54
