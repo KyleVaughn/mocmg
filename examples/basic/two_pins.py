@@ -16,10 +16,10 @@ gmsh.model.occ.addDisk(1.0, 1.0, 0.0, 0.5, 0.5)
 gmsh.model.occ.addDisk(3.0, 1.0, 0.0, 0.5, 0.5)
 gmsh.model.occ.synchronize()
 
-p = gmsh.model.addPhysicalGroup(2, [1,2])
+p = gmsh.model.addPhysicalGroup(2, [1, 2])
 gmsh.model.setPhysicalName(2, p, "MATERIAL_UO2")
-#p = gmsh.model.addPhysicalGroup(2, [2])
-#gmsh.model.setPhysicalName(2, p, "MATERIAL_MOX")
+# p = gmsh.model.addPhysicalGroup(2, [2])
+# gmsh.model.setPhysicalName(2, p, "MATERIAL_MOX")
 
 mocmg.model.overlay_rectangular_grid(bb_42, nx=[1, 2], ny=[1, 1])
 
