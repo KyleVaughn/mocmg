@@ -100,6 +100,7 @@ def coord_2_id(x, y):
 
 gmsh.initialize()
 gmsh.option.setNumber("General.NumThreads", 4)
+gmsh.option.setNumber("Geometry.OCCParallel", 1)
 mocmg.initialize()
 if gen_model:  # noqa: C901
     radius = 0.54

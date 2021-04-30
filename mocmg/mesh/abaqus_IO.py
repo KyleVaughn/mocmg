@@ -16,6 +16,7 @@ abaqus_to_topo_type = {
     # quad
     "CPS4": "quad",
     "CPS8": "quad8",
+    "M3D9": "quad8",
 }
 
 abaqus_1d = {
@@ -84,6 +85,12 @@ def _convert_abaqus_to_topo_type(elements):
     for key in keys:
         if key in abaqus_1d:
             elements.pop(key)
+
+    # Convert T3D9 to 8 elements (remove last element)
+    for key in keys:
+        if key == "M3D9":
+            for k in elements[key].keys():
+                elements[key][k] = elements[key][k][:-1]
 
     # convert abaqus types to mesh class topological types
     keys = [k for k in elements.keys()]

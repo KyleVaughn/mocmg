@@ -1,9 +1,10 @@
+"""Generates the VERA Problem 1A benchmark mesh."""
 import gmsh
 import numpy as np
 
 import mocmg
-import mocmg.model
 import mocmg.mesh
+import mocmg.model
 
 lclist = [0.40, 0.30, 0.25, 0.20, 0.15, 0.12, 0.10]
 results = []
@@ -34,13 +35,11 @@ for lc in lclist:
     #    R_f = [R_clad_f, R_gap_f, R_fuel_f]
 
     for radius in R_f:
-        gmsh.model.occ.addDisk(
-            1.26 - 1.26/2, 1.26 - 1.26/2, 0, radius, radius
-        )
+        gmsh.model.occ.addDisk(1.26 - 1.26 / 2, 1.26 - 1.26 / 2, 0, radius, radius)
     ent = gmsh.model.occ.getEntities(2)
     gmsh.model.occ.fragment(ent, ent)
     gmsh.model.occ.synchronize()
-#    gmsh.fltk.run()
+    #    gmsh.fltk.run()
 
     # Materials
     tags_fuel = [3]
@@ -57,7 +56,7 @@ for lc in lclist:
         nx=[1], ny=[1], bb=[0, 0, 0, 1.26, 1.26, 0], material="MATERIAL_MODERATOR"
     )
     gmsh.model.occ.synchronize()
-#    gmsh.fltk.run()
+    #    gmsh.fltk.run()
 
     # Mesh
     gmsh.model.mesh.setSize(gmsh.model.getEntities(0), lc)
@@ -68,10 +67,15 @@ for lc in lclist:
     gmsh.option.setNumber("Mesh.CharacteristicLengthFromPoints", 0)
     gmsh.option.setNumber("Mesh.CharacteristicLengthFromCurvature", 0)
 
+    # Quads
     gmsh.option.setNumber("Mesh.RecombineAll", 1)
+    gmsh.option.setNumber("Mesh.Algorithm", 8)
+    gmsh.option.setNumber("Mesh.Smoothing", 1000)
     gmsh.model.mesh.generate(2)
-#    gmsh.model.mesh.setOrder(2)
-#    gmsh.model.mesh.optimize("HighOrderElastic")
+    gmsh.model.mesh.setOrder(2)
+    gmsh.model.mesh.optimize("HighOrderElastic")
+    #    gmsh.model.mesh.optimize("Relocate2D")
+    #    gmsh.model.mesh.optimize("Laplace2D")
     gmsh.fltk.run()
 
     # Convert mesh to XDMF
@@ -86,16 +90,16 @@ for lc in lclist:
     num_cells = mesh.n_cells()
     print("Number of cells: ", num_cells)
     total_mesh_area = mesh.get_set_area("GRID_L1_1_1")
-    uo2_mesh_area   = mesh.get_set_area("MATERIAL_UO2-3.1")
-    gap_mesh_area   = mesh.get_set_area("MATERIAL_GAP")
-    clad_mesh_area  = mesh.get_set_area("MATERIAL_CLAD")
-    mod_mesh_area   = mesh.get_set_area("MATERIAL_MODERATOR")
+    uo2_mesh_area = mesh.get_set_area("MATERIAL_UO2-3.1")
+    gap_mesh_area = mesh.get_set_area("MATERIAL_GAP")
+    clad_mesh_area = mesh.get_set_area("MATERIAL_CLAD")
+    mod_mesh_area = mesh.get_set_area("MATERIAL_MODERATOR")
 
     total_area = 1.26 ** 2
-    uo2_area   = np.pi * R2_f ** 2
-    gap_area   = np.pi * (R1_f ** 2 - R2_f ** 2)
-    clad_area  = np.pi * (R0_f ** 2 - R1_f ** 2)
-    mod_area   = total_area - uo2_area - gap_area - clad_area
+    uo2_area = np.pi * R2_f ** 2
+    gap_area = np.pi * (R1_f ** 2 - R2_f ** 2)
+    clad_area = np.pi * (R0_f ** 2 - R1_f ** 2)
+    mod_area = total_area - uo2_area - gap_area - clad_area
 
     print(f"\nTotal area (analytic): {total_area}")
     print(f"Total area (computed): {total_mesh_area}")
