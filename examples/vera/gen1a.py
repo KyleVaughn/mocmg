@@ -6,7 +6,8 @@ import mocmg
 import mocmg.mesh
 import mocmg.model
 
-lclist = [0.40, 0.30, 0.25, 0.20, 0.15, 0.12, 0.10]
+# lclist = [0.40, 0.30, 0.25, 0.20, 0.15, 0.12, 0.10]
+lclist = [0.40]
 results = []
 results.append(
     (
@@ -70,12 +71,10 @@ for lc in lclist:
     # Quads
     gmsh.option.setNumber("Mesh.RecombineAll", 1)
     gmsh.option.setNumber("Mesh.Algorithm", 8)
-    gmsh.option.setNumber("Mesh.Smoothing", 1000)
+    gmsh.option.setNumber("Mesh.RecombinationAlgorithm", 1)
     gmsh.model.mesh.generate(2)
     gmsh.model.mesh.setOrder(2)
-    gmsh.model.mesh.optimize("HighOrderElastic")
-    #    gmsh.model.mesh.optimize("Relocate2D")
-    #    gmsh.model.mesh.optimize("Laplace2D")
+    gmsh.model.mesh.optimize("HighOrderElastic", True)
     gmsh.fltk.run()
 
     # Convert mesh to XDMF
