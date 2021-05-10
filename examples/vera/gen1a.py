@@ -64,17 +64,56 @@ for lc in lclist:
     gmsh.model.mesh.field.add("MathEval", 1)
     gmsh.model.mesh.field.setString(1, "F", f"{lc:.6f}")
     gmsh.model.mesh.field.setAsBackgroundMesh(1)
-    gmsh.option.setNumber("Mesh.CharacteristicLengthExtendFromBoundary", 0)
-    gmsh.option.setNumber("Mesh.CharacteristicLengthFromPoints", 0)
-    gmsh.option.setNumber("Mesh.CharacteristicLengthFromCurvature", 0)
+    #    gmsh.option.setNumber("Mesh.CharacteristicLengthExtendFromBoundary", 0)
+    #    gmsh.option.setNumber("Mesh.CharacteristicLengthFromPoints", 0)
+    #    gmsh.option.setNumber("Mesh.CharacteristicLengthFromCurvature", 0)
 
     # Quads
     gmsh.option.setNumber("Mesh.RecombineAll", 1)
     gmsh.option.setNumber("Mesh.Algorithm", 8)
     gmsh.option.setNumber("Mesh.RecombinationAlgorithm", 1)
+    gmsh.option.setNumber("Mesh.CharacteristicLengthExtendFromBoundary", 0)
+    gmsh.option.setNumber("Mesh.CharacteristicLengthFromPoints", 0)
+    gmsh.option.setNumber("Mesh.CharacteristicLengthFromCurvature", 0)
+
     gmsh.model.mesh.generate(2)
+
+    # First order triangles
+    #    niter = 2
+    #    for n in range(niter):
+    #        gmsh.model.mesh.optimize("Laplace2D")
+
+    # First order quad
+    # niter = 2
+    # for n in range(niter):
+    #    gmsh.model.mesh.optimize("Laplace2D")
+    #    gmsh.model.mesh.optimize("Relocate2D")
+    #    gmsh.model.mesh.optimize("Laplace2D")
+
+    # Second order triangles
+    # gmsh.option.setNumber("Mesh.HighOrderDistCAD", 1)
+    # gmsh.model.mesh.setOrder(2)
+    # niter = 2
+    # for n in range(niter):
+    #    gmsh.model.mesh.optimize("HighOrderElastic")
+    #    gmsh.model.mesh.optimize("Relocate2D")
+    #    gmsh.model.mesh.optimize("HighOrderElastic")
+
+    # Second order quad
+    niter = 10
+    for _n in range(niter):
+        gmsh.model.mesh.optimize("Laplace2D")
+        gmsh.model.mesh.optimize("Relocate2D")
+        gmsh.model.mesh.optimize("Laplace2D")
+
+    gmsh.option.setNumber("Mesh.HighOrderDistCAD", 1)
     gmsh.model.mesh.setOrder(2)
-    gmsh.model.mesh.optimize("HighOrderElastic", True)
+    niter = 10
+    for _n in range(niter):
+        gmsh.model.mesh.optimize("HighOrderElastic")
+        gmsh.model.mesh.optimize("Relocate2D")
+        gmsh.model.mesh.optimize("HighOrderElastic")
+
     gmsh.fltk.run()
 
     # Convert mesh to XDMF
